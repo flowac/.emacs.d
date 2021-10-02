@@ -1,0 +1,6 @@
+;(autoload 'notmuch "notmuch" "notmuch mail" t)
+;(require 'notmuch)
+;(notmuch-address-message-insinuate)
+;(add-to-list 'auto-mode-alist '("sp00ky@archlinux.domain.tld" . notmuch-message-mode))
+;(require 'notmuch-address)
+; (setq notmuch-address-command "notmuch-addrlookup")
