@@ -98,6 +98,11 @@
 ;; org-mode
    `(org-level-2 ((,class (:foreground ,sp00ky-yellow))))
    `(org-level-4 ((,class (:foreground ,sp00ky-orange))))
+
+
+   `(Info-quoted ((,class
+		   (:inherit nil
+		    :foreground ,sp00ky-majenta))))
    
    ))
 

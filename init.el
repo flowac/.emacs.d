@@ -33,6 +33,7 @@
 
 (setq my-packages
       '(helm
+	undo-tree ;; can get rid of undo-tree in emacs 28, we can use undo-redo
         evil
         evil-collection
         company
@@ -49,9 +50,12 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;; Evil ;;;;;;;;;;;;;;;;
+(require 'undo-tree)
 (setq evil-want-integration t
-      evil-want-keybinding  nil)
+      evil-want-keybinding  nil
+      evil-undo-system 'undo-tree)
 (require 'evil)
+(add-hook 'evil-local-mode-hook 'turn-on-undo-tree-mode)
 (evil-mode 1)
 (evil-collection-init)
 
@@ -209,8 +213,8 @@
 ;; (define-key evil-normal-state-map "x" 'sp00ky/evil-delete-char)
 
 ;;;;;;;;; Keybindings for loaded functions
-(global-set-key [f2] 'sp00ky-idle-highlight-word-at-point)
-(global-set-key [(shift f2)] 'sp00ky-unhighlight-all-in-buffer)
+(global-set-key [f2] 'sp00ky/highlight-word-at-point)
+(global-set-key [(shift f2)] 'sp00ky/unhighlight-all-in-buffer)
 
 
 
@@ -233,10 +237,10 @@
 (global-set-key (kbd "C-;")     'comment-line)
 (global-set-key (kbd "M-;")     'comment-region)
 
-;; (define-key Info-mode-map (kbd "H") 'Info-last)
-;; (define-key Info-mode-map (kbd "J") 'Info-forward-node)
-;; (define-key Info-mode-map (kbd "K") 'Info-backward-node)
-;; (define-key Info-mode-map (kbd "L") 'Info-history-forward)
+(define-key Info-mode-map (kbd "H") 'Info-last)
+(define-key Info-mode-map (kbd "J") 'Info-forward-node)
+(define-key Info-mode-map (kbd "K") 'Info-backward-node)
+(define-key Info-mode-map (kbd "L") 'Info-history-forward)
 
 ;; Trying to make escape act sanely...
 (global-set-key (kbd "ESC ESC")  'keyboard-escape-quit)
@@ -248,6 +252,8 @@
 ;;;;;;;;;;;;;;                   MISC INIT                    ;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (setq text-scale-mode-step 1.05)
+
+(global-hl-line-mode +1) ; highlight current line
 
 ;; Show matching paren
 (show-paren-mode 1)
@@ -285,3 +291,17 @@
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
 (load-theme 'sp00ky t)
 
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(helm-minibuffer-history-key "M-p")
+ '(package-selected-packages
+   '(undo-tree sudo-edit helm-projectile helm-gtags eyebrowse evil-collection company)))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
