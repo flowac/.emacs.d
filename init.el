@@ -18,8 +18,6 @@
   (concat user-emacs-directory fname))
 
 
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;              PACKAGE INSTALLATION              ;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -44,6 +42,7 @@
         helm-projectile))
 
 (mapc 'sp00ky/install-package my-packages)
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;                 PACKAGE INIT                   ;;;;;;;;;;;;;;;;;
@@ -199,8 +198,6 @@
 (helm-projectile-on)
 
 
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;               MISC ELSIP LOADING               ;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -215,8 +212,6 @@
 ;;;;;;;;; Keybindings for loaded functions
 (global-set-key [f2] 'sp00ky/highlight-word-at-point)
 (global-set-key [(shift f2)] 'sp00ky/unhighlight-all-in-buffer)
-
-
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -251,57 +246,51 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;                   MISC INIT                    ;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(setq text-scale-mode-step 1.05)
-
-(global-hl-line-mode +1) ; highlight current line
-
-;; Show matching paren
-(show-paren-mode 1)
-
-;; Changing title of duplicate buffer titles
-(require 'uniquify)
-(setq uniquify-buffer-name-style 'reverse)
-
-(require 'midnight)
-(setq clean-buffer-list-delay-general 7)
-
-(setq desktop-restore-eager 10)
-(desktop-save-mode 1)
-
-;; Who wants to hear this annoying bell anyways...
-(setq ring-bell-function   'ignore
-      make-backup-files     nil
+;; Various configurations that I like:
+(setq ring-bell-function   'ignore ; Who wants to hear this annoying bell anyways...
+      make-backup-files     nil    ; By default, emacs makes to many backup files.
       backup-inhibited      t
       help-window-select    t
       scroll-conservatively 101    ; Scroll just one line when hitting bottom of window
+      text-scale-mode-step 1.05
       auto-save-default     nil)
 
+;; Enabling various minor modes built in with emacs
+(global-hl-line-mode +1) ; highlight current line
+(show-paren-mode 1) ; Show matching paren
 (scroll-bar-mode -1)
 (tool-bar-mode   -1)
 (menu-bar-mode   -1)
 (xterm-mouse-mode 1)
+(require 'uniquify) ; Changing title of duplicate buffer titles
+(setq uniquify-buffer-name-style 'reverse)
+(require 'midnight)
+(setq clean-buffer-list-delay-general 7)
+(setq desktop-restore-eager 10
+      desktop-load-locked-desktop 'nil)
+(desktop-save-mode 1)
 
-;(if (= nil server-process)
-;    server-start
-;  (message "Not starting emacs server, one already exists"))
 
-(add-to-list 'default-frame-alist
-	     '(font . "DejaVu Sans Mono-16"))
+;; Misc init elisp
 
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
 (load-theme 'sp00ky t)
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(helm-minibuffer-history-key "M-p")
- '(package-selected-packages
-   '(undo-tree sudo-edit helm-projectile helm-gtags eyebrowse evil-collection company)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+;; It's annoying when a new emacs instance prompts about a pre-existing server
+(require 'server)
+(if (not server-process)
+    (server-start)
+  (message "Not starting emacs server, one already exists"))
+
+;; Changing font to my current favourite font, DejaVu Sans Mono
+(add-to-list 'default-frame-alist '(font . "DejaVu Sans Mono-16"))
+
+;; Emacs' customize interface pollutes the init file in an unseemly way.
+(setq custom-file "~/.emacs.d/.emacs-custom.el")
+(load custom-file)
+;; Emacs sets package-selected-packges with custom variable settings which is annoying.
+;; So to avoid emacs from setting this variable override this function.
+(defun package--save-selected-packages (&optional value)
+  "Set and save `package-selected-packages' to VALUE."
+  (when value
+    (setq package-selected-packages value)))
