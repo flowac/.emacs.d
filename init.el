@@ -260,6 +260,7 @@
       help-window-select    t
       scroll-conservatively 101    ; Scroll just one line when hitting bottom of window
       text-scale-mode-step 1.05
+      org-edit-src-content-indentation 0; Org mode autoindents src code
       auto-save-default     nil)
 
 ;; Enabling various minor modes built in with emacs
@@ -274,6 +275,7 @@
 (setq uniquify-buffer-name-style 'reverse)
 (require 'midnight)
 (setq clean-buffer-list-delay-general 7)
+(midnight-mode t)
 (setq desktop-restore-eager 10
       desktop-load-locked-desktop 'nil)
 (desktop-save-mode 1)
