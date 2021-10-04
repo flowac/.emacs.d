@@ -31,16 +31,16 @@
 
 (setq my-packages
       '(helm
-	undo-tree ;; can get rid of undo-tree in emacs 28, we can use undo-redo
-        evil
-        evil-collection
+        undo-tree       ; can get rid of undo-tree in emacs 28, we can use undo-redo
+        evil            ; Long term goal of completing Evics to replace this
+        evil-collection ; Long term goal of completing Evics to replace this
         company
-        projectile
-        eyebrowse
+        projectile      ; Can use emacs built in project.el in emacs 28
+        eyebrowse       ; Can explore using built in tab-bar mode
         sudo-edit
-	highlight-parentheses
-        helm-gtags
-        helm-projectile))
+        highlight-parentheses
+        helm-gtags        ; Long term goal of replacing this with sp00ky-global
+        helm-projectile)) ; Can use emacs built in project.el in emacs 28
 
 (mapc 'sp00ky/install-package my-packages)
 
@@ -253,6 +253,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Various configurations that I like:
+(setq-default indent-tabs-mode nil); Replace Tabs with spaces
 (setq ring-bell-function   'ignore ; Who wants to hear this annoying bell anyways...
       make-backup-files     nil    ; By default, emacs makes to many backup files.
       backup-inhibited      t

@@ -25,3 +25,6 @@ hilighting")
 	(setq sp00ky/last-highlighted-word target)))))
 
 (global-set-key [f2] 'sp00ky/highlight-word-at-point)
+
+
+(require 'project)
