@@ -156,7 +156,6 @@
   (define-key helm-gtags-mode-map (kbd "M-T") 'helm-gtags-find-tag)
   (define-key helm-gtags-mode-map (kbd "M-r") 'helm-gtags-find-rtag)
   (define-key helm-gtags-mode-map (kbd "M-s") 'helm-gtags-find-symbol)
-  ;; (define-key helm-gtags-mode-map (kbd "M-f") 'helm-gtags-find-files)
   (define-key helm-gtags-mode-map (kbd "M-f") 'helm-gtags-tags-in-this-function)
   (define-key helm-gtags-mode-map (kbd "C-k") 'helm-gtags-previous-history)
   (define-key helm-gtags-mode-map (kbd "M->") 'helm-gtags-next-history)
@@ -246,6 +245,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;                   MISC INIT                    ;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ;; Various configurations that I like:
 (setq ring-bell-function   'ignore ; Who wants to hear this annoying bell anyways...
       make-backup-files     nil    ; By default, emacs makes to many backup files.
@@ -257,11 +257,11 @@
 
 ;; Enabling various minor modes built in with emacs
 (global-hl-line-mode +1) ; highlight current line
-(show-paren-mode 1) ; Show matching paren
-(scroll-bar-mode -1)
-(tool-bar-mode   -1)
-(menu-bar-mode   -1)
-(xterm-mouse-mode 1)
+(show-paren-mode      1) ; Show matching paren
+(scroll-bar-mode     -1)
+(tool-bar-mode       -1)
+(menu-bar-mode       -1)
+(xterm-mouse-mode     1)
 (require 'uniquify) ; Changing title of duplicate buffer titles
 (setq uniquify-buffer-name-style 'reverse)
 (require 'midnight)
@@ -270,9 +270,7 @@
       desktop-load-locked-desktop 'nil)
 (desktop-save-mode 1)
 
-
 ;; Misc init elisp
-
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
 (load-theme 'sp00ky t)
 

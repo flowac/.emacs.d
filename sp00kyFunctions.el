@@ -12,7 +12,7 @@ The same result can also be be achieved by \\[universal-argument] \\[unhighlight
   (interactive)
   (unhighlight-regexp t))
 
-(defvar sp00ky/last-highlighted-word nil
+(defvar-local sp00ky/last-highlighted-word nil
   "This variable keeps track of the last highlighted word. This is used to toggle word
 hilighting")
 
