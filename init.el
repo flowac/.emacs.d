@@ -263,6 +263,7 @@
       auto-save-default     nil)
 
 ;; Enabling various minor modes built in with emacs
+(global-auto-revert-mode t)
 (global-hl-line-mode +1) ; highlight current line
 (show-paren-mode      1) ; Show matching paren
 (scroll-bar-mode     -1)
