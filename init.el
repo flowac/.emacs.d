@@ -38,6 +38,7 @@
         projectile
         eyebrowse
         sudo-edit
+	highlight-parentheses
         helm-gtags
         helm-projectile))
 
@@ -196,6 +197,11 @@
       (append '("GTAGS" "GPATH" "GRTAGS" "TAGS")))
 (helm-projectile-on)
 
+;;;;;;;;;;;;;;;; Highlight-Parentheses ;;;;;;;;;;;;;;;;
+(require 'highlight-parentheses)
+(setq highlight-parentheses-background-colors '("steelblue3"))
+(add-hook 'c-mode-hook 'highlight-parentheses-mode)
+(add-hook 'emacs-lisp-mode-hook 'highlight-parentheses-mode)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;               MISC ELSIP LOADING               ;;;;;;;;;;;;;;;;;
