@@ -166,6 +166,8 @@
 
 ;;;;;;;;;;;;;;;; Eyebrowse ;;;;;;;;;;;;;;;;
 (require 'eyebrowse)
+(setq eyebrowse-new-workspace t)
+
 (define-key eyebrowse-mode-map (kbd "C-a 1") 'eyebrowse-switch-to-window-config-1)
 (define-key eyebrowse-mode-map (kbd "C-a 2") 'eyebrowse-switch-to-window-config-2)
 (define-key eyebrowse-mode-map (kbd "C-a 3") 'eyebrowse-switch-to-window-config-3)
@@ -207,16 +209,19 @@
 ;;;;;;;;;;;;;;               MISC ELSIP LOADING               ;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (load (sp00ky/set-init-file-path "sp00kyFunctions.el"))
-(load (sp00ky/set-init-file-path "sp00kyWork.el"))
-(load (sp00ky/set-init-file-path "sp00kyHome.el"))
+
+(if (file-exists-p (sp00ky/set-init-file-path ".sp00kyWork"))
+    (load (sp00ky/set-init-file-path "sp00kyWork.el"))
+  (load (sp00ky/set-init-file-path "sp00kyHome.el")))
+
 ;; (define-key evil-visual-state-map "p" 'sp00ky/evil-paste-after-from-0)
 ;; (define-key evil-normal-state-map "p" 'evil-paste-after)
 ;; (define-key evil-visual-state-map "x" 'sp00ky/evil-cut-to-0)
 ;; (define-key evil-normal-state-map "x" 'sp00ky/evil-delete-char)
 
 ;;;;;;;;; Keybindings for loaded functions
-(global-set-key [f2] 'sp00ky/highlight-word-at-point)
-(global-set-key [(shift f2)] 'sp00ky/unhighlight-all-in-buffer)
+(define-key evil-normal-state-map (kbd "`") 'sp00ky/highlight-word-at-point)
+(define-key evil-normal-state-map (kbd "~") 'sp00ky/unhighlight-all-in-buffer)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -280,7 +285,12 @@
       desktop-load-locked-desktop 'nil)
 (desktop-save-mode 1)
 
-;; Misc init elisp
+;; If we want relative line number then we can do something like:
+;; (require 'display-line-numbers)
+;; (setq display-line-numbers-type 'relative)
+;; (add-hook 'c-mode-hook 'display-line-numbers-mode)
+
+;;;;;;;;;;;;;; Misc init elisp
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
 (load-theme 'sp00ky t)
 

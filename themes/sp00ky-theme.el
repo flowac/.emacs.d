@@ -102,7 +102,7 @@
 
    `(Info-quoted ((,class
 		   (:inherit nil
-		    :foreground ,sp00ky-majenta))))
+		    :foreground ,sp00ky-pink))))
    
    ))
 
