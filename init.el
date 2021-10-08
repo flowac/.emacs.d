@@ -75,6 +75,7 @@
 (define-key evil-normal-state-map "+"       'text-scale-increase)
 (define-key evil-normal-state-map "-"       'text-scale-decrease)
 (define-key evil-motion-state-map (kbd "TAB") 'nil)
+(define-key evil-motion-state-map (kbd "z z") 'eval-defun)
 (define-key evil-window-map "\C-h" 'evil-window-left)
 
 ;; Change evil window commands to C-a to be like my tmux config. Helps not confuse my fingers
@@ -221,6 +222,7 @@
 
 ;;;;;;;;; Keybindings for loaded functions
 (define-key evil-normal-state-map (kbd "`") 'sp00ky/highlight-word-at-point)
+(define-key evil-normal-state-map (kbd "!") 'sp00ky/highlight-word-at-point)
 (define-key evil-normal-state-map (kbd "~") 'sp00ky/unhighlight-all-in-buffer)
 
 
@@ -276,6 +278,15 @@
 (tool-bar-mode       -1)
 (menu-bar-mode       -1)
 (xterm-mouse-mode     1)
+(column-number-mode   t)
+(which-function-mode)
+(setq which-func-unknown "n/a") ; Display n/a instead of ???
+;; Show current function in headerline
+(setq-default header-line-format '((which-function-mode ("" which-func-format " "))))
+;; We remove Which Function Mode from the mode line, because it's mostly
+;; invisible here anyway.
+(setq mode-line-misc-info (assq-delete-all 'which-function-mode mode-line-misc-info))
+
 (require 'uniquify) ; Changing title of duplicate buffer titles
 (setq uniquify-buffer-name-style 'reverse)
 (require 'midnight)
@@ -289,6 +300,16 @@
 ;; (require 'display-line-numbers)
 ;; (setq display-line-numbers-type 'relative)
 ;; (add-hook 'c-mode-hook 'display-line-numbers-mode)
+
+(setq c-default-style "k&r")
+(defun sp00ky/c-mode-hook ()
+  "Various configs I want to apply for c-mode"
+  (interactive)
+  (setq tab-stop-list '(0 3)
+        tab-width 3
+        c-basic-offset 3))
+(add-hook 'c-mode-hook 'sp00ky/c-mode-hook)
+(add-hook 'emacs-lisp-mode-hook 'abbrev-mode)
 
 ;;;;;;;;;;;;;; Misc init elisp
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
