@@ -222,8 +222,8 @@
 
 ;;;;;;;;; Keybindings for loaded functions
 (define-key evil-normal-state-map (kbd "`") 'sp00ky/highlight-word-at-point)
-(define-key evil-normal-state-map (kbd "!") 'sp00ky/highlight-word-at-point)
-(define-key evil-normal-state-map (kbd "~") 'sp00ky/unhighlight-all-in-buffer)
+(define-key evil-normal-state-map (kbd "f") 'sp00ky/highlight-word-at-point)
+(define-key evil-normal-state-map (kbd "F") 'sp00ky/unhighlight-all-in-buffer)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
