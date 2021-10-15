@@ -1,7 +1,7 @@
-(load-file "evics/evicsFunctions.el")
-(load-file "evics/evicsNormalMode.el")
-(load-file "evics/evicsInsertMode.el")
-(load-file "evics/evicsVisualMode.el")
+(load-file (concat user-emacs-directory "/evics/" "evicsFunctions.el"))
+(load-file (concat user-emacs-directory "/evics/" "evicsNormalMode.el"))
+(load-file (concat user-emacs-directory "/evics/" "evicsInsertMode.el"))
+(load-file (concat user-emacs-directory "/evics/" "evicsVisualMode.el"))
 
 ;;; Look into help-mode-map
 

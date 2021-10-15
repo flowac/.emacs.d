@@ -31,6 +31,7 @@
 (define-key evics-normal-mode-map (kbd "_") 'ignore)
 (define-key evics-normal-mode-map (kbd "=") 'ignore)
 (define-key evics-normal-mode-map (kbd "+") 'ignore)
+(define-key evics-normal-mode-map (kbd "M-x") 'execute-extended-command)
 
 (define-key evics-normal-mode-map (kbd "<tab>") 'ignore)
 (define-key evics-normal-mode-map (kbd "q") 'ignore)
@@ -43,7 +44,7 @@
 (define-key evics-normal-mode-map (kbd "R") 'ignore)
 (define-key evics-normal-mode-map (kbd "t") 'ignore)
 (define-key evics-normal-mode-map (kbd "T") 'ignore)
-(define-key evics-normal-mode-map (kbd "y") 'ignore)
+(define-key evics-normal-mode-map (kbd "y") 'yank)
 (define-key evics-normal-mode-map (kbd "Y") 'ignore)
 (define-key evics-normal-mode-map (kbd "u") 'undo)
 (define-key evics-normal-mode-map (kbd "U") 'ignore)
@@ -115,6 +116,8 @@
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (define-key evics-normal-mode-map (kbd "DEL") 'left-char)
 (define-key evics-normal-mode-map (kbd "RET") 'isearch-exit)
+;; Just binding keyboard-escape-quit to escape isn't as easy as it sounds. On terminals ESC sends
+;; the same character code as META.
 ;; (define-key evics-normal-mode-map (kbd "ESC") 'keyboard-escape-quit)
 ;; (define-key evics-normal-mode-map (kbd "<escape>")      'keyboard-escape-quit)
 

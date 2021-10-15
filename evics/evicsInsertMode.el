@@ -6,6 +6,12 @@
      (evics-normal-mode t)
      (keyboard-quit)))
 
+(define-key evics-insert-mode-map (kbd "ESC")
+  '(lambda () (interactive)
+     (evics-insert-mode -1)
+     (evics-normal-mode t)
+     (keyboard-quit)))
+
 
 (define-minor-mode evics-insert-mode
   "Toggle evics normal mode."
