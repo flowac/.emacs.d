@@ -52,7 +52,9 @@
         eyebrowse       ; Can explore using built in tab-bar mode
         sudo-edit
         highlight-parentheses
+        highlight-indent-guides ; Useful for python code
         helm-xref
+        company-jedi
         helm-gtags        ; Long term goal of replacing this with sp00ky-global
         helm-projectile)) ; Can use emacs built in project.el in emacs 28
 
@@ -92,7 +94,10 @@
 (define-key evil-normal-state-map "-"       'text-scale-decrease)
 (define-key evil-motion-state-map (kbd "TAB") 'nil)
 (define-key evil-motion-state-map (kbd "z z") 'eval-defun)
+;; Not sure why I need the \C infront here... perhaps it's something prefix related. Doesnt
+;; seem to work when using just C-h or C-o
 (define-key evil-window-map "\C-h" 'evil-window-left)
+(define-key evil-window-map "\C-o" 'nil)
 
 ;; Change evil window commands to C-a to be like my tmux config. Helps not confuse my fingers
 ;; if everything is the same.
@@ -116,7 +121,7 @@
 
 ;;;;;;;;;;;;;;;; Company ;;;;;;;;;;;;;;;;
 (setq company-dabbrev-downcase      nil
-      company-idle-delay            0.5
+      company-idle-delay            0.2
       company-selection-wrap-around t
       company-minimum-prefix-length 5)
 
@@ -156,6 +161,8 @@
 (define-key helm-map (kbd "TAB")   #'helm-execute-persistent-action) ; Fix tab behaviour in helm
 (define-key helm-map (kbd "<tab>") #'helm-execute-persistent-action) ; Fix tab behaviour in helm
 (helm-mode 1)
+(setq helm-autoresize-min-height 50)
+(helm-autoresize-mode 1)
 
 ;;;;;;;;;;;;;;;; helm-gtags ;;;;;;;;;;;;;;;;
 (setq helm-gtags-fuzzy-match            t
@@ -246,6 +253,10 @@
 (add-hook 'c-mode-hook 'highlight-parentheses-mode)
 (add-hook 'emacs-lisp-mode-hook 'highlight-parentheses-mode)
 
+;;;;;;;;;;;;;;;; Highlight-Indent-Guides ;;;;;;;;;;;;;;;;
+(setq highlight-indent-guides-method     'character
+      highlight-indent-guides-responsive 'stack)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;               MISC ELSIP LOADING               ;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -256,10 +267,10 @@
   (load (sp00ky/set-init-file-path "sp00kyHome.el")))
 
 ;;;;;;;;; Keybindings for loaded functions
-(define-key evil-normal-state-map (kbd "f") 'evil-scroll-page-down)
-(define-key evil-normal-state-map (kbd "F") 'evil-scroll-page-up)
-(define-key evil-normal-state-map (kbd "t") 'sp00ky/highlight-word-at-point)
-(define-key evil-normal-state-map (kbd "T") 'sp00ky/unhighlight-all-in-buffer)
+(define-key evil-normal-state-map (kbd "f") 'sp00ky/highlight-word-at-point)
+(define-key evil-normal-state-map (kbd "F") 'sp00ky/unhighlight-all-in-buffer)
+;; (define-key evil-normal-state-map (kbd "t") 'sp00ky/highlight-word-at-point)
+;; (define-key evil-normal-state-map (kbd "T") 'sp00ky/unhighlight-all-in-buffer)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -363,7 +374,14 @@
   (abbrev-mode))
 (add-hook 'emacs-lisp-mode-hook 'sp00ky/emacs-lisp-mode-hook)
 
-;;;;;;;;;;;;;;;; Misc init elisp ;;;;;;;;;;;;;;;;
+(defun sp00ky/python-mode-hook ()
+  "Various configs I want to apply for c-mode"
+  (interactive)
+  (add-to-list 'company-backends 'company-jedi)
+  (highlight-indent-guides-mode))
+(add-hook 'python-mode-hook 'sp00ky/python-mode-hook)
+
+;;;;;;;;;;;;;; Misc init elisp
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
 (load-theme 'sp00ky t)
 ;; Changing font to my current favourite font, DejaVu Sans Mono
