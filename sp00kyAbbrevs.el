@@ -21,6 +21,13 @@
     ("cif" "" sp00ky-skeleton/c-if-statement)
     ("chf" "" sp00ky-skeleton/c-hal-ret-fun)
     ("cst" "" sp00ky-skeleton/skeleton-test)
+    ("hs" "HalStatus")
+    ("hso" "HalStatus_Ok")
+    ("hse" "HalStatus_Error")
+    ("hli" "HAL_LOG_INFO")
+    ("hle" "HAL_LOG_ERR")
+    ("hld" "HAL_LOG_DEBUG")
+    ("HER" "HAL_ERR_RET")
     ;; END
     ))
 

@@ -1,8 +1,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;                   PREAMBLE                     ;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;SECTION:              PREAMBLE                  ;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; TODO
+;; - Maybe switch C-h i to 'info-display-manual
 ;; - Fix calc-mode keybindings
 ;; - Look at xref--marker-ring to make history function that does not pop the entry from the stack
 ;; - Figure out whats wrong with TAB in cc-mode
@@ -10,11 +11,16 @@
 ;; - elisp-eldoc support for multiline, see elisp-get-var-docstring, eldoc-documentation-function
 ;; - Emacs source code xref doesnt seem to work, see xref-backend-references. Issue seems to be that the
 ;;      Xref backend defaults to find | grep instead of using tags... Compare xref-backend-references and
-;;      xref-backend-functions
+;;      xref-backend-functions. I think there is also an configure option to not compress these
 ;; - Work on sp00ky global
-;; - Work on evics
-;;   - Fix escape key on terminal
 ;; - Work on AHK mode
+;;
+;; EVICS
+;; - Change precedence of evics keymaps, see minor-mode-map-alist
+;;
+;; MANUAL
+;; - Read about assoc list (alists)
+;; - Read about thread
 
 ;; Useful emacs compile command for being lightweight:
 ;; ./configure --without-all --with-xml2 --with-xft --with-libotf --with-x-toolkit=lucid --with-modules --with-png --with-jpeg --with-mailutils
@@ -32,7 +38,7 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;              PACKAGE INSTALLATION              ;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;SECTION:         PACKAGE INSTALLATION           ;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; I have moved away from using use-package, now I am just using emacs' built in
@@ -62,10 +68,10 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;                 PACKAGE INIT                   ;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;SECTION:            PACKAGE INIT                ;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;;;;;;;;;;;;;;;; Evil ;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;SUBSECTION: Evil ;;;;;;;;;;;;;;;;
 (require 'undo-tree)
 (setq evil-want-integration t
       evil-want-keybinding  nil
@@ -119,7 +125,7 @@
     (define-key evil-emacs-state-map  (kbd "`")   'evil-window-map)))
 (define-key evil-normal-state-map (kbd "`") 'nil)
 
-;;;;;;;;;;;;;;;; Company ;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;SUBSECTION: Company ;;;;;;;;;;;;;;;;
 (setq company-dabbrev-downcase      nil
       company-idle-delay            0.2
       company-selection-wrap-around t
@@ -134,7 +140,7 @@
 (define-key company-active-map (kbd "C-n")   'company-complete-common-or-cycle)
 (define-key company-active-map (kbd "C-p")   'company-select-previous)
 
-;;;;;;;;;;;;;;;; Helm ;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;SUBSECTION: Helm ;;;;;;;;;;;;;;;;
 (require 'helm)
 (require 'helm-config)
 (global-set-key (kbd "C-c z") 'helm-command-prefix)
@@ -148,6 +154,8 @@
       ;; to nil seems to address the problem. See:
       ;; https://groups.google.com/g/emacs-helm/c/jmiTit83VhE
       helm-mode-handle-completion-in-region nil)
+
+(add-to-list 'helm-imenu-type-faces '("^\\(Sections\\|Subsections\\)" . font-lock-builtin-face))
 
 (global-set-key (kbd "C-x b") 'helm-buffers-list)
 (global-set-key (kbd "C-s")   'helm-occur)
@@ -164,7 +172,7 @@
 (setq helm-autoresize-min-height 50)
 (helm-autoresize-mode 1)
 
-;;;;;;;;;;;;;;;; helm-gtags ;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;SUBSECTION: helm-gtags ;;;;;;;;;;;;;;;;
 (setq helm-gtags-fuzzy-match            t
       helm-gtags-display-style          nil
       helm-gtags-use-input-at-cursor    t
@@ -191,7 +199,7 @@
 
 (add-hook 'c-mode-hook 'helm-gtags-mode)
 
-;;;;;;;;;;;;;;;; Eyebrowse ;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;SUBSECTION: Eyebrowse ;;;;;;;;;;;;;;;;
 (require 'eyebrowse)
 (setq eyebrowse-new-workspace t)
 
@@ -239,7 +247,7 @@
 ;; (define-key eyebrowse-mode-map (kbd "M-)") 'eyebrowse-switch-to-window-config-0)
 (eyebrowse-mode t)
 
-;;;;;;;;;;;;;;;; Projectile ;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;SUBSECTION: Projectile ;;;;;;;;;;;;;;;;
 (projectile-mode +1)
 (define-key projectile-mode-map (kbd "C-w") 'projectile-command-map)
 (setq projectile-enable-caching nil)
@@ -247,21 +255,22 @@
       (append '("GTAGS" "GPATH" "GRTAGS" "TAGS")))
 (helm-projectile-on)
 
-;;;;;;;;;;;;;;;; Highlight-Parentheses ;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;SUBSECTION: Highlight-Parentheses ;;;;;;;;;;;;;;;;
 (require 'highlight-parentheses)
 (setq highlight-parentheses-background-colors '("steelblue3"))
 (add-hook 'c-mode-hook 'highlight-parentheses-mode)
 (add-hook 'emacs-lisp-mode-hook 'highlight-parentheses-mode)
 
-;;;;;;;;;;;;;;;; Highlight-Indent-Guides ;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;SUBSECTION: Highlight-Indent-Guides ;;;;;;;;;;;;;;;;
 (setq highlight-indent-guides-method     'character
       highlight-indent-guides-responsive 'stack)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;               MISC ELSIP LOADING               ;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;SECTION:       MISC ELISP LOADING               ;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (load (sp00ky/set-init-file-path "sp00kyFunctions.el"))
+(load (sp00ky/set-init-file-path "sp00kyAbbrevs.el"))
 (if (file-exists-p (sp00ky/set-init-file-path ".sp00kyWork"))
     (load (sp00ky/set-init-file-path "sp00kyWork.el"))
   (load (sp00ky/set-init-file-path "sp00kyHome.el")))
@@ -274,7 +283,7 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;                 MISC KEYBINDINGS               ;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;SECTION:            MISC KEYBINDINGS            ;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (global-set-key (kbd "C-x B")   'ibuffer)
 (global-set-key (kbd "C-x C-b") 'switch-to-buffer)
@@ -291,6 +300,8 @@
 (global-set-key (kbd "C-;")     'comment-line)
 (global-set-key (kbd "M-;")     'comment-region)
 
+(define-key help-mode-map (kbd "M-<") 'help-go-back)
+(define-key help-mode-map (kbd "M->") 'help-go-forward)
 (define-key Info-mode-map (kbd "H") 'Info-last)
 (define-key Info-mode-map (kbd "J") 'Info-forward-node)
 (define-key Info-mode-map (kbd "K") 'Info-backward-node)
@@ -307,7 +318,7 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;                   MISC INIT                    ;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;SECTION:              MISC INIT                 ;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Various configurations that I like:
@@ -355,7 +366,10 @@
       desktop-load-locked-desktop 'nil)
 (desktop-save-mode 1)
 
-;;;;;;;;;;;;;;;; Programming Mode Hooks ;;;;;;;;;;;;;;;;
+(add-to-list 'auto-mode-alist '("\\.inc\\'" . conf-mode))
+(add-to-list 'auto-mode-alist '("\\.bb\\'" . conf-mode))
+;;;;;;;;;;;;;;;;SUBSECTION: Programming Mode Hooks ;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;SUBSECTION: C mode Hooks ;;;;;;;;;;;;;;;;
 (setq c-default-style "k&r")
 (defun sp00ky/c-mode-hook ()
   "Various configs I want to apply for c-mode"
@@ -367,13 +381,25 @@
         evil-shift-width    3))
 (add-hook 'c-mode-hook 'sp00ky/c-mode-hook)
 
+;;;;;;;;;;;;;;;;SUBSECTION: Elisp mode Hooks ;;;;;;;;;;;;;;;;
+(defvar init-el-lisp-imenu-generic-expression
+  ;; Match on word followed optionionally by space + word
+  (append (list '("Sections" ";SECTION:\s*+\\(\\w+\\([\s-]\\w+\\)*\\)"   1)
+                '("Subsections" "SUBSECTION:\s*+\\(\\w+\\([\s-]\\w+\\)*\\)" 1))
+          lisp-imenu-generic-expression)
+  "imenu expressions to parse specific tags in init.el")
+
 (defun sp00ky/emacs-lisp-mode-hook ()
   "Various configs I want to apply for c-mode"
   (interactive)
   (setq tab-always-indent nil)
-  (abbrev-mode))
+  (abbrev-mode)
+  (if (string-equal (buffer-name) "init.el")
+      (setq imenu-generic-skip-comments-and-strings nil
+            imenu-generic-expression init-el-lisp-imenu-generic-expression)))
 (add-hook 'emacs-lisp-mode-hook 'sp00ky/emacs-lisp-mode-hook)
 
+;;;;;;;;;;;;;;;;SUBSECTION: Python mode Hooks ;;;;;;;;;;;;;;;;
 (defun sp00ky/python-mode-hook ()
   "Various configs I want to apply for c-mode"
   (interactive)
@@ -381,7 +407,7 @@
   (highlight-indent-guides-mode))
 (add-hook 'python-mode-hook 'sp00ky/python-mode-hook)
 
-;;;;;;;;;;;;;; Misc init elisp
+;;;;;;;;;;;;;;SUBSECTION: Misc init elisp ;;;;;;;;;;;;;;;;;
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
 (load-theme 'sp00ky t)
 ;; Changing font to my current favourite font, DejaVu Sans Mono
@@ -408,7 +434,7 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;                    COMMENTS                    ;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;SECTION:               COMMENTS                 ;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; If we want relative line number then we can do something like:
