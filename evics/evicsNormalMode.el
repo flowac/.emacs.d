@@ -44,18 +44,35 @@
 (define-key evics-normal-mode-map (kbd "R") 'ignore)
 (define-key evics-normal-mode-map (kbd "t") 'ignore)
 (define-key evics-normal-mode-map (kbd "T") 'ignore)
-(define-key evics-normal-mode-map (kbd "y") 'yank)
+(define-key evics-normal-mode-map (kbd "y") 'kill-ring-save)
 (define-key evics-normal-mode-map (kbd "Y") 'ignore)
 (define-key evics-normal-mode-map (kbd "u") 'undo)
 (define-key evics-normal-mode-map (kbd "U") 'ignore)
-(define-key evics-normal-mode-map (kbd "i")
-  '(lambda () (interactive)
-     (evics-normal-mode -1)
-     (evics-insert-mode t)))
+(defun evics-goto-insert-mode ()
+  "Switch from whatever evics mode to insert"
+  (interactive)
+  (evics-normal-mode -1)
+  (evics-insert-mode t))
+(define-key evics-normal-mode-map (kbd "i") 'evics-goto-insert-mode)
 (define-key evics-normal-mode-map (kbd "I") 'ignore)
-(define-key evics-normal-mode-map (kbd "o") 'ignore)
-(define-key evics-normal-mode-map (kbd "O") 'ignore)
-(define-key evics-normal-mode-map (kbd "p") 'ignore)
+
+(defun evics-newline-above ()
+  "Insert newline above and enter evics insert mode"
+  (interactive)
+  (move-beginning-of-line nil)
+  (newline)
+  (previous-line)
+  (evics-goto-insert-mode))
+
+(defun evics-newline-below ()
+  "Insert newline below and enter evics insert mode"
+  (interactive)
+  (move-end-of-line nil)
+  (newline)
+  (evics-goto-insert-mode))
+(define-key evics-normal-mode-map (kbd "o") 'evics-newline-below)
+(define-key evics-normal-mode-map (kbd "O") 'evics-newline-above)
+(define-key evics-normal-mode-map (kbd "p") 'yank)
 (define-key evics-normal-mode-map (kbd "P") 'ignore)
 (define-key evics-normal-mode-map (kbd "[") 'ignore)
 (define-key evics-normal-mode-map (kbd "{") 'ignore)
@@ -64,8 +81,20 @@
 (define-key evics-normal-mode-map (kbd "\\") 'ignore)
 (define-key evics-normal-mode-map (kbd "|") 'ignore)
 
-(define-key evics-normal-mode-map (kbd "a") 'ignore)
-(define-key evics-normal-mode-map (kbd "A") 'ignore)
+(defun evics-append ()
+  "Goto end of line and enter insert mode"
+  (interactive)
+  (forward-char)
+  (evics-goto-insert-mode))
+
+(defun evics-append-line ()
+  "Goto end of line and enter insert mode"
+  (interactive)
+  (end-of-line)
+  (evics-goto-insert-mode))
+
+(define-key evics-normal-mode-map (kbd "a") 'evics-append)
+(define-key evics-normal-mode-map (kbd "A") 'evics-append-line)
 (define-key evics-normal-mode-map (kbd "s") 'ignore)
 (define-key evics-normal-mode-map (kbd "S") 'ignore)
 (define-key evics-normal-mode-map (kbd "d") 'ignore)
@@ -109,7 +138,15 @@
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;;;;;;;;;             commands              ;;;;;;;;;;;;;;
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(define-key evics-normal-mode-map (kbd ": e") 'find-file)
+(defun evics-command ()
+  "tmp"
+  (interactive)
+  (let ((input (read-minibuffer ":")))
+    (print input)))
+(define-key evics-normal-mode-map (kbd ":") 'evics-command)
+;; (define-key evics-normal-mode-map (kbd ": e") 'find-file)
+;; (define-key evics-normal-mode-map (kbd ": w") 'save-buffer)
+;; (define-key evics-normal-mode-map (kbd ": W") 'save-buffer)
 
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;;;;;;;;;      Non alpha-numberic pressed       ;;;;;;;;;;
@@ -119,7 +156,7 @@
 ;; Just binding keyboard-escape-quit to escape isn't as easy as it sounds. On terminals ESC sends
 ;; the same character code as META.
 ;; (define-key evics-normal-mode-map (kbd "ESC") 'keyboard-escape-quit)
-;; (define-key evics-normal-mode-map (kbd "<escape>")      'keyboard-escape-quit)
+(define-key evics-normal-mode-map (kbd "<escape>") 'keyboard-escape-quit)
 
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;;;;;;;;;;;;;;;;      CTRL pressed         ;;;;;;;;;;;;;;;
@@ -142,6 +179,24 @@
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (define-key evics-normal-mode-map (kbd "g g") 'beginning-of-buffer)
 ;; (define-key evics-normal-mode-map (kbd "G G") 'end-of-buffer)
+(defun evics-minibuffer-hook ()
+  "Configurations to modify minibuffer to behave more evics in nature"
+  (interactive)
+  (evics-normal-mode -1))
+(add-hook 'minibuffer-setup-hook 'evics-minibuffer-hook)
+
+(defun evics-esc (map)
+  "Catch \\e on TTY and translate to escape if there is no other action after timeout"
+  (if (and (equal (this-single-command-keys) [?\e])
+           (sit-for 0.1))
+      [escape] map))
+
+(defun evics-init-esc ()
+  "If we are in tty then we will have to translate \\e to escape under certain conditions.
+This is taken from viper mode."
+  (when (terminal-live-p (frame-terminal))
+    (let ((default-esc (lookup-key input-decode-map [?\e])))
+      (define-key input-decode-map [?\e] `(menu-item "" ,default-esc :filter evics-esc)))))
 
 (define-minor-mode evics-normal-mode
   "Toggle evics normal mode."

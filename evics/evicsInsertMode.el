@@ -1,16 +1,16 @@
 (defvar evics-insert-mode-map (make-sparse-keymap) "Evics insert mode keymap")
 
-(define-key evics-insert-mode-map (kbd "M-c")
-  '(lambda () (interactive)
-     (evics-insert-mode -1)
-     (evics-normal-mode t)
-     (keyboard-quit)))
+(defun evics-goto-normal-mode ()
+  "Switch from whatever evics mode to evics normal mode"
+  (interactive)
+  (backward-char)
+  (evics-insert-mode -1)
+  (evics-normal-mode t)
+  (keyboard-quit))
 
-(define-key evics-insert-mode-map (kbd "ESC")
-  '(lambda () (interactive)
-     (evics-insert-mode -1)
-     (evics-normal-mode t)
-     (keyboard-quit)))
+(define-key evics-insert-mode-map (kbd "M-c") 'evics-goto-normal-mode)
+
+(define-key evics-insert-mode-map (kbd "<escape>") 'evics-goto-normal-mode)
 
 
 (define-minor-mode evics-insert-mode
