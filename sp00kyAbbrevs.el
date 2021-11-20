@@ -1,5 +1,4 @@
 ;; C-mode abbrevs
-(clear-abbrev-table c-mode-abbrev-table)
 (setq skeleton-end-newline nil)
 (define-skeleton sp00ky-skeleton/c-if-statement
   "Insert an if statement" nil

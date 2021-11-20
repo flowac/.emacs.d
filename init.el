@@ -116,6 +116,7 @@
 ;; seem to work when using just C-h or C-o
 (define-key evil-window-map "\C-h" 'evil-window-left)
 (define-key evil-window-map "\C-o" 'nil)
+(define-key evil-window-map "o" 'nil)
 
 ;; Change evil window commands to C-a to be like my tmux config. Helps not confuse my fingers
 ;; if everything is the same.
@@ -261,7 +262,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (load (sp00ky/set-init-file-path "sp00kyFunctions.el"))
-;(load (sp00ky/set-init-file-path "sp00kyAbbrevs.el"))
+(load (sp00ky/set-init-file-path "sp00kyAbbrevs.el"))
 (if (file-exists-p (sp00ky/set-init-file-path ".sp00kyWork"))
     (load (sp00ky/set-init-file-path "sp00kyWork.el"))
   (load (sp00ky/set-init-file-path "sp00kyHome.el")))
