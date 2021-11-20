@@ -1,4 +1,18 @@
 ;; Home to various sp00ky functions
+(defun sp00ky-update-env (fn)
+  (let ((str 
+         (with-temp-buffer
+           (insert-file-contents fn)
+           (buffer-string))) lst)
+    (setq lst (split-string str "\000"))
+    (while lst
+      (setq cur (car lst))
+      (when (string-match "^\\(.*?\\)=\\(.*\\)" cur)
+        (setq var (match-string 1 cur))
+        (setq value (match-string 2 cur))
+        (setenv var value))
+      (setq lst (cdr lst)))))
+
 (defun sp00ky/insert-org-ctag ()
   "Insert C code block in org mode"
   (interactive)
@@ -89,6 +103,14 @@ Version 2017-03-12"
           'face (list :background (match-string-no-properties 0)))))))
   (font-lock-flush))
 
+(defun xah-display-minor-mode-key-priority  ()
+  "Print out minor mode's key priority.
+URL `http://ergoemacs.org/emacs/minor_mode_key_priority.html'
+Version 2017-01-27"
+  (interactive)
+  (mapc
+   (lambda (x) (prin1 (car x)) (terpri))
+   minor-mode-map-alist))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;                 MISC KEYBINDINGS               ;;;;;;;;;;;;;;;;;

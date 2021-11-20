@@ -3,7 +3,6 @@
 (defun evics-goto-normal-mode ()
   "Switch from whatever evics mode to evics normal mode"
   (interactive)
-  (backward-char)
   (evics-insert-mode -1)
   (evics-normal-mode t)
   (keyboard-quit))
@@ -20,4 +19,5 @@
   :lighter " <I>"
   ;; The minor mode bindings.
   :keymap evics-insert-mode-map
+  :group 'evics-insert
   (setq cursor-type 'bar))

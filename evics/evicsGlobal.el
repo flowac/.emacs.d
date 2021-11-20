@@ -10,3 +10,5 @@
 (define-key winner-mode-map (kbd "C-a l") 'windmove-right)
 (define-key winner-mode-map (kbd "C-a j") 'windmove-down)
 (define-key winner-mode-map (kbd "C-a k") 'windmove-up)
+
+(delete-selection-mode 1)

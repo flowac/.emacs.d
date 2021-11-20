@@ -3,6 +3,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; TODO
+;; - Clean up modeline, for example, only need to show eyebrowse workspace thats currently active
+;; - Make mode that will convert constant value to hex/binary in the echo area
+;; - Enable visual-line-mode or auto-fill-mode for org-mode. For autofill mode, verify
+;; if it can auto format lines when editing late
+;; - Make helm respect screen split when using helm-buffer-max-length
 ;; - Maybe switch C-h i to 'info-display-manual
 ;; - Fix calc-mode keybindings
 ;; - Look at xref--marker-ring to make history function that does not pop the entry from the stack
@@ -16,7 +21,14 @@
 ;; - Work on AHK mode
 ;;
 ;; EVICS
-;; - Change precedence of evics keymaps, see minor-mode-map-alist
+;; - Implement vsplit and split
+;; - Implement sed (look at visual-regexp/anzu)
+;; - Implement prefix for c - (c w), (c i w) etc...
+;; - highlight under cursor when marking region
+;; - Implement rectangle commands (cua)
+;; - Dont goto newline when going far left/right
+;; - Echo when changing modes
+;; - maybe use previous-logical-line
 ;;
 ;; MANUAL
 ;; - Read about assoc list (alists)
@@ -155,7 +167,7 @@
       ;; https://groups.google.com/g/emacs-helm/c/jmiTit83VhE
       helm-mode-handle-completion-in-region nil)
 
-(add-to-list 'helm-imenu-type-faces '("^\\(Sections\\|Subsections\\)" . font-lock-builtin-face))
+;(add-to-list 'helm-imenu-type-faces '("^\\(Sections\\|Subsections\\)" . font-lock-builtin-face))
 
 (global-set-key (kbd "C-x b") 'helm-buffers-list)
 (global-set-key (kbd "C-s")   'helm-occur)
@@ -224,27 +236,6 @@
 (define-key eyebrowse-mode-map (kbd "M-8") 'eyebrowse-switch-to-window-config-8)
 (define-key eyebrowse-mode-map (kbd "M-9") 'eyebrowse-switch-to-window-config-9)
 (define-key eyebrowse-mode-map (kbd "M-0") 'eyebrowse-switch-to-window-config-0)
-;; (define-key eyebrowse-mode-map (kbd "C-a !") 'eyebrowse-switch-to-window-config-1)
-;; (define-key eyebrowse-mode-map (kbd "C-a @") 'eyebrowse-switch-to-window-config-2)
-;; (define-key eyebrowse-mode-map (kbd "C-a #") 'eyebrowse-switch-to-window-config-3)
-;; (define-key eyebrowse-mode-map (kbd "C-a $") 'eyebrowse-switch-to-window-config-4)
-;; (define-key eyebrowse-mode-map (kbd "C-a %") 'eyebrowse-switch-to-window-config-5)
-;; (define-key eyebrowse-mode-map (kbd "C-a ^") 'eyebrowse-switch-to-window-config-6)
-;; (define-key eyebrowse-mode-map (kbd "C-a &") 'eyebrowse-switch-to-window-config-7)
-;; (define-key eyebrowse-mode-map (kbd "C-a *") 'eyebrowse-switch-to-window-config-8)
-;; (define-key eyebrowse-mode-map (kbd "C-a (") 'eyebrowse-switch-to-window-config-9)
-;; (define-key eyebrowse-mode-map (kbd "C-a )") 'eyebrowse-switch-to-window-config-0)
-;; (define-key eyebrowse-mode-map (kbd "C-a -") 'eyebrowse-prev-window-config)
-;; (define-key eyebrowse-mode-map (kbd "M-!") 'eyebrowse-switch-to-window-config-1)
-;; (define-key eyebrowse-mode-map (kbd "M-@") 'eyebrowse-switch-to-window-config-2)
-;; (define-key eyebrowse-mode-map (kbd "M-#") 'eyebrowse-switch-to-window-config-3)
-;; (define-key eyebrowse-mode-map (kbd "M-$") 'eyebrowse-switch-to-window-config-4)
-;; (define-key eyebrowse-mode-map (kbd "M-%") 'eyebrowse-switch-to-window-config-5)
-;; (define-key eyebrowse-mode-map (kbd "M-^") 'eyebrowse-switch-to-window-config-6)
-;; (define-key eyebrowse-mode-map (kbd "M-&") 'eyebrowse-switch-to-window-config-7)
-;; (define-key eyebrowse-mode-map (kbd "M-*") 'eyebrowse-switch-to-window-config-8)
-;; (define-key eyebrowse-mode-map (kbd "M-(") 'eyebrowse-switch-to-window-config-9)
-;; (define-key eyebrowse-mode-map (kbd "M-)") 'eyebrowse-switch-to-window-config-0)
 (eyebrowse-mode t)
 
 ;;;;;;;;;;;;;;;;SUBSECTION: Projectile ;;;;;;;;;;;;;;;;
@@ -270,7 +261,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (load (sp00ky/set-init-file-path "sp00kyFunctions.el"))
-(load (sp00ky/set-init-file-path "sp00kyAbbrevs.el"))
+;(load (sp00ky/set-init-file-path "sp00kyAbbrevs.el"))
 (if (file-exists-p (sp00ky/set-init-file-path ".sp00kyWork"))
     (load (sp00ky/set-init-file-path "sp00kyWork.el"))
   (load (sp00ky/set-init-file-path "sp00kyHome.el")))
@@ -366,9 +357,20 @@
       desktop-load-locked-desktop 'nil)
 (desktop-save-mode 1)
 
+(autoload 'cflow-mode "cflow-mode")
+(add-to-list 'auto-mode-alist '("\\.flow\\'" . cflow-mode))
 (add-to-list 'auto-mode-alist '("\\.inc\\'" . conf-mode))
 (add-to-list 'auto-mode-alist '("\\.bb\\'" . conf-mode))
 ;;;;;;;;;;;;;;;;SUBSECTION: Programming Mode Hooks ;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;SUBSECTION: Shell-script mode Hooks ;;;;;;;;;;;;;;;;
+(defun sp00ky/sh-mode-hook ()
+  "Various settings to apply to shell script"
+  (interactive)
+  (setq tab-stop-list     '(0 3)
+        tab-width           3
+        sh-basic-offset      3
+        evil-shift-width    3))
+(add-hook 'sh-mode-hook 'sp00ky/sh-mode-hook)
 ;;;;;;;;;;;;;;;;SUBSECTION: C mode Hooks ;;;;;;;;;;;;;;;;
 (setq c-default-style "k&r")
 (defun sp00ky/c-mode-hook ()
@@ -406,6 +408,22 @@
   (add-to-list 'company-backends 'company-jedi)
   (highlight-indent-guides-mode))
 (add-hook 'python-mode-hook 'sp00ky/python-mode-hook)
+
+;;;;;;;;;;;;;;;;SUBSECTION: Python mode Hooks ;;;;;;;;;;;;;;;;
+(defun sp00ky/org-mode-hook ()
+  "Various config for org-mode"
+  (visual-line-mode t)
+  (setq-local word-wrap nil))
+(add-hook 'org-mode-hook 'sp00ky/org-mode-hook)
+
+;;;;;;;;;;;;;;;;SUBSECTION: Protobuf mode ;;;;;;;;;;;;;;;;
+;; This is grabbed from:
+;; https://github.com/protocolbuffers/protobuf/blob/master/editors/protobuf-mode.el
+(if (file-exists-p "/localdata/hmuresan/my_builds/protobuf/editors/protobuf-mode.el")
+    (progn (load "/localdata/hmuresan/my_builds/protobuf/editors/protobuf-mode.el")
+           (require 'protobuf-mode)
+           (add-to-list 'auto-mode-alist '("\\.proto\\'" . protobuf-mode)))
+  (message "Cannot locate protobuf-mode.el, not loading"))
 
 ;;;;;;;;;;;;;;SUBSECTION: Misc init elisp ;;;;;;;;;;;;;;;;;
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
