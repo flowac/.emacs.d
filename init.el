@@ -19,6 +19,7 @@
 ;;      xref-backend-functions. I think there is also an configure option to not compress these
 ;; - Work on sp00ky global
 ;; - Work on AHK mode
+;; - look at savehist
 ;;
 ;; EVICS
 ;; - Implement vsplit and split
@@ -354,6 +355,34 @@
 (setq clean-buffer-list-delay-general 7)
 (midnight-mode t)
 
+(require 'desktop)
+(defun sp00ky/remove-unused-desktop-lock ()
+  "If emacs crashes or exits abruptly then it does not remove the desktop lock.
+This causes subsequent emacs sessions to not load the desktop file.
+Using desktop-load-locked-desktop doesn't address the issue since this will cause us to load the desktop file if we have two emacs instances running."
+  (let ((os-list '(gnu/linux)))
+    (if (member system-type os-list)
+        (mapcar (lambda (dir)
+                  (if (file-exists-p (concat dir desktop-base-lock-name))
+                      (with-temp-buffer
+                        (message "Found lock file: %s" (concat dir desktop-base-lock-name))
+                        (insert-file-contents (concat dir desktop-base-lock-name))
+                        (let ((comm-file (concat "/proc/" (buffer-string) "/comm")))
+                          (if (file-exists-p comm-file)
+                              (with-temp-buffer 
+                                (insert-file-contents comm-file)
+                                (if (string-match "emacs" (buffer-string))
+                                    (message "Active emacs session has lock file")
+                                  (progn
+                                    (message "Removing desktop lockfile since lockfile pid is not emacs")
+                                    (delete-file (concat dir desktop-base-lock-name)))))
+                            (progn
+                              (message "Removing desktop lockfile since lockfile pid is not emacs")
+                              (delete-file (concat dir desktop-base-lock-name))))))))
+                desktop-path)
+      (message "Cannot handle os: %s" system-type))))
+
+(sp00ky/remove-unused-desktop-lock)
 (setq desktop-restore-eager 10
       desktop-load-locked-desktop 'nil)
 (desktop-save-mode 1)
