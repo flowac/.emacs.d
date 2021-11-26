@@ -1,4 +1,36 @@
 ;; Home to various sp00ky functions
+(require 'desktop)
+(defun sp00ky/remove-unused-desktop-lock ()
+  "If emacs crashes or exits abruptly then it does not remove the 
+desktop lock. This causes subsequent emacs sessions to not load the
+desktop file. Using desktop-load-locked-desktop doesn't address the
+issue since this will cause us to load the desktop file if we have two
+emacs instances running."
+  (let ((os-list '(gnu/linux)))
+    (if (member system-type os-list)
+        (mapcar
+         (lambda (dir)
+           (if (file-exists-p (concat dir desktop-base-lock-name))
+               ;; Seems like in elisp this is the only way to get file contents...
+               (with-temp-buffer
+                 (insert-file-contents (concat dir desktop-base-lock-name))
+                 (let ((lock-file (concat dir desktop-base-lock-name))
+                       (comm-file (concat "/proc/" (buffer-string) "/comm")))
+                   (message "Found lock file: %s" lock-file)
+                   (if (file-exists-p comm-file)
+                       (with-temp-buffer 
+                         (insert-file-contents comm-file)
+                         (if (string-match "emacs" (buffer-string))
+                             (message "Active emacs session has lock file")
+                           (progn
+                             (message "Removing desktop lockfile since lockfile pid is not emacs")
+                             (delete-file lock-file))))
+                     (progn
+                       (message "Removing desktop lockfile since lockfile pid is not emacs")
+                       (delete-file lock-file)))))))
+         desktop-path)
+      (message "Cannot handle os: %s" system-type))))
+
 (defun sp00ky-update-env (fn)
   (let ((str 
          (with-temp-buffer

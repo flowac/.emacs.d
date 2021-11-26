@@ -6,7 +6,7 @@
   "{" > \n
   "}" >)
 (define-skeleton sp00ky-skeleton/c-hal-ret-fun
-  "Insert an if statement" nil
+  "Insert a function skeleton that returns HalStatus" nil
   "HalStatus " _ " ()" > \n
   "{" > \n
   "}" >)
@@ -15,6 +15,11 @@
   t
   ("Enter test input: " "test: " str \n))
 
+(define-skeleton sp00ky-skeleton/HER-expansion
+  "Insert a function skeleton that returns HalStatus" nil
+  "HAL_ERR_RET(status, " _ ");")
+
+;(clear-abbrev-table c-mode-abbrev-table)
 (define-abbrev-table 'c-mode-abbrev-table
   '(
     ("cif" "" sp00ky-skeleton/c-if-statement)
@@ -23,10 +28,11 @@
     ("hs" "HalStatus")
     ("hso" "HalStatus_Ok")
     ("hse" "HalStatus_Error")
+    ("hsi" "HalStatus_InvalidParameter")
     ("hli" "HAL_LOG_INFO")
     ("hle" "HAL_LOG_ERR")
     ("hld" "HAL_LOG_DEBUG")
-    ("HER" "HAL_ERR_RET")
+    ("HER" "" sp00ky-skeleton/HER-expansion)
     ;; END
     ))
 

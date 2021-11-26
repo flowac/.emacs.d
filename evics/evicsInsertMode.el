@@ -5,7 +5,8 @@
   (interactive)
   (evics-insert-mode -1)
   (evics-normal-mode t)
-  (keyboard-quit))
+  ;; (keyboard-quit) ;; For now keep this disabled... seems to clobber the message call below
+  (message "-- NORMAL --"))
 
 (define-key evics-insert-mode-map (kbd "M-c") 'evics-goto-normal-mode)
 

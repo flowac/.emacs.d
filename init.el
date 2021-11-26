@@ -20,6 +20,12 @@
 ;; - Work on sp00ky global
 ;; - Work on AHK mode
 ;; - look at savehist
+;; - Fix function definitions in C imenu that are in macros ... see BfdDebug file
+;; - Look at removing mouse-buffer-menu
+;; - Look at enaabling pulse mode
+;; - Look into undo-region
+;; - helm look into typing something and hitting enter and it taking your literal input instead of
+;; the item under the cursor
 ;;
 ;; EVICS
 ;; - Implement vsplit and split
@@ -28,12 +34,15 @@
 ;; - highlight under cursor when marking region
 ;; - Implement rectangle commands (cua)
 ;; - Dont goto newline when going far left/right
-;; - Echo when changing modes
 ;; - maybe use previous-logical-line
 ;;
 ;; MANUAL
 ;; - Read about assoc list (alists)
 ;; - Read about thread
+;; - Read about CL, see example in helm-get-pid-from-process-name
+;;
+;; Useful links:
+;; https://karthinks.com/software/batteries-included-with-emacs/
 
 ;; Useful emacs compile command for being lightweight:
 ;; ./configure --without-all --with-xml2 --with-xft --with-libotf --with-x-toolkit=lucid --with-modules --with-png --with-jpeg --with-mailutils
@@ -354,33 +363,6 @@
 (require 'midnight)
 (setq clean-buffer-list-delay-general 7)
 (midnight-mode t)
-
-(require 'desktop)
-(defun sp00ky/remove-unused-desktop-lock ()
-  "If emacs crashes or exits abruptly then it does not remove the desktop lock.
-This causes subsequent emacs sessions to not load the desktop file.
-Using desktop-load-locked-desktop doesn't address the issue since this will cause us to load the desktop file if we have two emacs instances running."
-  (let ((os-list '(gnu/linux)))
-    (if (member system-type os-list)
-        (mapcar (lambda (dir)
-                  (if (file-exists-p (concat dir desktop-base-lock-name))
-                      (with-temp-buffer
-                        (message "Found lock file: %s" (concat dir desktop-base-lock-name))
-                        (insert-file-contents (concat dir desktop-base-lock-name))
-                        (let ((comm-file (concat "/proc/" (buffer-string) "/comm")))
-                          (if (file-exists-p comm-file)
-                              (with-temp-buffer 
-                                (insert-file-contents comm-file)
-                                (if (string-match "emacs" (buffer-string))
-                                    (message "Active emacs session has lock file")
-                                  (progn
-                                    (message "Removing desktop lockfile since lockfile pid is not emacs")
-                                    (delete-file (concat dir desktop-base-lock-name)))))
-                            (progn
-                              (message "Removing desktop lockfile since lockfile pid is not emacs")
-                              (delete-file (concat dir desktop-base-lock-name))))))))
-                desktop-path)
-      (message "Cannot handle os: %s" system-type))))
 
 (sp00ky/remove-unused-desktop-lock)
 (setq desktop-restore-eager 10

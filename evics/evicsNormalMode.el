@@ -5,7 +5,8 @@
   "Switch from whatever evics mode to insert"
   (interactive)
   (evics-normal-mode -1)
-  (evics-insert-mode t))
+  (evics-insert-mode t)
+  (message "-- INSERT --"))
 
 (defun evics-kill-whole-line ()
   "Kill line of text"
