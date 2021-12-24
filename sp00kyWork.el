@@ -13,8 +13,9 @@
              '("\\*Async Shell Command\\*" . (display-buffer-no-window . nil)))
 
 (defun sp00kyWork/copy-to-clipboard ()
-  "Send text from selected region to port 5556. Note, we are expecting this port to be port forwarded
-with something like \"ssh -R 5556:localhost:5556\""
+  "Send text from selected region to port 5556. Note, we are
+expecting this port to be port forwarded with something like
+\"ssh -R 5556:localhost:5556\""
   (interactive)
   (if (use-region-p)
       (let ((regionp (buffer-substring-no-properties (mark) (point))))
@@ -23,3 +24,22 @@ with something like \"ssh -R 5556:localhost:5556\""
 
 (define-key evil-visual-state-map (kbd "y") 'sp00kyWork/copy-to-clipboard)
 
+(defun sp00ky/cnfp-dbg-parse-pkt ()
+  "Take output from pp vis ppi and make it fit parsepkt. To use,
+position cursor on the line after the pasted output."
+  (interactive)
+  ; Selec lines
+  (set-mark-command nil)
+  (while (not (looking-at-p "^| Pkt_H"))
+    (previous-logical-line))
+  ; combine packet to one hex string
+  (replace-regexp "|.*?| \\([0-9a-z]*\\).*[\\\n|$]" "\\1" nil (point) (mark))
+  (beginning-of-line)
+  (insert "cnfp-dbg parsepkt ")
+  (end-of-line)
+  (insert " noshim")
+  ; Copy one liner
+  (beginning-of-line)
+  (set-mark-command nil)
+  (end-of-line 1)
+  (sp00kyWork/copy-to-clipboard))

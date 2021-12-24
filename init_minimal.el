@@ -1,6 +1,7 @@
 
 (setq user-emacs-directory "~/.emacs.d/")
 (load "~/.emacs.d/evics/evics.el")
+(load "~/scratch/visual-regexp.el")
 (xterm-mouse-mode     1)
 
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")

@@ -7,7 +7,7 @@
   "}" >)
 (define-skeleton sp00ky-skeleton/c-hal-ret-fun
   "Insert a function skeleton that returns HalStatus" nil
-  "HalStatus " _ " ()" > \n
+  "HalStatus " _ "()" > \n
   "{" > \n
   "}" >)
 (define-skeleton sp00ky-skeleton/skeleton-test
@@ -19,6 +19,14 @@
   "Insert a function skeleton that returns HalStatus" nil
   "HAL_ERR_RET(status, " _ ");")
 
+(define-skeleton sp00ky-skeleton/DER-expansion
+  "Insert a function skeleton that returns HalStatus" nil
+  "DRV_ERR_RET(drvStatus, " _ ");")
+
+(define-skeleton sp00ky-skeleton/hso-expansion
+  "Insert HalStatus_Ok" nil
+  "HalStatus_Ok");")
+
 ;(clear-abbrev-table c-mode-abbrev-table)
 (define-abbrev-table 'c-mode-abbrev-table
   '(
@@ -26,13 +34,15 @@
     ("chf" "" sp00ky-skeleton/c-hal-ret-fun)
     ("cst" "" sp00ky-skeleton/skeleton-test)
     ("hs" "HalStatus")
-    ("hso" "HalStatus_Ok")
+    ("hso" "" sp00ky-skeleton/hso-expansion)
     ("hse" "HalStatus_Error")
     ("hsi" "HalStatus_InvalidParameter")
+    ("hsd" "HalStatus_DriverError")
     ("hli" "HAL_LOG_INFO")
     ("hle" "HAL_LOG_ERR")
     ("hld" "HAL_LOG_DEBUG")
     ("HER" "" sp00ky-skeleton/HER-expansion)
+    ("DER" "" sp00ky-skeleton/DER-expansion)
     ;; END
     ))
 

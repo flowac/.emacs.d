@@ -28,18 +28,22 @@
 ;; the item under the cursor
 ;;
 ;; EVICS
+;; - Probably have to change evics-command-mode-map to be an alist instead of keymap to handle
+;; string arguments
 ;; - Implement vsplit and split
-;; - Implement sed (look at visual-regexp/anzu)
-;; - Implement prefix for c - (c w), (c i w) etc...
 ;; - highlight under cursor when marking region
 ;; - Implement rectangle commands (cua)
 ;; - Dont goto newline when going far left/right
 ;; - maybe use previous-logical-line
+;; - For regex replace, see if we can do global replace i.e. s/<pat>/<pat>/g
 ;;
 ;; MANUAL
 ;; - Read about assoc list (alists)
 ;; - Read about thread
 ;; - Read about CL, see example in helm-get-pid-from-process-name
+;;
+;; To Use:
+;; alt-Q - fill-paragraph
 ;;
 ;; Useful links:
 ;; https://karthinks.com/software/batteries-included-with-emacs/
@@ -361,7 +365,7 @@
 
 ;; Delete unused buffers after a certain amount of time. This could potentially go into sp00kyWork.
 (require 'midnight)
-(setq clean-buffer-list-delay-general 7)
+(setq clean-buffer-list-delay-general 14)
 (midnight-mode t)
 
 (sp00ky/remove-unused-desktop-lock)
@@ -373,6 +377,7 @@
 (add-to-list 'auto-mode-alist '("\\.flow\\'" . cflow-mode))
 (add-to-list 'auto-mode-alist '("\\.inc\\'" . conf-mode))
 (add-to-list 'auto-mode-alist '("\\.bb\\'" . conf-mode))
+(add-to-list 'auto-mode-alist '("\\.cint\\'" . c-mode))
 ;;;;;;;;;;;;;;;;SUBSECTION: Programming Mode Hooks ;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;SUBSECTION: Shell-script mode Hooks ;;;;;;;;;;;;;;;;
 (defun sp00ky/sh-mode-hook ()
@@ -392,7 +397,8 @@
         tab-width           3
         c-basic-offset      3
         c-tab-always-indent nil
-        evil-shift-width    3))
+        evil-shift-width    3
+        fill-column         100))
 (add-hook 'c-mode-hook 'sp00ky/c-mode-hook)
 
 ;;;;;;;;;;;;;;;;SUBSECTION: Elisp mode Hooks ;;;;;;;;;;;;;;;;
@@ -425,7 +431,8 @@
 (defun sp00ky/org-mode-hook ()
   "Various config for org-mode"
   (visual-line-mode t)
-  (setq-local word-wrap nil))
+  (setq-local word-wrap nil)
+  (setq fill-column 100))
 (add-hook 'org-mode-hook 'sp00ky/org-mode-hook)
 
 ;;;;;;;;;;;;;;;;SUBSECTION: Protobuf mode ;;;;;;;;;;;;;;;;
