@@ -321,7 +321,9 @@
 (global-set-key (kbd "ESC ESC")  'keyboard-escape-quit)
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
-
+(require 'python)
+(define-key python-mode-map (kbd "M-t") 'jedi:goto-definition)
+(define-key python-mode-map (kbd "M-h") 'jedi:show-doc)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;SECTION:              MISC INIT                 ;;;;;;;;;;;;;;;;;
@@ -427,7 +429,7 @@
   (highlight-indent-guides-mode))
 (add-hook 'python-mode-hook 'sp00ky/python-mode-hook)
 
-;;;;;;;;;;;;;;;;SUBSECTION: Python mode Hooks ;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;SUBSECTION: Org mode Hooks ;;;;;;;;;;;;;;;;
 (defun sp00ky/org-mode-hook ()
   "Various config for org-mode"
   (visual-line-mode t)
