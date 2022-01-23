@@ -430,6 +430,7 @@
 (add-hook 'python-mode-hook 'sp00ky/python-mode-hook)
 
 ;;;;;;;;;;;;;;;;SUBSECTION: Org mode Hooks ;;;;;;;;;;;;;;;;
+(setq org-adapt-indentation 'nil)
 (defun sp00ky/org-mode-hook ()
   "Various config for org-mode"
   (visual-line-mode t)
