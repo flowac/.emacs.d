@@ -26,6 +26,8 @@
 ;; - Look into undo-region
 ;; - helm look into typing something and hitting enter and it taking your literal input instead of
 ;; the item under the cursor
+;; - show-paren-mode and highlight-parentheses should play nicer together. Maybe I should change the BG
+;; colour of show-paren mode to something like red...
 ;;
 ;; EVICS
 ;; - Probably have to change evics-command-mode-map to be an alist instead of keymap to handle
@@ -87,6 +89,9 @@
         highlight-indent-guides ; Useful for python code
         helm-xref
         company-jedi
+        gnuplot
+        geiser
+        geiser-guile
         helm-gtags        ; Long term goal of replacing this with sp00ky-global
         helm-projectile)) ; Can use emacs built in project.el in emacs 28
 
@@ -104,10 +109,22 @@
       evil-undo-system 'undo-tree)
 (require 'evil)
 (add-hook 'evil-local-mode-hook 'turn-on-undo-tree-mode)
+;; I wish this would work... No idea why this is not working...
+;; (add-to-list 'evil-overriding-maps '(Info-mode-map . nil))
+;; (add-to-list 'evil-intercept-maps '(Info-mode-map . nil))
 (evil-mode 1)
 (require 'evil-collection)
 (delete 'calc evil-collection-mode-list)
+(delete 'info evil-collection-mode-list)
 (evil-collection-init)
+
+(evil-define-key 'motion Info-mode-map (kbd "H") 'Info-last)
+(evil-define-key 'motion Info-mode-map (kbd "J") 'Info-forward-node)
+(evil-define-key 'motion Info-mode-map (kbd "K") 'Info-backward-node)
+(evil-define-key 'motion Info-mode-map (kbd "L") 'Info-history-forward)
+(evil-define-key 'motion Info-mode-map (kbd ",") 'Info-index-next)
+(evil-define-key 'normal help-mode-map (kbd "M-<") 'help-go-back)
+(evil-define-key 'normal help-mode-map (kbd "M->") 'help-go-forward)
 
 ;; Some aliases to cover my common typos.
 (evil-ex-define-cmd "Q"    'kill-this-buffer)
@@ -266,6 +283,7 @@
 (setq highlight-parentheses-background-colors '("steelblue3"))
 (add-hook 'c-mode-hook 'highlight-parentheses-mode)
 (add-hook 'emacs-lisp-mode-hook 'highlight-parentheses-mode)
+(add-hook 'scheme-mode-hook 'highlight-parentheses-mode)
 
 ;;;;;;;;;;;;;;;;SUBSECTION: Highlight-Indent-Guides ;;;;;;;;;;;;;;;;
 (setq highlight-indent-guides-method     'character
@@ -312,6 +330,7 @@
 (define-key Info-mode-map (kbd "J") 'Info-forward-node)
 (define-key Info-mode-map (kbd "K") 'Info-backward-node)
 (define-key Info-mode-map (kbd "L") 'Info-history-forward)
+(define-key Info-mode-map (kbd ",") 'Info-index-next)
 
 (define-key emacs-lisp-mode-map (kbd "M-r") 'xref-find-references)
 (define-key emacs-lisp-mode-map (kbd "M-t") 'xref-find-definitions)
@@ -351,9 +370,11 @@
 (tool-bar-mode       -1)
 (menu-bar-mode       -1)
 (xterm-mouse-mode     1)
+(electric-pair-mode   t)
+;; Modifications to mode line
+(size-indication-mode)
 (column-number-mode   t)
 (line-number-mode     t)
-(electric-pair-mode   t)
 
 (which-function-mode)
 (setq which-func-unknown "n/a") ; Display n/a instead of ???
@@ -380,6 +401,7 @@
 (add-to-list 'auto-mode-alist '("\\.inc\\'" . conf-mode))
 (add-to-list 'auto-mode-alist '("\\.bb\\'" . conf-mode))
 (add-to-list 'auto-mode-alist '("\\.cint\\'" . c-mode))
+(add-to-list 'auto-mode-alist '("\\.gpi\\'" . gnuplot-mode))
 ;;;;;;;;;;;;;;;;SUBSECTION: Programming Mode Hooks ;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;SUBSECTION: Shell-script mode Hooks ;;;;;;;;;;;;;;;;
 (defun sp00ky/sh-mode-hook ()
@@ -420,6 +442,10 @@
       (setq imenu-generic-skip-comments-and-strings nil
             imenu-generic-expression init-el-lisp-imenu-generic-expression)))
 (add-hook 'emacs-lisp-mode-hook 'sp00ky/emacs-lisp-mode-hook)
+
+;;;;;;;;;;;;;;;;SUBSECTION: Scheme (Guile) mode Hooks ;;;;;;;;;;;;;;;;
+(require 'geiser-guile)
+;; Empty for now
 
 ;;;;;;;;;;;;;;;;SUBSECTION: Python mode Hooks ;;;;;;;;;;;;;;;;
 (defun sp00ky/python-mode-hook ()
