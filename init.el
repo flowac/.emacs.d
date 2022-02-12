@@ -463,6 +463,8 @@
   (setq-local word-wrap nil)
   (setq fill-column 100))
 (add-hook 'org-mode-hook 'sp00ky/org-mode-hook)
+(require 'org)
+(plist-put org-format-latex-options :scale 2.5)
 
 ;;;;;;;;;;;;;;;;SUBSECTION: Protobuf mode ;;;;;;;;;;;;;;;;
 ;; This is grabbed from:
