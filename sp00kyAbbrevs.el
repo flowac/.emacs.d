@@ -1,5 +1,8 @@
 ;; C-mode abbrevs
 (setq skeleton-end-newline nil)
+(define-skeleton sp00ky-skeleton/hss
+  "Declare HalStatus variable" nil
+  "HalStatus status;" \n)
 (define-skeleton sp00ky-skeleton/c-if-statement
   "Insert an if statement" nil
   "if (" _ ")" > \n
@@ -39,6 +42,7 @@
     ("chf" "" sp00ky-skeleton/c-hal-ret-fun)
     ("cst" "" sp00ky-skeleton/skeleton-test)
     ("hs" "HalStatus")
+    ("hss" "" sp00ky-skeleton/hss)
     ("hso" "" sp00ky-skeleton/hso-expansion)
     ("hse" "HalStatus_Error")
     ("hsi" "HalStatus_InvalidParameter")

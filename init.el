@@ -28,6 +28,7 @@
 ;; the item under the cursor
 ;; - show-paren-mode and highlight-parentheses should play nicer together. Maybe I should change the BG
 ;; colour of show-paren mode to something like red...
+;; - Look at mouse-buffer-menu to see howto do x-popup-menu
 ;;
 ;; EVICS
 ;; - Probably have to change evics-command-mode-map to be an alist instead of keymap to handle
@@ -110,15 +111,20 @@
 (require 'evil)
 (add-hook 'evil-local-mode-hook 'turn-on-undo-tree-mode)
 ;; I wish this would work... No idea why this is not working...
-;; (add-to-list 'evil-overriding-maps '(Info-mode-map . nil))
-;; (add-to-list 'evil-intercept-maps '(Info-mode-map . nil))
+(add-to-list 'evil-overriding-maps '(Info-mode-map . nil))
+(add-to-list 'evil-intercept-maps '(Info-mode-map . nil))
 (evil-mode 1)
 (require 'evil-collection)
 (delete 'calc evil-collection-mode-list)
 (delete 'info evil-collection-mode-list)
 (evil-collection-init)
 
+(evil-define-key 'motion Info-mode-map (kbd "<escape>") 'sp00ky/ignore)
+(evil-define-key 'motion Info-mode-map (kbd "f") 'sp00ky/highlight-word-at-point)
+(evil-define-key 'motion Info-mode-map (kbd "F") 'sp00ky/unhighlight-all-in-buffer)
+(evil-define-key 'motion Info-mode-map (kbd "RET") 'Info-follow-nearest-node)
 (evil-define-key 'motion Info-mode-map (kbd "H") 'Info-last)
+(evil-define-key 'motion Info-mode-map (kbd "u") 'Info-up)
 (evil-define-key 'motion Info-mode-map (kbd "J") 'Info-forward-node)
 (evil-define-key 'motion Info-mode-map (kbd "K") 'Info-backward-node)
 (evil-define-key 'motion Info-mode-map (kbd "L") 'Info-history-forward)
@@ -360,7 +366,8 @@
       org-edit-src-content-indentation 0; Org mode autoindents src code
       xref-prompt-for-identifier nil    ; So we don't need to input the symbol each time we call xref
       eldoc-echo-area-use-multiline-p t ; Let eldoc use more than 1 line in the echo area
-      auto-save-default     nil)
+      auto-save-default     nil
+      xterm-max-cut-length  200000)
 
 ;; Enabling various minor modes built in with emacs
 (global-auto-revert-mode t)
@@ -395,6 +402,9 @@
 (setq desktop-restore-eager 10
       desktop-load-locked-desktop 'nil)
 (desktop-save-mode 1)
+
+(setq sp00ky/number-to-hex-timer
+      (run-with-idle-timer 0.5 t 'sp00ky/at-point-to-hex t))
 
 (autoload 'cflow-mode "cflow-mode")
 (add-to-list 'auto-mode-alist '("\\.flow\\'" . cflow-mode))
@@ -444,6 +454,11 @@
 (add-hook 'emacs-lisp-mode-hook 'sp00ky/emacs-lisp-mode-hook)
 
 ;;;;;;;;;;;;;;;;SUBSECTION: Scheme (Guile) mode Hooks ;;;;;;;;;;;;;;;;
+(defun sp00ky/scheme-mode-hook ()
+  "Various configs I want to apply for c-mode"
+  (interactive)
+  (highlight-indent-guides-mode))
+(add-hook 'scheme-mode-hook 'sp00ky/scheme-mode-hook)
 (require 'geiser-guile)
 ;; Empty for now
 

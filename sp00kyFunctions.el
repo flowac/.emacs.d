@@ -1,4 +1,15 @@
 ;; Home to various sp00ky functions
+(defvar sp00ky/number-to-hex-timer nil
+  "Timer for `sp00ky/at-point-to-hex' to reschedule itself, or nil.")
+(require 'eldoc)
+(defun sp00ky/at-point-to-hex (&optional quiet)
+  "Convert the number at point to hex"
+  (interactive)
+  (if (numberp (thing-at-point 'number))
+      (eldoc-message (format "0x%X" (thing-at-point 'number)))
+    (if (not quiet)
+        (message "Expecting number at point"))))
+
 (require 'desktop)
 (defun sp00ky/remove-unused-desktop-lock ()
   "If emacs crashes or exits abruptly then it does not remove the 
@@ -50,6 +61,12 @@ emacs instances running."
   (interactive)
   (save-excursion (progn
                     (insert "#+BEGIN_SRC c\n#+END_SRC"))))
+
+(defun sp00ky/ignore ()
+  "Do nothing. Need to define this to specific keys that will have no
+action happen when pressed."
+  (interactive)
+  'nil)
 
 ; https://emacs.stackexchange.com/questions/19861/how-to-unhighlight-symbol-highlighted-with-highlight-symbol-at-point
 (defun sp00ky/unhighlight-all-in-buffer ()
