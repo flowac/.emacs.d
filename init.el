@@ -80,6 +80,7 @@
         geiser-guile
         gnuplot
         helm
+        helm-flyspell
         helm-gtags      ; Long term goal of replacing this with sp00ky-global
         helm-projectile
         helm-xref
@@ -218,6 +219,9 @@
 (setq helm-autoresize-min-height 50)
 (helm-autoresize-mode 1)
 
+;;;;;;;;;;;;;;;;SUBSECTION: helm-flyspell ;;;;;;;;;;;;;;;;
+(define-key flyspell-mode-map (kbd "C-;") 'helm-flyspell-correct)
+
 ;;;;;;;;;;;;;;;;SUBSECTION: helm-gtags ;;;;;;;;;;;;;;;;
 (setq helm-gtags-fuzzy-match            t
       helm-gtags-display-style          nil
@@ -353,6 +357,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Various configurations that I like:
+(require 'ispell)
+(setq-default ispell-program-name "aspell")
 (setq-default indent-tabs-mode nil); Replace Tabs with spaces
 (setq ring-bell-function   'ignore ; Who wants to hear this annoying bell anyways...
       make-backup-files     nil    ; By default, emacs makes to many backup files.
