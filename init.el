@@ -4,7 +4,6 @@
 
 ;; TODO
 ;; - Clean up modeline, for example, only need to show eyebrowse workspace thats currently active
-;; - Make mode that will convert constant value to hex/binary in the echo area
 ;; - Enable visual-line-mode or auto-fill-mode for org-mode. For autofill mode, verify
 ;; if it can auto format lines when editing late
 ;; - Make helm respect screen split when using helm-buffer-max-length
@@ -18,17 +17,15 @@
 ;;      Xref backend defaults to find | grep instead of using tags... Compare xref-backend-references and
 ;;      xref-backend-functions. I think there is also an configure option to not compress these
 ;; - Work on sp00ky global
-;; - Work on AHK mode
 ;; - look at savehist
 ;; - Fix function definitions in C imenu that are in macros ... see BfdDebug file
 ;; - Look at removing mouse-buffer-menu
-;; - Look at enaabling pulse mode
+;; - Look at enabling pulse mode
 ;; - Look into undo-region
 ;; - helm look into typing something and hitting enter and it taking your literal input instead of
 ;; the item under the cursor
-;; - show-paren-mode and highlight-parentheses should play nicer together. Maybe I should change the BG
-;; colour of show-paren mode to something like red...
 ;; - Look at mouse-buffer-menu to see howto do x-popup-menu
+;; - Look into org-comment-regexp, making it work when there is no space
 ;;
 ;; EVICS
 ;; - Probably have to change evics-command-mode-map to be an alist instead of keymap to handle
@@ -55,7 +52,6 @@
 ;; ./configure --without-all --with-xml2 --with-xft --with-libotf --with-x-toolkit=lucid --with-modules --with-png --with-jpeg --with-mailutils
 
 (setq gc-cons-threshold (* 32 1024 1024))
-
 (package-initialize)
 
 (require 'package)
@@ -78,24 +74,23 @@
     (package-install package)))
 
 (setq my-packages
-      '(helm
-        undo-tree       ; can get rid of undo-tree in emacs 28, we can use undo-redo
+      '(company
+        company-jedi
         evil            ; Long term goal of completing Evics to replace this
         evil-collection ; Long term goal of completing Evics to replace this
-        company
-        projectile      ; Can use emacs built in project.el in emacs 28
         eyebrowse       ; Can explore using built in tab-bar mode
-        sudo-edit
-        highlight-parentheses
-        highlight-indent-guides ; Useful for python code
-        helm-xref
-        company-jedi
-        gnuplot
         geiser
         geiser-guile
-        helm-gtags        ; Long term goal of replacing this with sp00ky-global
-        helm-projectile)) ; Can use emacs built in project.el in emacs 28
-
+        gnuplot
+        helm
+        helm-gtags      ; Long term goal of replacing this with sp00ky-global
+        helm-projectile
+        helm-xref
+        highlight-indent-guides
+        highlight-parentheses
+        projectile      ; Can use emacs built in project . el in emacs 28
+        sudo-edit
+        undo-tree))     ; Can get rid of undo-tree in emacs 28, we can use undo-redo
 (mapc 'sp00ky/install-package my-packages)
 
 
@@ -207,6 +202,9 @@
 
 ;(add-to-list 'helm-imenu-type-faces '("^\\(Sections\\|Subsections\\)" . font-lock-builtin-face))
 
+(require 'bookmark)
+(setq bookmark-save-flag 1) ; Setting this to 1 ensures we save bookmarks each time we add one
+(global-set-key (kbd "C-x B") 'helm-bookmarks)
 (global-set-key (kbd "C-x b") 'helm-buffers-list)
 (global-set-key (kbd "C-s")   'helm-occur)
 (global-set-key (kbd "M-x")   'helm-M-x)
@@ -286,14 +284,17 @@
 
 ;;;;;;;;;;;;;;;;SUBSECTION: Highlight-Parentheses ;;;;;;;;;;;;;;;;
 (require 'highlight-parentheses)
+; Highlight-parentheses has replaced show-paren-mode
 (setq highlight-parentheses-background-colors '("steelblue3"))
-(add-hook 'c-mode-hook 'highlight-parentheses-mode)
-(add-hook 'emacs-lisp-mode-hook 'highlight-parentheses-mode)
-(add-hook 'scheme-mode-hook 'highlight-parentheses-mode)
+(add-hook 'prog-mode-hook 'highlight-parentheses-mode)
+;; (add-hook 'c-mode-hook 'highlight-parentheses-mode)
+;; (add-hook 'emacs-lisp-mode-hook 'highlight-parentheses-mode)
+;; (add-hook 'scheme-mode-hook 'highlight-parentheses-mode)
 
 ;;;;;;;;;;;;;;;;SUBSECTION: Highlight-Indent-Guides ;;;;;;;;;;;;;;;;
 (setq highlight-indent-guides-method     'character
       highlight-indent-guides-responsive 'stack)
+(add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;SECTION:       MISC ELISP LOADING               ;;;;;;;;;;;;;;;;;
@@ -315,7 +316,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;SECTION:            MISC KEYBINDINGS            ;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(global-set-key (kbd "C-x B")   'ibuffer)
 (global-set-key (kbd "C-x C-b") 'switch-to-buffer)
 ;; Error about starting with non prefix key...
 ;; (global-set-key (kbd "C-a z")   'toggle-maximize-buffer)
@@ -348,6 +348,7 @@
 
 (require 'python)
 (define-key python-mode-map (kbd "M-t") 'jedi:goto-definition)
+(define-key python-mode-map (kbd "M-<") 'jedi:goto-definition-pop-marker)
 (define-key python-mode-map (kbd "M-h") 'jedi:show-doc)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -369,10 +370,14 @@
       auto-save-default     nil
       xterm-max-cut-length  200000)
 
+; Setting tab width
+(setq tab-stop-list     '(0 3)
+      tab-width           3
+      evil-shift-width    3)
+
 ;; Enabling various minor modes built in with emacs
 (global-auto-revert-mode t)
 (global-hl-line-mode +1) ; highlight current line
-(show-paren-mode      1) ; Show matching paren
 (scroll-bar-mode     -1)
 (tool-bar-mode       -1)
 (menu-bar-mode       -1)
@@ -456,8 +461,7 @@
 ;;;;;;;;;;;;;;;;SUBSECTION: Scheme (Guile) mode Hooks ;;;;;;;;;;;;;;;;
 (defun sp00ky/scheme-mode-hook ()
   "Various configs I want to apply for c-mode"
-  (interactive)
-  (highlight-indent-guides-mode))
+  (interactive))
 (add-hook 'scheme-mode-hook 'sp00ky/scheme-mode-hook)
 (require 'geiser-guile)
 ;; Empty for now
@@ -466,8 +470,7 @@
 (defun sp00ky/python-mode-hook ()
   "Various configs I want to apply for c-mode"
   (interactive)
-  (add-to-list 'company-backends 'company-jedi)
-  (highlight-indent-guides-mode))
+  (add-to-list 'company-backends 'company-jedi))
 (add-hook 'python-mode-hook 'sp00ky/python-mode-hook)
 
 ;;;;;;;;;;;;;;;;SUBSECTION: Org mode Hooks ;;;;;;;;;;;;;;;;
@@ -480,6 +483,16 @@
 (add-hook 'org-mode-hook 'sp00ky/org-mode-hook)
 (require 'org)
 (plist-put org-format-latex-options :scale 2.5)
+
+;;;;;;;;;;;;;;;;SUBSECTION: Javascript mode ;;;;;;;;;;;;;;;;
+(defun sp00ky/js-mode-hook ()
+  "Various config for org-mode"
+  (setq tab-stop-list     '(0 3)
+        tab-width           3
+        js-indent-level     3
+        evil-shift-width    3
+        fill-column         100))
+(add-hook 'js-mode-hook 'sp00ky/js-mode-hook)
 
 ;;;;;;;;;;;;;;;;SUBSECTION: Protobuf mode ;;;;;;;;;;;;;;;;
 ;; This is grabbed from:

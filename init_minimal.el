@@ -1,5 +1,14 @@
+; Usage:
+; emacs -q -nw -l ~/.emacs.d/init_minimal.el
 
-(setq user-emacs-directory "~/.emacs.d/")
+;;(add-to-list 'load-path "~/.emacs.d/elpa/highlight-parentheses-20210821.1957")
+;;(require 'highlight-parentheses)
+;;(setq highlight-parentheses-highlight-adjacent t)
+;;(setq highlight-parentheses-background-colors '("steelblue3"))
+;;(highlight-parentheses-mode)
+
+
+;;(setq user-emacs-directory "~/.emacs.d/")
 (load "~/.emacs.d/evics/evics.el")
 (load "~/scratch/visual-regexp.el")
 (xterm-mouse-mode     1)
@@ -14,6 +23,14 @@
 
 (setq visual-order-cursor-movement t
       help-window-select    t)
+
+;;; Nice to have init
+(add-to-list 'load-path "~/.emacs.d/elpa/highlight-parentheses-20210821.1957")
+(require 'highlight-parentheses)
+;; (setq highlight-parentheses-highlight-adjacent t) ; Replace show-paren mode
+(setq highlight-parentheses-background-colors '("steelblue3"))
+(electric-pair-mode)
+(highlight-parentheses-mode)
 
 (defun xah-display-minor-mode-key-priority  ()
   "Print out minor mode's key priority.
