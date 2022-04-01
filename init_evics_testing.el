@@ -1,53 +1,3 @@
-;; TODO
-;; - Clean up modeline, for example, only need to show eyebrowse workspace thats currently active
-;; - Enable visual-line-mode or auto-fill-mode for org-mode. For autofill mode, verify
-;; if it can auto format lines when editing late
-;; - Make helm respect screen split when using helm-buffer-max-length
-;; - Maybe switch C-h i to 'info-display-manual
-;; - Fix calc-mode keybindings
-;; - Look at xref--marker-ring to make history function that does not pop the entry from the stack
-;; - Figure out whats wrong with TAB in cc-mode
-;;    - I think c-tab-always-indent fixes this
-;; - elisp-eldoc support for multiline, see elisp-get-var-docstring, eldoc-documentation-function
-;; - Emacs source code xref doesnt seem to work, see xref-backend-references. Issue seems to be that the
-;;      Xref backend defaults to find | grep instead of using tags... Compare xref-backend-references and
-;;      xref-backend-functions. I think there is also an configure option to not compress these
-;; - Work on sp00ky global
-;; - look at savehist
-;; - Fix function definitions in C imenu that are in macros ... see BfdDebug file
-;; - Look at removing mouse-buffer-menu
-;; - Look at enabling pulse mode
-;; - Look into undo-region
-;; - helm look into typing something and hitting enter and it taking your literal input instead of
-;; the item under the cursor
-;; - Look at mouse-buffer-menu to see howto do x-popup-menu
-;; - Look into org-comment-regexp, making it work when there is no space
-;; - look into using package-quickstart
-;;
-;; EVICS
-;; - Probably have to change evics-command-mode-map to be an alist instead of keymap to handle
-;; string arguments
-;; - Show current mode on modeline
-;; - highlight under cursor when marking region
-;; - Implement rectangle commands (cua)
-;; - maybe use previous-logical-line
-;; - For regex replace, see if we can do global replace i.e. s/<pat>/<pat>/g
-;; - Dont goto newline when going far left/right
-;;
-;; MANUAL
-;; - Read about assoc list (alists)
-;; - Read about thread
-;; - Read about CL, see example in helm-get-pid-from-process-name
-;;
-;; To Use:
-;; alt-Q - fill-paragraph
-;;
-;; Useful links:
-;; https://karthinks.com/software/batteries-included-with-emacs/
-
-;; Useful emacs compile command for being lightweight:
-;; ./configure --without-all --with-xml2 --with-xft --with-libotf --with-x-toolkit=lucid --with-modules --with-png --with-jpeg --with-mailutils
-
 (setq gc-cons-threshold (* 32 1024 1024))
 (package-initialize)
 
@@ -73,8 +23,6 @@
 (setq my-packages
       '(company
         company-jedi
-        evil            ; Long term goal of completing Evics to replace this
-        evil-collection ; Long term goal of completing Evics to replace this
         eyebrowse       ; Can explore using built in tab-bar mode
         geiser
         geiser-guile
@@ -89,84 +37,11 @@
         sudo-edit
         undo-tree))     ; Can get rid of undo-tree in emacs 28, we can use undo-redo
 (mapc 'sp00ky/install-package my-packages)
-(require 'esup)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;SECTION:            PACKAGE INIT                ;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;;;;;;;;;;;;;;;;SUBSECTION: Evil ;;;;;;;;;;;;;;;;
-(require 'undo-tree)
-(setq evil-want-integration t
-      evil-want-keybinding  nil
-      evil-undo-system 'undo-tree)
-(require 'evil)
-(add-hook 'evil-local-mode-hook 'turn-on-undo-tree-mode)
-;; I wish this would work... No idea why this is not working...
-(add-to-list 'evil-overriding-maps '(Info-mode-map . nil))
-(add-to-list 'evil-intercept-maps '(Info-mode-map . nil))
-(evil-mode 1)
-(require 'evil-collection)
-(delete 'calc evil-collection-mode-list)
-(delete 'info evil-collection-mode-list)
-(evil-collection-init)
-
-(evil-define-key 'motion Info-mode-map (kbd "<escape>") 'sp00ky/ignore)
-(evil-define-key 'motion Info-mode-map (kbd "f") 'sp00ky/highlight-word-at-point)
-(evil-define-key 'motion Info-mode-map (kbd "F") 'sp00ky/unhighlight-all-in-buffer)
-(evil-define-key 'motion Info-mode-map (kbd "RET") 'Info-follow-nearest-node)
-(evil-define-key 'motion Info-mode-map (kbd "H") 'Info-last)
-(evil-define-key 'motion Info-mode-map (kbd "u") 'Info-up)
-(evil-define-key 'motion Info-mode-map (kbd "J") 'Info-forward-node)
-(evil-define-key 'motion Info-mode-map (kbd "K") 'Info-backward-node)
-(evil-define-key 'motion Info-mode-map (kbd "L") 'Info-history-forward)
-(evil-define-key 'motion Info-mode-map (kbd ",") 'Info-index-next)
-(evil-define-key 'normal help-mode-map (kbd "M-<") 'help-go-back)
-(evil-define-key 'normal help-mode-map (kbd "M->") 'help-go-forward)
-
-;; Some aliases to cover my common typos.
-(evil-ex-define-cmd "Q"    'kill-this-buffer)
-(evil-ex-define-cmd "E"    'evil-edit)
-(evil-ex-define-cmd "Wq"   'evil-save-and-close)
-(evil-ex-define-cmd "W"    'evil-write)
-(evil-ex-define-cmd "Qa"   "quitall")
-(evil-ex-define-cmd "Wqa"  'evil-save-and-quit)
-(evil-ex-define-cmd "q"    'kill-this-buffer)
-(evil-ex-define-cmd "quit" 'evil-quit) ;; Need to type out :quit to close emacs
-
-;; Go over lines that span multiple lines nicely
-(define-key evil-normal-state-map (kbd "j") 'evil-next-visual-line)
-(define-key evil-normal-state-map (kbd "k") 'evil-previous-visual-line)
-(define-key evil-normal-state-map "+"       'text-scale-increase)
-(define-key evil-normal-state-map "-"       'text-scale-decrease)
-(define-key evil-motion-state-map (kbd "TAB") 'nil)
-(define-key evil-motion-state-map (kbd "z z") 'eval-defun)
-;; Not sure why I need the \C infront here... perhaps it's something prefix related. Doesnt
-;; seem to work when using just C-h or C-o
-(define-key evil-window-map "\C-h" 'evil-window-left)
-(define-key evil-window-map "\C-o" 'nil)
-(define-key evil-window-map "o" 'nil)
-
-;; Change evil window commands to C-a to be like my tmux config. Helps not confuse my fingers
-;; if everything is the same.
-;;
-;; Previously this was done using dolist, it was cleaner. But now
-;; I am specifying ` as an extra window switching cmd and I still want to be able to insert
-;; ` normally in insert mode.
-(eval-after-load "evil-maps"
-  (progn
-    ;; Clearing old window movement keybindings
-    (define-key evil-motion-state-map (kbd "C-w") nil)
-    (define-key evil-insert-state-map (kbd "C-w") nil)
-    (define-key evil-emacs-state-map  (kbd "C-w") nil)
-    ;; Defining new window movement keybindings
-    (define-key evil-motion-state-map (kbd "C-a") 'evil-window-map)
-    (define-key evil-insert-state-map (kbd "C-a") 'evil-window-map)
-    (define-key evil-emacs-state-map  (kbd "C-a") 'evil-window-map)
-    (define-key evil-motion-state-map (kbd "`")   'evil-window-map)
-    (define-key evil-emacs-state-map  (kbd "`")   'evil-window-map)))
-(define-key evil-normal-state-map (kbd "`") 'nil)
 
 ;;;;;;;;;;;;;;;;SUBSECTION: Company ;;;;;;;;;;;;;;;;
 (setq company-dabbrev-downcase      nil
@@ -297,18 +172,13 @@
 ;;;;;;;;;;;;;;SECTION:       MISC ELISP LOADING               ;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(load (sp00ky/set-init-file-path "sp00kyFunctions.el"))
-(load (sp00ky/set-init-file-path "sp00kyAbbrevs.el"))
-(if (file-exists-p (sp00ky/set-init-file-path ".sp00kyWork"))
-    (load (sp00ky/set-init-file-path "sp00kyWork.el"))
-  (load (sp00ky/set-init-file-path "sp00kyHome.el")))
+;(load (sp00ky/set-init-file-path "sp00kyFunctions.el"))
+;(load (sp00ky/set-init-file-path "sp00kyAbbrevs.el"))
+;(if (file-exists-p (sp00ky/set-init-file-path ".sp00kyWork"))
+;    (load (sp00ky/set-init-file-path "sp00kyWork.el"))
+;  (load (sp00ky/set-init-file-path "sp00kyHome.el")))
 
 ;;;;;;;;; Keybindings for loaded functions
-(define-key evil-normal-state-map (kbd "f") 'sp00ky/highlight-word-at-point)
-(define-key evil-normal-state-map (kbd "F") 'sp00ky/unhighlight-all-in-buffer)
-;; (define-key evil-normal-state-map (kbd "t") 'sp00ky/highlight-word-at-point)
-;; (define-key evil-normal-state-map (kbd "T") 'sp00ky/unhighlight-all-in-buffer)
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;SECTION:            MISC KEYBINDINGS            ;;;;;;;;;;;;;;;;;
@@ -369,8 +239,7 @@
 
 ; Setting tab width
 (setq tab-stop-list     '(0 3)
-      tab-width           3
-      evil-shift-width    3)
+      tab-width           3)
 
 ;; Highlighting matching parens
 (setq show-paren-when-point-inside-paren t)
@@ -404,13 +273,13 @@
 (setq clean-buffer-list-delay-general 14)
 (midnight-mode t)
 
-(sp00ky/remove-unused-desktop-lock)
-(setq desktop-restore-eager 10
-      desktop-load-locked-desktop 'nil)
-(desktop-save-mode 1)
+;(sp00ky/remove-unused-desktop-lock)
+;(setq desktop-restore-eager 10
+;      desktop-load-locked-desktop 'nil)
+;(desktop-save-mode 1)
 
-(setq sp00ky/number-to-hex-timer
-      (run-with-idle-timer 0.5 t 'sp00ky/at-point-to-hex t))
+;; (setq sp00ky/number-to-hex-timer
+      ;; (run-with-idle-timer 0.5 t 'sp00ky/at-point-to-hex t))
 
 (autoload 'cflow-mode "cflow-mode")
 (add-to-list 'auto-mode-alist '("\\.flow\\'" . cflow-mode))
@@ -425,8 +294,7 @@
   (interactive)
   (setq tab-stop-list     '(0 3)
         tab-width           3
-        sh-basic-offset      3
-        evil-shift-width    3))
+        sh-basic-offset      3))
 (add-hook 'sh-mode-hook 'sp00ky/sh-mode-hook)
 ;;;;;;;;;;;;;;;;SUBSECTION: C mode Hooks ;;;;;;;;;;;;;;;;
 (setq c-default-style "k&r")
@@ -437,7 +305,6 @@
         tab-width           3
         c-basic-offset      3
         c-tab-always-indent nil
-        evil-shift-width    3
         fill-column         100))
 (add-hook 'c-mode-hook 'sp00ky/c-mode-hook)
 
@@ -491,7 +358,6 @@
   (setq tab-stop-list     '(0 3)
         tab-width           3
         js-indent-level     3
-        evil-shift-width    3
         fill-column         100))
 (add-hook 'js-mode-hook 'sp00ky/js-mode-hook)
 
@@ -511,10 +377,10 @@
 (add-to-list 'default-frame-alist '(font . "DejaVu Sans Mono-16"))
 
 ;; It's annoying when a new emacs instance prompts about a pre-existing server
-(require 'server)
-(if (not server-process)
-    (server-start)
-  (message "Not starting emacs server, one already exists"))
+;(require 'server)
+;(if (not server-process)
+;    (server-start)
+;  (message "Not starting emacs server, one already exists"))
 
 ;; Emacs' customize interface pollutes the init file in an unseemly way.
 (setq custom-file "~/.emacs.d/.emacs-custom.el")
@@ -556,3 +422,20 @@
 
 ;; To change emacs user directory from ~/.emacs.d
 ;;(setq user-emacs-directory "~/multimedia/.emacs.d/")
+
+;; EVICS
+(load "~/.emacs.d/evics/evics.el")
+(evics-global-mode t)
+(evics-init-esc)
+
+(global-undo-tree-mode)
+(define-key evics-normal-mode-map (kbd "M-x") 'helm-M-x)
+
+;; Needed because we are skipping init hook when using -q it seems
+(global-company-mode 1)
+(defun sp00ky/keyboard-escape-quit (orig-fun &rest args)
+  "Do not close all windows when calling keyboard-escape-quit"
+  (cl-flet ((delete-other-windows (nil) 'nil))
+    (message "here")
+    (apply orig-fun args)))
+(advice-add 'keyboard-escape-quit :around #'sp00ky/keyboard-escape-quit)

@@ -28,9 +28,12 @@
 (add-to-list 'load-path "~/.emacs.d/elpa/highlight-parentheses-20210821.1957")
 (require 'highlight-parentheses)
 ;; (setq highlight-parentheses-highlight-adjacent t) ; Replace show-paren mode
-(setq highlight-parentheses-background-colors '("steelblue3"))
+;; (setq highlight-parentheses-background-colors '("steelblue3"))
 (electric-pair-mode)
 (highlight-parentheses-mode)
+;; (setq show-paren-highlight-openparen 'nil)
+(setq show-paren-when-point-inside-paren t)
+(show-paren-mode)
 
 (defun xah-display-minor-mode-key-priority  ()
   "Print out minor mode's key priority.

@@ -14,9 +14,26 @@ else it will call cb2"
               (setq this-command ,cb2)
               (call-interactively ,cb2))))))
 
+(defun evics-goto-normal-mode ()
+  "Switch from whatever evics mode to evics normal mode"
+  (interactive)
+  (evics-insert-mode -1)
+  (evics-visual-mode -1)
+  (evics-normal-mode t)
+  (left-char)
+  (keyboard-quit) ;; For now keep this disabled... seems to clobber the message call below
+  (message "-- NORMAL --"))
+
+(defvar evics-region-position nil)
+(make-variable-buffer-local 'evics-region-position)
+
 ;; https://lists.gnu.org/archive/html/help-gnu-emacs/2010-12/msg01183.html
 (defun evics-select-line ()
   "Select whole line, by setting the mark at the start of the line"
-    (interactive)
-    (end-of-line) ; move to end of line
-    (set-mark (line-beginning-position)))
+  (interactive)
+  (setq evics-region-position (line-number-at-pos))
+  (forward-line 1)
+  (move-beginning-of-line nil)
+  (set-mark (point))
+  (forward-line -1)
+  (evics-visual-mode 1))

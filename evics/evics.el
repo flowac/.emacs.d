@@ -30,12 +30,36 @@
   "This function sets evics-Info-mode, which puts Info mode keybindings before evics bindings"
   (interactive)
   (setq-local evics-Info-mode t))
+(define-key Info-mode-map (kbd "h") 'left-char)
+(define-key Info-mode-map (kbd "j") 'next-line)
+(define-key Info-mode-map (kbd "k") 'previous-line)
+(define-key Info-mode-map (kbd "l") 'right-char)
+
 (add-hook 'Info-mode-hook 'evics-Info-hook)
 
 (require 'help-mode)
 (require 'info)
 (add-to-list 'minor-mode-map-alist (cons 'evics-special-mode special-mode-map))
 (add-to-list 'minor-mode-map-alist (cons 'evics-Info-mode Info-mode-map))
+
+(define-thing-chars evics-WORD "[:alnum:]_-")
+
+(defun evics-visual-post-command ()
+  "Check the current position vs evics-region-position and move
+  mark accordingly to emulate vim line mode highlighting"
+  (if (and (boundp evics-visual-mode)
+           evics-visual-mode)
+      (if (=  (line-number-at-pos) (+ 1 evics-region-position))
+          (forward-line 1)))
+  (message (format "%d - %d" (line-number-at-pos) evics-region-position)))
+(evics-visual-post-command)
+(add-hook 'post-command-hook 'evics-visual-post-command)
+
+
+;; (defun evics-emacs-lisp-hook ()
+;;   (interactive)
+;;   (modify-syntax-entry ?- "w"))
+;; (add-hook 'emacs-lisp-mode-hook 'evics-emacs-lisp-hook)
 
 ;; (defun evics-transient-mode-hook ()
   ;; "Hide the cursor when entering transient mode, and show cursor when exiting"

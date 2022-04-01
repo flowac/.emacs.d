@@ -8,6 +8,50 @@
   (evics-insert-mode t)
   (message "-- INSERT --"))
 
+(defun evics-redo ()
+  "If undotree is present call that, else no-op"
+  (interactive)
+  (if (and (locate-library "undo-tree")
+           (boundp 'undo-tree-mode)
+           undo-tree-mode)
+      (undo-tree-redo)))
+
+(defun evics-join-line ()
+  "Join line of text with next one"
+  (interactive)
+  (save-excursion
+    (join-line t)))
+
+(defun evics-backward-WORD ()
+  "Skip backwards over a WORD. evics-WORD was defined with
+define-thing-chars, and this macro does not seem to assign a
+forward op. So this method uses a makeshift forward op."
+  (interactive)
+  (while
+      (not
+       (and (thing-at-point 'evics-WORD)
+            (and (> (point)
+                    (car (bounds-of-thing-at-point 'word)))
+                 (<= (point)
+                     (cdr (bounds-of-thing-at-point 'word))))))
+    (left-char))
+  (beginning-of-thing 'evics-WORD))
+
+(defun evics-forward-WORD ()
+  "Skip over a WORD. evics-WORD was defined with
+define-thing-chars, and this macro does not seem to assign a
+forward op. So this method uses a makeshift forward op."
+  (interactive)
+  (while
+      (not
+       (and (thing-at-point 'evics-WORD)
+            (and (>= (point)
+                     (car (bounds-of-thing-at-point 'word)))
+                 (< (point)
+                    (cdr (bounds-of-thing-at-point 'word))))))
+    (right-char))
+  (end-of-thing 'evics-WORD))
+
 (defun evics-kill-whole-line ()
   "Kill line of text"
   (interactive)
@@ -53,16 +97,16 @@
 (defun evics-newline-above ()
   "Insert newline above and enter evics insert mode"
   (interactive)
-  (move-beginning-of-line nil)
-  (newline)
   (previous-line)
+  (move-end-of-line nil)
+  (call-interactively 'newline)
   (evics-goto-insert-mode))
 
 (defun evics-newline-below ()
   "Insert newline below and enter evics insert mode"
   (interactive)
   (move-end-of-line nil)
-  (newline)
+  (call-interactively 'newline)
   (evics-goto-insert-mode))
 
 (defun evics-append ()
@@ -109,6 +153,23 @@ under certain conditions. This is taken from viper mode."
     (let ((default-esc (lookup-key input-decode-map [?\e])))
       (define-key input-decode-map [?\e] `(menu-item "" ,default-esc :filter evics-esc)))))
 
+;(defun evics-command ()
+;  "Read command from minibuffer and perform the action specified
+;in evics-command-mode-map"
+;  (interactive)
+;  ;; We can specify a keymap and bind tab to a completion
+;  ;; function... look at evil implementation
+;  (let ((input (read-from-minibuffer ":"))
+;        (command nil))
+;    (setq command (car (cdr (assoc input evics-command-mode-alist))))
+;    (if command
+;        ;; Perhaps switch to funcall in the future
+;        (call-interactively command)
+;      ((mapc (lambda (x)
+;               (call-interactively
+;                (car (cdr (assoc (key-description (list x)) evics-command-mode-alist)))))
+;             input)))))
+
 (defun evics-command ()
   "Read command from minibuffer and perform the action specified
 in evics-command-mode-map"
@@ -152,10 +213,14 @@ in evics-command-mode-map"
     (define-key map "$" 'move-end-of-line)
     (define-key map "/" 'isearch-forward)
     (define-key map "?" 'isearch-backward)
-    (define-key map (kbd "<escape>") 'keyboard-escape-quit)
+    (define-key map "_" 'beginning-of-line-text)
+    ;; Kind of a cheat to bind this to keyboard-quit instead of
+    ;; keyboard escape quit.
+    (define-key map (kbd "<escape>") 'keyboard-quit)
     (define-key map ":" 'evics-command)
     (define-key map ";" 'ignore)
     (define-key map "," 'ignore)
+    (define-key map "=" 'indent-region)
 
     ;; If 0 is pressed without any other digit args before it, then we
     ;; goto the beginning of the line.
@@ -173,7 +238,7 @@ in evics-command-mode-map"
     (define-key map "a" 'evics-append)
     (define-key map "A" 'evics-append-line)
     (define-key map "b" 'backward-word)
-    (define-key map "B" 'backward-word)
+    (define-key map "B" 'evics-backward-WORD)
     (define-key map (kbd "c i w") 'evics-kill-whole-word-insert)
     (define-key map (kbd "c w") 'evics-kill-word-insert)
     (define-key map (kbd "c c") 'evics-kill-whole-line-insert)
@@ -183,14 +248,14 @@ in evics-command-mode-map"
     (define-key map (kbd "d d") 'evics-kill-whole-line)
     (define-key map "D" 'kill-line)
     (define-key map "e" 'forward-word)
-    (define-key map "E" 'forward-word)
+    (define-key map "E" 'evics-forward-WORD)
     (define-key map (kbd "g g") 'beginning-of-buffer)
     (evics-key-prefix-argument-overload map "G" 'goto-line 'end-of-buffer)
     (define-key map "h" 'left-char)
     (define-key map "H" 'backward-list)
     (define-key map "i" 'evics-goto-insert-mode)
     (define-key map "j" 'next-line)
-    (define-key map "J" 'down-list)
+    (define-key map "J" 'evics-join-line)
     (define-key map "k" 'previous-line)
     (define-key map "K" 'backward-up-list)
     (define-key map "l" 'right-char)
@@ -210,12 +275,19 @@ in evics-command-mode-map"
     (define-key map "y" 'kill-ring-save)
     (define-key map "z" 'eval-defun)
 
+    (define-key map (kbd "<tab>") 'complete-symbol)
+    ;; Will need to remove undo-tree dependency in the future
+    (define-key map (kbd "C-r") 'evics-redo)
     (define-key map (kbd "C-f") 'scroll-up-command)
+    (define-key map (kbd "C-=") 'align)
     (define-key map (kbd "C-b") 'scroll-down-command)
     (define-key map (kbd "C-j") 'delete-indentation)
     (define-key map (kbd "DEL") 'left-char)
     (define-key map (kbd "RET") 'isearch-exit)
     (define-key map (kbd "M-x") 'execute-extended-command)
+
+    ;; Window navigation Should not be in evics
+    (define-key map (kbd "C-a c") 'delete-window)
     map)
   "Evics normal mode keymap")
 
@@ -229,7 +301,9 @@ in evics-command-mode-map"
         ("Q" save-buffers-kill-terminal)
         ("o" delete-other-windows)
         ("e" find-file)
-        ("s" evics-regex-replace        )))
+        ("vsplit" split-window-right)
+        ("split" split-window-below)
+        ("s" evics-regex-replace)))
 (defvar evics-command-mode-map (make-sparse-keymap) "Evics command mode keymap")
 (define-key evics-command-mode-map (kbd "w") 'save-buffer)
 (define-key evics-command-mode-map (kbd "W") 'save-buffer)
