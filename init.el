@@ -448,6 +448,12 @@
 (add-hook 'c-mode-hook 'sp00ky/c-mode-hook)
 
 ;;;;;;;;;;;;;;;;SUBSECTION: Elisp mode Hooks ;;;;;;;;;;;;;;;;
+(defun sp00ky/tex-mode-hook ()
+  (interactive)
+  (flyspell-mode-on))
+(add-hook 'tex-mode-hook 'sp00ky/tex-mode-hook)
+
+;;;;;;;;;;;;;;;;SUBSECTION: Elisp mode Hooks ;;;;;;;;;;;;;;;;
 (defvar init-el-lisp-imenu-generic-expression
   ;; Match on word followed optionionally by space + word
   (append (list '("Sections" ";SECTION:\s*+\\(\\w+\\([\s-]\\w+\\)*\\)"   1)
