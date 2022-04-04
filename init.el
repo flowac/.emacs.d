@@ -24,20 +24,11 @@
 ;; - Look into org-comment-regexp, making it work when there is no space
 ;; - look into using package-quickstart
 ;;
-;; EVICS
-;; - Probably have to change evics-command-mode-map to be an alist instead of keymap to handle
-;; string arguments
-;; - Show current mode on modeline
-;; - highlight under cursor when marking region
-;; - Implement rectangle commands (cua)
-;; - maybe use previous-logical-line
-;; - For regex replace, see if we can do global replace i.e. s/<pat>/<pat>/g
-;; - Dont goto newline when going far left/right
-;;
 ;; MANUAL
 ;; - Read about assoc list (alists)
 ;; - Read about thread
 ;; - Read about CL, see example in helm-get-pid-from-process-name
+;; - Look at command loop (Section 21 in elisp manual)
 ;;
 ;; To Use:
 ;; alt-Q - fill-paragraph
@@ -90,7 +81,6 @@
         sudo-edit
         undo-tree))     ; Can get rid of undo-tree in emacs 28, we can use undo-redo
 (mapc 'sp00ky/install-package my-packages)
-(require 'esup)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

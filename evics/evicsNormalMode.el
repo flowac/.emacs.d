@@ -8,6 +8,13 @@
   (evics-insert-mode t)
   (message "-- INSERT --"))
 
+(defun evics-kill-ring-save ()
+  "Call kill ring save and force us out of visual mode"
+  (interactive)
+  (call-interactively 'kill-ring-save)
+  (evics-visual-mode -1)
+  (evics-normal-mode 1))
+
 (defun evics-redo ()
   "If undotree is present call that, else no-op"
   (interactive)
@@ -97,15 +104,17 @@ forward op. So this method uses a makeshift forward op."
 (defun evics-newline-above ()
   "Insert newline above and enter evics insert mode"
   (interactive)
-  (previous-line)
-  (move-end-of-line nil)
+  (beginning-of-line)
+  ;; Currently calling this interactively so it indents
   (call-interactively 'newline)
+  (forward-line -1)
   (evics-goto-insert-mode))
 
 (defun evics-newline-below ()
   "Insert newline below and enter evics insert mode"
   (interactive)
   (move-end-of-line nil)
+  ;; Currently calling this interactively so it indents
   (call-interactively 'newline)
   (evics-goto-insert-mode))
 
@@ -219,7 +228,7 @@ in evics-command-mode-map"
     (define-key map (kbd "<escape>") 'keyboard-quit)
     (define-key map ":" 'evics-command)
     (define-key map ";" 'ignore)
-    (define-key map "," 'ignore)
+    (define-key map "," 'jump-to-register)
     (define-key map "=" 'indent-region)
 
     ;; If 0 is pressed without any other digit args before it, then we
@@ -255,12 +264,12 @@ in evics-command-mode-map"
     (define-key map "H" 'backward-list)
     (define-key map "i" 'evics-goto-insert-mode)
     (define-key map "j" 'next-line)
-    (define-key map "J" 'evics-join-line)
+    (define-key map "J" 'down-list)
     (define-key map "k" 'previous-line)
     (define-key map "K" 'backward-up-list)
     (define-key map "l" 'right-char)
     (define-key map "L" 'forward-list)
-    (define-key map "m" (lambda () (interactive)(print (current-local-map))))
+    (define-key map "m" 'point-to-register)
     (define-key map "M" (lambda () (interactive)(print (current-minor-mode-maps))))
     (define-key map "n" 'isearch-repeat-forward)
     (define-key map "N" 'isearch-repeat-backward)
@@ -272,16 +281,16 @@ in evics-command-mode-map"
     (define-key map "v" 'set-mark-command)
     (define-key map "V" 'evics-select-line)
     (define-key map "x" 'delete-forward-char)
-    (define-key map "y" 'kill-ring-save)
+    (define-key map "y" 'evics-kill-ring-save)
     (define-key map "z" 'eval-defun)
 
     (define-key map (kbd "<tab>") 'complete-symbol)
     ;; Will need to remove undo-tree dependency in the future
+    (define-key map (kbd "C-j") 'evics-join-line)
     (define-key map (kbd "C-r") 'evics-redo)
     (define-key map (kbd "C-f") 'scroll-up-command)
     (define-key map (kbd "C-=") 'align)
     (define-key map (kbd "C-b") 'scroll-down-command)
-    (define-key map (kbd "C-j") 'delete-indentation)
     (define-key map (kbd "DEL") 'left-char)
     (define-key map (kbd "RET") 'isearch-exit)
     (define-key map (kbd "M-x") 'execute-extended-command)
@@ -290,6 +299,34 @@ in evics-command-mode-map"
     (define-key map (kbd "C-a c") 'delete-window)
     map)
   "Evics normal mode keymap")
+
+(defvar evics-mini-normal-mode-map
+  (let ((map (make-keymap)))
+    (suppress-keymap map)
+    (define-key map ":" 'evics-command)
+    (define-key map "B" 'evics-backward-WORD)
+    (define-key map "b" 'backward-word)
+    (define-key map "e" 'forward-word)
+    (define-key map "E" 'evics-forward-WORD)
+    (define-key map (kbd "g g") 'beginning-of-buffer)
+    (define-key map (kbd "G") 'end-of-buffer)
+    (define-key map "h" 'left-char)
+    (define-key map "j" 'next-line)
+    (define-key map "k" 'previous-line)
+    (define-key map "l" 'right-char)
+    (define-key map (kbd "C-f") 'scroll-up-command)
+    (define-key map (kbd "C-b") 'scroll-down-command)
+    map)
+  "Minimal keymap for navigation. This is used to override
+  special modes keybindings.")
+
+(defun evics-help-mode-override ()
+  "Adding a overriding map to help mode to prevent it from
+clobbering basic movement commands"
+  (add-to-list 'minor-mode-overriding-map-alist
+               '((evics-normal-mode evics-mini-normal-mode-map))))
+(add-hook 'help-mode-hook 'evics-help-mode-override)
+(remove-hook 'help-mode-hook 'evics-help-mode-override)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;             commands              ;;;;;;;;;;;;;;

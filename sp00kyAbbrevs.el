@@ -1,4 +1,5 @@
 ;; C-mode abbrevs
+(setq save-abbrevs nil)
 (setq skeleton-end-newline nil)
 (define-skeleton sp00ky-skeleton/hss
   "Declare HalStatus variable" nil
@@ -52,6 +53,20 @@
     ("hld" "HAL_LOG_DEBUG")
     ("HER" "" sp00ky-skeleton/HER-expansion)
     ("DER" "" sp00ky-skeleton/DER-expansion)
+    ;; END
+    ))
+
+(define-skeleton sp00ky-skeleton/elisp-edf-expansion
+  "Insert a defun statement" nil
+  "(defun f" _ " ()" \n
+  "\"DOCSTRING\"" \n
+  "(interactive)" \n
+  ")")
+
+;; (clear-abbrev-table emacs-lisp-mode-abbrev-table)
+(define-abbrev-table 'emacs-lisp-mode-abbrev-table
+  '(
+    ("edf" "" sp00ky-skeleton/elisp-edf-expansion)
     ;; END
     ))
 

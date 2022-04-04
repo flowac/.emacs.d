@@ -173,7 +173,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;(load (sp00ky/set-init-file-path "sp00kyFunctions.el"))
-;(load (sp00ky/set-init-file-path "sp00kyAbbrevs.el"))
+(load (sp00ky/set-init-file-path "sp00kyAbbrevs.el"))
 ;(if (file-exists-p (sp00ky/set-init-file-path ".sp00kyWork"))
 ;    (load (sp00ky/set-init-file-path "sp00kyWork.el"))
 ;  (load (sp00ky/set-init-file-path "sp00kyHome.el")))

@@ -14,18 +14,27 @@ else it will call cb2"
               (setq this-command ,cb2)
               (call-interactively ,cb2))))))
 
+(defun evics-left-char-same-line ()
+  "Only go as far left as column 0"
+  (interactive)
+  (if (not (= 0 (current-column)))
+      (left-char)))
+
 (defun evics-goto-normal-mode ()
   "Switch from whatever evics mode to evics normal mode"
   (interactive)
   (evics-insert-mode -1)
   (evics-visual-mode -1)
   (evics-normal-mode t)
-  (left-char)
+  (evics-left-char-same-line)
   (keyboard-quit) ;; For now keep this disabled... seems to clobber the message call below
   (message "-- NORMAL --"))
 
 (defvar evics-region-position nil)
 (make-variable-buffer-local 'evics-region-position)
+
+(defvar evics-previous-line-number nil)
+(make-variable-buffer-local 'evics-previous-line-number)
 
 ;; https://lists.gnu.org/archive/html/help-gnu-emacs/2010-12/msg01183.html
 (defun evics-select-line ()
@@ -37,3 +46,4 @@ else it will call cb2"
   (set-mark (point))
   (forward-line -1)
   (evics-visual-mode 1))
+
