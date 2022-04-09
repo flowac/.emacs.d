@@ -105,7 +105,7 @@
     ;; END
     ))
 
-(define-skeleton sp00ky-skeleton/elisp-edf-expansion
+(define-skeleton sp00ky-skeleton/elisp-dfn-expansion
   "Insert a defun statement" nil
   "(defun f" _ " ()" \n
   "\"DOCSTRING\"" \n
@@ -123,7 +123,7 @@
 ;; (clear-abbrev-table emacs-lisp-mode-abbrev-table)
 (define-abbrev-table 'emacs-lisp-mode-abbrev-table
   '(
-    ("edf" "" sp00ky-skeleton/elisp-edf-expansion)
+    ("dfn" "" sp00ky-skeleton/elisp-dfn-expansion)
     ("dfk" "" sp00ky-skeleton/elisp-dfk-expansion)
     ("dfv" "" sp00ky-skeleton/elisp-dfv-expansion)
     ;; END

@@ -61,12 +61,16 @@
     (package-refresh-contents)
     (package-install package)))
 
+(defvar sp00ky/use-evics t
+  "Load evics or evil")
+
 (setq my-packages
       '(company
         company-jedi
-        evil            ; Long term goal of completing Evics to replace this
-        evil-collection ; Long term goal of completing Evics to replace this
-        eyebrowse       ; Can explore using built in tab-bar mode
+        ;; evil            ; Long term goal of completing Evics to replace this
+        ;; evil-collection ; Long term goal of completing Evics to replace this
+        eyebrowse       ; Can explore using built in tab-bar mode, or
+                        ; window/frame registers
         geiser
         geiser-guile
         gnuplot
@@ -82,85 +86,98 @@
         undo-tree))     ; Can get rid of undo-tree in emacs 28, we can use undo-redo
 (mapc 'sp00ky/install-package my-packages)
 
+(if (not file-exists-p "/multimedia/builds/evics")
+    (setq sp00ky/use-evics nil))
+(if sp00ky/use-evics
+    (progn
+      (add-to-list 'load-path "/multimedia/builds/evics")
+      (require 'evics)
+      (evics-global-mode t))
+  (mapc
+   'sp00ky/install-package
+   (list
+    evil
+    evil-collection)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;SECTION:            PACKAGE INIT                ;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;SUBSECTION: Evil ;;;;;;;;;;;;;;;;
-(require 'undo-tree)
-(setq evil-want-integration t
-      evil-want-keybinding  nil
-      evil-undo-system 'undo-tree)
-(require 'evil)
-(add-hook 'evil-local-mode-hook 'turn-on-undo-tree-mode)
-;; I wish this would work... No idea why this is not working...
-(add-to-list 'evil-overriding-maps '(Info-mode-map . nil))
-(add-to-list 'evil-intercept-maps '(Info-mode-map . nil))
-(evil-mode 1)
-(require 'evil-collection)
-(delete 'calc evil-collection-mode-list)
-(delete 'info evil-collection-mode-list)
-(evil-collection-init)
+(if (not sp00ky/use-evics)
+    (progn
+      (require 'undo-tree)
+      (setq evil-want-integration t
+            evil-want-keybinding  nil
+            evil-undo-system 'undo-tree)
+      (require 'evil)
+      (add-hook 'evil-local-mode-hook 'turn-on-undo-tree-mode)
+      ;; I wish this would work... No idea why this is not working...
+      (add-to-list 'evil-overriding-maps '(Info-mode-map . nil))
+      (add-to-list 'evil-intercept-maps '(Info-mode-map . nil))
+      (evil-mode 1)
+      (require 'evil-collection)
+      (delete 'calc evil-collection-mode-list)
+      (delete 'info evil-collection-mode-list)
+      (evil-collection-init)
 
-(evil-define-key 'motion Info-mode-map (kbd "<escape>") 'sp00ky/ignore)
-(evil-define-key 'motion Info-mode-map (kbd "f") 'sp00ky/highlight-word-at-point)
-(evil-define-key 'motion Info-mode-map (kbd "F") 'sp00ky/unhighlight-all-in-buffer)
-(evil-define-key 'motion Info-mode-map (kbd "RET") 'Info-follow-nearest-node)
-(evil-define-key 'motion Info-mode-map (kbd "H") 'Info-last)
-(evil-define-key 'motion Info-mode-map (kbd "u") 'Info-up)
-(evil-define-key 'motion Info-mode-map (kbd "J") 'Info-forward-node)
-(evil-define-key 'motion Info-mode-map (kbd "K") 'Info-backward-node)
-(evil-define-key 'motion Info-mode-map (kbd "L") 'Info-history-forward)
-(evil-define-key 'motion Info-mode-map (kbd ",") 'Info-index-next)
-(evil-define-key 'normal help-mode-map (kbd "M-<") 'help-go-back)
-(evil-define-key 'normal help-mode-map (kbd "M->") 'help-go-forward)
+      (evil-define-key 'motion Info-mode-map (kbd "<escape>") 'sp00ky/ignore)
+      (evil-define-key 'motion Info-mode-map (kbd "f") 'sp00ky/highlight-word-at-point)
+      (evil-define-key 'motion Info-mode-map (kbd "F") 'sp00ky/unhighlight-all-in-buffer)
+      (evil-define-key 'motion Info-mode-map (kbd "RET") 'Info-follow-nearest-node)
+      (evil-define-key 'motion Info-mode-map (kbd "H") 'Info-last)
+      (evil-define-key 'motion Info-mode-map (kbd "u") 'Info-up)
+      (evil-define-key 'motion Info-mode-map (kbd "J") 'Info-forward-node)
+      (evil-define-key 'motion Info-mode-map (kbd "K") 'Info-backward-node)
+      (evil-define-key 'motion Info-mode-map (kbd "L") 'Info-history-forward)
+      (evil-define-key 'motion Info-mode-map (kbd ",") 'Info-index-next)
+      (evil-define-key 'normal help-mode-map (kbd "M-<") 'help-go-back)
+      (evil-define-key 'normal help-mode-map (kbd "M->") 'help-go-forward)
 
-;; Some aliases to cover my common typos.
-(evil-ex-define-cmd "Q"    'kill-this-buffer)
-(evil-ex-define-cmd "E"    'evil-edit)
-(evil-ex-define-cmd "Wq"   'evil-save-and-close)
-(evil-ex-define-cmd "W"    'evil-write)
-(evil-ex-define-cmd "Qa"   "quitall")
-(evil-ex-define-cmd "Wqa"  'evil-save-and-quit)
-(evil-ex-define-cmd "q"    'kill-this-buffer)
-(evil-ex-define-cmd "quit" 'evil-quit) ;; Need to type out :quit to close emacs
+      ;; Some aliases to cover my common typos.
+      (evil-ex-define-cmd "Q"    'kill-this-buffer)
+      (evil-ex-define-cmd "E"    'evil-edit)
+      (evil-ex-define-cmd "Wq"   'evil-save-and-close)
+      (evil-ex-define-cmd "W"    'evil-write)
+      (evil-ex-define-cmd "Qa"   "quitall")
+      (evil-ex-define-cmd "Wqa"  'evil-save-and-quit)
+      (evil-ex-define-cmd "q"    'kill-this-buffer)
+      (evil-ex-define-cmd "quit" 'evil-quit) ;; Need to type out :quit to close emacs
 
-;; Go over lines that span multiple lines nicely
-;; (define-key evil-insert-state-map (kbd "C-k") 'hippie-expand)
+      ;; Go over lines that span multiple lines nicely
+      ;; (define-key evil-insert-state-map (kbd "C-k") 'hippie-expand)
 
-(define-key evil-normal-state-map (kbd "j") 'evil-next-visual-line)
-(define-key evil-normal-state-map (kbd "k") 'evil-previous-visual-line)
-(define-key evil-normal-state-map "+"       'text-scale-increase)
-(define-key evil-normal-state-map "-"       'text-scale-decrease)
-(define-key evil-motion-state-map (kbd "TAB") 'nil)
-(define-key evil-motion-state-map (kbd "z z") 'eval-defun)
-;; Not sure why I need the \C infront here... perhaps it's something prefix related. Doesnt
-;; seem to work when using just C-h or C-o
-(define-key evil-window-map "\C-h" 'evil-window-left)
-(define-key evil-window-map "\C-o" 'nil)
-(define-key evil-window-map "o" 'nil)
+      (define-key evil-normal-state-map (kbd "j") 'evil-next-visual-line)
+      (define-key evil-normal-state-map (kbd "k") 'evil-previous-visual-line)
+      (define-key evil-normal-state-map "+"       'text-scale-increase)
+      (define-key evil-normal-state-map "-"       'text-scale-decrease)
+      (define-key evil-motion-state-map (kbd "TAB") 'nil)
+      (define-key evil-motion-state-map (kbd "z z") 'eval-defun)
+      ;; Not sure why I need the \C infront here... perhaps it's something prefix related. Doesnt
+      ;; seem to work when using just C-h or C-o
+      (define-key evil-window-map "\C-h" 'evil-window-left)
+      (define-key evil-window-map "\C-o" 'nil)
+      (define-key evil-window-map "o" 'nil)
 
-;; Change evil window commands to C-a to be like my tmux config. Helps not confuse my fingers
-;; if everything is the same.
-;;
-;; Previously this was done using dolist, it was cleaner. But now
-;; I am specifying ` as an extra window switching cmd and I still want to be able to insert
-;; ` normally in insert mode.
-(eval-after-load "evil-maps"
-  (progn
-    ;; Clearing old window movement keybindings
-    (define-key evil-motion-state-map (kbd "C-w") nil)
-    (define-key evil-insert-state-map (kbd "C-w") nil)
-    (define-key evil-emacs-state-map  (kbd "C-w") nil)
-    ;; Defining new window movement keybindings
-    (define-key evil-motion-state-map (kbd "C-a") 'evil-window-map)
-    (define-key evil-insert-state-map (kbd "C-a") 'evil-window-map)
-    (define-key evil-emacs-state-map  (kbd "C-a") 'evil-window-map)
-    (define-key evil-motion-state-map (kbd "`")   'evil-window-map)
-    (define-key evil-emacs-state-map  (kbd "`")   'evil-window-map)))
-(define-key evil-normal-state-map (kbd "`") 'nil)
-
+      ;; Change evil window commands to C-a to be like my tmux config. Helps not confuse my fingers
+      ;; if everything is the same.
+      ;;
+      ;; Previously this was done using dolist, it was cleaner. But now
+      ;; I am specifying ` as an extra window switching cmd and I still want to be able to insert
+      ;; ` normally in insert mode.
+      (eval-after-load "evil-maps"
+        (progn
+          ;; Clearing old window movement keybindings
+          (define-key evil-motion-state-map (kbd "C-w") nil)
+          (define-key evil-insert-state-map (kbd "C-w") nil)
+          (define-key evil-emacs-state-map  (kbd "C-w") nil)
+          ;; Defining new window movement keybindings
+          (define-key evil-motion-state-map (kbd "C-a") 'evil-window-map)
+          (define-key evil-insert-state-map (kbd "C-a") 'evil-window-map)
+          (define-key evil-emacs-state-map  (kbd "C-a") 'evil-window-map)
+          (define-key evil-motion-state-map (kbd "`")   'evil-window-map)
+          (define-key evil-emacs-state-map  (kbd "`")   'evil-window-map)))
+      (define-key evil-normal-state-map (kbd "`") 'nil)))
 ;;;;;;;;;;;;;;;;SUBSECTION: Company ;;;;;;;;;;;;;;;;
 (setq company-dabbrev-downcase      nil
       company-idle-delay            0.2
@@ -212,6 +229,7 @@
 (helm-autoresize-mode 1)
 
 ;;;;;;;;;;;;;;;;SUBSECTION: helm-flyspell ;;;;;;;;;;;;;;;;
+(require 'flyspell)
 (define-key flyspell-mode-map (kbd "C-;") 'helm-flyspell-correct)
 
 ;;;;;;;;;;;;;;;;SUBSECTION: helm-gtags ;;;;;;;;;;;;;;;;
@@ -300,8 +318,13 @@
   (load (sp00ky/set-init-file-path "sp00kyHome.el")))
 
 ;;;;;;;;; Keybindings for loaded functions
-(define-key evil-normal-state-map (kbd "f") 'sp00ky/highlight-word-at-point)
-(define-key evil-normal-state-map (kbd "F") 'sp00ky/unhighlight-all-in-buffer)
+(if sp00ky/use-evics
+    (progn
+      (define-key evics-normal-mode-map (kbd "f") 'sp00ky/highlight-word-at-point)
+      (define-key evics-normal-mode-map (kbd "F") 'sp00ky/unhighlight-all-in-buffer))
+  (progn
+    (define-key evil-normal-state-map (kbd "f") 'sp00ky/highlight-word-at-point)
+    (define-key evil-normal-state-map (kbd "F") 'sp00ky/unhighlight-all-in-buffer)))
 ;; (define-key evil-normal-state-map (kbd "t") 'sp00ky/highlight-word-at-point)
 ;; (define-key evil-normal-state-map (kbd "T") 'sp00ky/unhighlight-all-in-buffer)
 
@@ -309,6 +332,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;SECTION:            MISC KEYBINDINGS            ;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(global-set-key (kbd "<tab>") 'complete-symbol)
+(global-set-key (kbd "TAB") 'complete-symbol)
 (global-set-key (kbd "M-w") 'hippie-expand)
 (global-set-key (kbd "C-x C-b") 'switch-to-buffer)
 (global-set-key (kbd "C-x C-b") 'switch-to-buffer)
@@ -369,8 +394,8 @@
 
 ; Setting tab width
 (setq tab-stop-list     '(0 3)
-      tab-width           3
-      evil-shift-width    3)
+      ;; evil-shift-width    3
+      tab-width           3)
 
 ;; Highlighting matching parens
 (setq show-paren-when-point-inside-paren t)
@@ -425,8 +450,8 @@
   (interactive)
   (setq tab-stop-list     '(0 3)
         tab-width           3
-        sh-basic-offset      3
-        evil-shift-width    3))
+        ;; evil-shift-width    3
+        sh-basic-offset      3))
 (add-hook 'sh-mode-hook 'sp00ky/sh-mode-hook)
 ;;;;;;;;;;;;;;;;SUBSECTION: C mode Hooks ;;;;;;;;;;;;;;;;
 (setq c-default-style "k&r")
@@ -437,7 +462,7 @@
         tab-width           3
         c-basic-offset      3
         c-tab-always-indent nil
-        evil-shift-width    3
+        ;; evil-shift-width    3
         fill-column         100))
 (add-hook 'c-mode-hook 'sp00ky/c-mode-hook)
 
@@ -497,7 +522,7 @@
   (setq tab-stop-list     '(0 3)
         tab-width           3
         js-indent-level     3
-        evil-shift-width    3
+        ;; evil-shift-width    3
         fill-column         100))
 (add-hook 'js-mode-hook 'sp00ky/js-mode-hook)
 
@@ -536,13 +561,19 @@
     (setq package-selected-packages value)))
 
 
-(load "~/.emacs.d/bb-mode.el")
-(require 'bb-mode)
-(setq auto-mode-alist (cons '("\\.bb$" . bb-mode) auto-mode-alist))
-(setq auto-mode-alist (cons '("\\.inc$" . bb-mode) auto-mode-alist))
-(setq auto-mode-alist (cons '("\\.bbappend$" . bb-mode) auto-mode-alist))
-(setq auto-mode-alist (cons '("\\.bbclass$" . bb-mode) auto-mode-alist))
-(setq auto-mode-alist (cons '("\\.conf$" . bb-mode) auto-mode-alist))
+(let ((file "~/.emacs.d/bb-mode.el"))
+  (when (file-exists-p file)
+    (load file)
+    (require 'bb-mode)
+    (setq auto-mode-alist (cons '("\\.bb$" . bb-mode) auto-mode-alist))
+    (setq auto-mode-alist (cons '("\\.inc$" . bb-mode) auto-mode-alist))
+    (setq auto-mode-alist (cons '("\\.bbappend$" . bb-mode) auto-mode-alist))
+    (setq auto-mode-alist (cons '("\\.bbclass$" . bb-mode) auto-mode-alist))
+    (setq auto-mode-alist (cons '("\\.conf$" . bb-mode) auto-mode-alist))))
+
+(let ((file "~/.emacs.d/help-fns+.el"))
+  (when (file-exists-p file)
+    (load file)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;SECTION:               COMMENTS                 ;;;;;;;;;;;;;;;;;

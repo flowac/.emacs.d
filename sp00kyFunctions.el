@@ -101,23 +101,27 @@ hilighting")
 	(highlight-regexp (regexp-opt target))
 	(setq sp00ky/last-highlighted-word target)))))
 
-(defun sp00ky/evil-cut-to-0 ()
-  (interactive)
-  (let ((evil-this-register ?0))
-    (call-interactively 'evil-yank)
-    (call-interactively 'evil-delete-char)))
+;;=========================================================================
+;; Evil code fragment to remove in the future.
+(unless sp00ky/use-evics
+  (defun sp00ky/evil-cut-to-0 ()
+    (interactive)
+    (let ((evil-this-register ?0))
+      (call-interactively 'evil-yank)
+      (call-interactively 'evil-delete-char)))
 
-(defun sp00ky/evil-delete-char ()
-  (interactive)
-  (let ((evil-this-register ?_))
-    (call-interactively 'evil-delete-char)))
-(define-key evil-visual-state-map "x" 'sp00ky/evil-cut-to-0)
-(define-key evil-normal-state-map "x" 'sp00ky/evil-delete-char)
+  (defun sp00ky/evil-delete-char ()
+    (interactive)
+    (let ((evil-this-register ?_))
+      (call-interactively 'evil-delete-char)))
+  (define-key evil-visual-state-map "x" 'sp00ky/evil-cut-to-0)
+  (define-key evil-normal-state-map "x" 'sp00ky/evil-delete-char)
 
-(defun sp00ky/evil-paste-after-from-0 ()
-  (interactive)
-  (let ((evil-this-register ?0))
-    (call-interactively 'evil-paste-after)))
+  (defun sp00ky/evil-paste-after-from-0 ()
+    (interactive)
+    (let ((evil-this-register ?0))
+      (call-interactively 'evil-paste-after))))
+;;=========================================================================
 
 (defun toggle-maximize-buffer () "Maximize buffer"
   (interactive)
