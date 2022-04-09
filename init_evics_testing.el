@@ -167,6 +167,7 @@
 (setq highlight-indent-guides-method     'character
       highlight-indent-guides-responsive 'stack)
 (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
+(remove-hook 'prog-mode-hook 'highlight-indent-guides-mode)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;SECTION:       MISC ELISP LOADING               ;;;;;;;;;;;;;;;;;
@@ -432,6 +433,8 @@
 (define-key evics-normal-mode-map (kbd "M-x") 'helm-M-x)
 
 ;; Needed because we are skipping init hook when using -q it seems
+(setq inhibit-startup-message t) ; For some reason evics doesnt work
+                                 ; on this buffer...
 (global-company-mode 1)
 (defun sp00ky/keyboard-escape-quit (orig-fun &rest args)
   "Do not close all windows when calling keyboard-escape-quit"
@@ -439,3 +442,5 @@
     (message "here")
     (apply orig-fun args)))
 (advice-add 'keyboard-escape-quit :around #'sp00ky/keyboard-escape-quit)
+(toggle-debug-on-error)
+(global-set-key (kbd "M-w") 'hippie-expand)

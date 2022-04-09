@@ -8,6 +8,14 @@
   (evics-insert-mode t)
   (message "-- INSERT --"))
 
+(defun evics-goto-Insert-mode ()
+  "Switch from whatever evics mode to insert"
+  (interactive)
+  (evics-normal-mode -1)
+  (evics-insert-mode t)
+  (exchange-point-and-mark)
+  (message "-- INSERT --"))
+
 (defun evics-kill-ring-save ()
   "Call kill ring save and force us out of visual mode"
   (interactive)
@@ -88,17 +96,25 @@ forward op. So this method uses a makeshift forward op."
   (kill-word 1)
   (evics-goto-insert-mode))
 
+(defun evics--kill-line-or-whitespace ()
+  "Kill-line functionality that does not kill through the
+newline."
+  (if (looking-at-p "[[:blank:]]*$")
+      (progn (re-search-forward "[[:blank:]]*")
+             (replace-match ""))
+    (kill-line)))
+
 (defun evics-kill-whole-line-insert ()
   "Kill line of text"
   (interactive)
   (move-beginning-of-line nil)
-  (kill-line)
+  (evics--kill-line-or-whitespace)
   (evics-goto-insert-mode))
 
 (defun evics-kill-line-insert ()
   "Kill line of text"
   (interactive)
-  (kill-line)
+  (evics--kill-line-or-whitespace)
   (evics-goto-insert-mode))
 
 (defun evics-newline-above ()
@@ -215,6 +231,7 @@ in evics-command-mode-map"
 ;;;;;;;;;;;;;;;;         Keymap            ;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(require 'rect)
 (defvar evics-normal-mode-map
   (let ((map (make-keymap)))
     (suppress-keymap map)
@@ -263,6 +280,7 @@ in evics-command-mode-map"
     (define-key map "h" 'left-char)
     (define-key map "H" 'backward-list)
     (define-key map "i" 'evics-goto-insert-mode)
+    (define-key map "I" 'evics-goto-Insert-mode)
     (define-key map "j" 'next-line)
     (define-key map "J" 'down-list)
     (define-key map "k" 'previous-line)
@@ -285,10 +303,12 @@ in evics-command-mode-map"
     (define-key map "z" 'eval-defun)
 
     (define-key map (kbd "<tab>") 'complete-symbol)
+    (define-key map (kbd "TAB") 'complete-symbol)
     ;; Will need to remove undo-tree dependency in the future
+    (define-key map (kbd "C-f") 'scroll-up-command)
     (define-key map (kbd "C-j") 'evics-join-line)
     (define-key map (kbd "C-r") 'evics-redo)
-    (define-key map (kbd "C-f") 'scroll-up-command)
+    (define-key map (kbd "C-v") 'rectangle-mark-mode)
     (define-key map (kbd "C-=") 'align)
     (define-key map (kbd "C-b") 'scroll-down-command)
     (define-key map (kbd "DEL") 'left-char)
@@ -304,6 +324,8 @@ in evics-command-mode-map"
   (let ((map (make-keymap)))
     (suppress-keymap map)
     (define-key map ":" 'evics-command)
+    (define-key map "/" 'isearch-forward)
+    (define-key map "?" 'isearch-backward)
     (define-key map "B" 'evics-backward-WORD)
     (define-key map "b" 'backward-word)
     (define-key map "e" 'forward-word)
@@ -316,6 +338,7 @@ in evics-command-mode-map"
     (define-key map "l" 'right-char)
     (define-key map (kbd "C-f") 'scroll-up-command)
     (define-key map (kbd "C-b") 'scroll-down-command)
+    (define-key map (kbd "<escape>") 'keyboard-quit)
     map)
   "Minimal keymap for navigation. This is used to override
   special modes keybindings.")

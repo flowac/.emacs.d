@@ -9,6 +9,21 @@
   "if (" _ ")" > \n
   "{" > \n
   "}" >)
+(define-skeleton sp00ky-skeleton/c-dfn
+  "Insert a function" nil
+  "//======================================================================" \n
+  "// Description:" \n
+  "//   DOCSTRING" \n
+  "//======================================================================" \n
+  "void f(" _ ")" \n
+  "{" > \n \n
+  "return;" > \n
+  "}" >)
+(define-skeleton sp00ky-skeleton/c-whi
+  "Insert a function" nil
+  "while (" _ ")" \n
+  "{" > \n \n
+  "}" >)
 (define-skeleton sp00ky-skeleton/c-for-statement
   "Insert an if statement" nil
   "for (" _ ")" > \n
@@ -26,6 +41,9 @@
 (define-skeleton sp00ky-skeleton/HER-expansion
   "Insert a function skeleton that returns HalStatus" nil
   "HAL_ERR_RET(status, " _ ");")
+(define-skeleton sp00ky-skeleton/HERU-expansion
+  "Insert a function skeleton that returns HalStatus" nil
+  "HAL_ERR_RETU(status, " _ ");")
 
 (define-skeleton sp00ky-skeleton/DER-expansion
   "Insert a function skeleton that returns HalStatus" nil
@@ -35,9 +53,39 @@
   "Insert HalStatus_Ok" nil
   "HalStatus_Ok");")
 
+(define-skeleton sp00ky-skeleton/hli-expansion
+  "" nil
+  "HAL_LOG_INFO(\"" _ "\");" >)
+
+(define-skeleton sp00ky-skeleton/hle-expansion
+  "" nil
+  "HAL_LOG_ERR(\"" _ "\");" >)
+
+(define-skeleton sp00ky-skeleton/hld-expansion
+  "" nil
+  "HAL_LOG_DEBUG(\"" _ "\");" >)
+(define-skeleton sp00ky-skeleton/c-swi
+  "" nil
+  "switch (" _ ")" > \n
+  "{" > \n
+  "case x:" > \n
+  "break;" > \n
+  "default:" > \n
+  "break;" > \n
+  "}" > )
+(define-skeleton sp00ky-skeleton/c-tenu
+  "" nil
+  "typedef enum" > \n
+  "{" _ > \n
+  "} enumName;" >)
+
 ;(clear-abbrev-table c-mode-abbrev-table)
 (define-abbrev-table 'c-mode-abbrev-table
   '(
+    ("tenu" "" sp00ky-skeleton/c-tenu)
+    ("swi" "" sp00ky-skeleton/c-swi)
+    ("whi" "" sp00ky-skeleton/c-whi)
+    ("dfn" "" sp00ky-skeleton/c-dfn)
     ("cif" "" sp00ky-skeleton/c-if-statement)
     ("cfor" "" sp00ky-skeleton/c-for-statement)
     ("chf" "" sp00ky-skeleton/c-hal-ret-fun)
@@ -48,10 +96,11 @@
     ("hse" "HalStatus_Error")
     ("hsi" "HalStatus_InvalidParameter")
     ("hsd" "HalStatus_DriverError")
-    ("hli" "HAL_LOG_INFO")
-    ("hle" "HAL_LOG_ERR")
-    ("hld" "HAL_LOG_DEBUG")
+    ("hli" "" sp00ky-skeleton/hli-expansion)
+    ("hle" "" sp00ky-skeleton/hle-expansion)
+    ("hld" "" sp00ky-skeleton/hld-expansion)
     ("HER" "" sp00ky-skeleton/HER-expansion)
+    ("HERU" "" sp00ky-skeleton/HERU-expansion)
     ("DER" "" sp00ky-skeleton/DER-expansion)
     ;; END
     ))
@@ -63,10 +112,20 @@
   "(interactive)" \n
   ")")
 
+(define-skeleton sp00ky-skeleton/elisp-dfk-expansion
+  "Insert a define-key statement" nil
+  "(define-key m" _ " (kbd \"k\") 'function)" >)
+
+(define-skeleton sp00ky-skeleton/elisp-dfv-expansion
+  "Insert a defvar statement" nil
+  "(defvar v" _ " nil \"DOCSTRING\")" >)
+
 ;; (clear-abbrev-table emacs-lisp-mode-abbrev-table)
 (define-abbrev-table 'emacs-lisp-mode-abbrev-table
   '(
     ("edf" "" sp00ky-skeleton/elisp-edf-expansion)
+    ("dfk" "" sp00ky-skeleton/elisp-dfk-expansion)
+    ("dfv" "" sp00ky-skeleton/elisp-dfv-expansion)
     ;; END
     ))
 

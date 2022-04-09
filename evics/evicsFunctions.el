@@ -1,5 +1,10 @@
 ;; See example: evil-redirect-digit-argument
 ;; also see:    https://stackoverflow.com/questions/29956644/elisp-defmacro-with-lambda
+(defun evics-keep-pred-cb ()
+  "Callback to supply to set-transient-map"
+  (interactive)
+  t)
+
 (defmacro evics-key-prefix-argument-overload (map key cb1 cb2)
   "Overload function key with the specified cbs. This is useful 
 when we want different behaviour in the lack of prefix args. 

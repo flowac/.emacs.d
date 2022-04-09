@@ -127,6 +127,8 @@
 (evil-ex-define-cmd "quit" 'evil-quit) ;; Need to type out :quit to close emacs
 
 ;; Go over lines that span multiple lines nicely
+;; (define-key evil-insert-state-map (kbd "C-k") 'hippie-expand)
+
 (define-key evil-normal-state-map (kbd "j") 'evil-next-visual-line)
 (define-key evil-normal-state-map (kbd "k") 'evil-previous-visual-line)
 (define-key evil-normal-state-map "+"       'text-scale-increase)
@@ -307,6 +309,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;SECTION:            MISC KEYBINDINGS            ;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(global-set-key (kbd "M-w") 'hippie-expand)
+(global-set-key (kbd "C-x C-b") 'switch-to-buffer)
 (global-set-key (kbd "C-x C-b") 'switch-to-buffer)
 ;; Error about starting with non prefix key...
 ;; (global-set-key (kbd "C-a z")   'toggle-maximize-buffer)
@@ -531,6 +535,14 @@
   (when value
     (setq package-selected-packages value)))
 
+
+(load "~/.emacs.d/bb-mode.el")
+(require 'bb-mode)
+(setq auto-mode-alist (cons '("\\.bb$" . bb-mode) auto-mode-alist))
+(setq auto-mode-alist (cons '("\\.inc$" . bb-mode) auto-mode-alist))
+(setq auto-mode-alist (cons '("\\.bbappend$" . bb-mode) auto-mode-alist))
+(setq auto-mode-alist (cons '("\\.bbclass$" . bb-mode) auto-mode-alist))
+(setq auto-mode-alist (cons '("\\.conf$" . bb-mode) auto-mode-alist))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;SECTION:               COMMENTS                 ;;;;;;;;;;;;;;;;;

@@ -1,12 +1,12 @@
 ;; EVICS
+;; - Keyboard macros "q"
+;; - Make yank (pasting) more like vim
 ;; - Probably have to change evics-command-mode-map to be an alist instead of keymap to handle
 ;; string arguments
 ;; - Show current mode on modeline
 ;; - highlight under cursor when marking region
-;; - Implement rectangle commands (cua)
 ;; - maybe use previous-logical-line
 ;; - For regex replace, see if we can do global replace i.e. s/<pat>/<pat>/g
-;; - Dont goto newline when going far left/right
 ;; - Record kbd macros with q (see keyboard macro registers in manual)
 ;; - Make evics commands handle prefix values
 ;;
@@ -57,6 +57,7 @@ keybindings before evics bindings"
 ;; (add-to-list 'minor-mode-map-alist (cons 'evics-special-mode special-mode-map))
 ;; (add-to-list 'minor-mode-map-alist (cons 'evics-Info-mode Info-mode-map))
 
+(require 'thingatpt)
 (define-thing-chars evics-WORD "[:alnum:]_-")
 
 (defun evics-visual-pre-command ()
@@ -86,7 +87,7 @@ keybindings before evics bindings"
 (add-hook 'post-command-hook 'evics-visual-post-command)
 
 (defun evics-mini-mode-override ()
-  "Adding a overriding map to help mode to prevent it from
+  "Adding a overriding map to current mode to prevent it from
 clobbering basic movement commands"
   (add-to-list 'minor-mode-overriding-map-alist
                (cons 'evics-normal-mode evics-mini-normal-mode-map)))
@@ -103,6 +104,24 @@ clobbering basic movement commands"
   (if (not (minibufferp (current-buffer)))
       (evics-normal-mode 1)))
 (define-globalized-minor-mode evics-global-mode evics-normal-mode evics-enable-normal-mode)
+
+(defvar evics-visual-block-callback nil
+  "Callback to disable the transient rectangle-mark-mode-map that
+  we enable when selecting rectangles in rectangle-mark-mode")
+(make-variable-buffer-local 'evics-visual-block-callback)
+
+(defun evics-toggle-transient-rectangle-map ()
+  "DOCSTRING"
+  (if rectangle-mark-mode
+      (progn (setq evics-visual-block-callback
+                   (set-transient-map
+                    rectangle-mark-mode-map 'evics-keep-pred-cb)))
+    (when evics-visual-block-callback
+      (funcall evics-visual-block-callback)
+      (setq evics-visual-block-callback nil))))
+(define-key rectangle-mark-mode-map (kbd "I") 'string-insert-rectangle)
+(add-hook 'rectangle-mark-mode-hook 'evics-toggle-transient-rectangle-map)
+
 ;; To test use:
 ;; emacs -nw -q -l init_test.el  --file scratch/tmp.txt
 
