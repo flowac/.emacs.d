@@ -15,7 +15,17 @@
   "// Description:" \n
   "//   DOCSTRING" \n
   "//======================================================================" \n
-  "void f(" _ ")" \n
+  "void f" _ "(void)" \n
+  "{" > \n \n
+  "return;" > \n
+  "}" >)
+(define-skeleton sp00ky-skeleton/c-sdfn
+  "Insert a function" nil
+  "//======================================================================" \n
+  "// Description:" \n
+  "//   DOCSTRING" \n
+  "//======================================================================" \n
+  "static void f" _ "(void)" \n
   "{" > \n \n
   "return;" > \n
   "}" >)
@@ -41,6 +51,9 @@
 (define-skeleton sp00ky-skeleton/HER-expansion
   "Insert a function skeleton that returns HalStatus" nil
   "HAL_ERR_RET(status, " _ ");")
+(define-skeleton sp00ky-skeleton/hec-expansion
+  "" nil
+  "HAL_ERR_CONT(status, " _ ");")
 (define-skeleton sp00ky-skeleton/HERU-expansion
   "Insert a function skeleton that returns HalStatus" nil
   "HAL_ERR_RETU(status, " _ ");")
@@ -53,6 +66,10 @@
   "Insert HalStatus_Ok" nil
   "HalStatus_Ok");")
 
+(define-skeleton sp00ky-skeleton/rhso-expansion
+  "DOCSTRING" nil
+  "return HalStatus_Ok;");")
+
 (define-skeleton sp00ky-skeleton/hli-expansion
   "" nil
   "HAL_LOG_INFO(\"" _ "\");" >)
@@ -60,7 +77,9 @@
 (define-skeleton sp00ky-skeleton/hle-expansion
   "" nil
   "HAL_LOG_ERR(\"" _ "\");" >)
-
+(define-skeleton sp00ky-skeleton/hs-expansion
+  "" nil
+  "HalStatus" >)
 (define-skeleton sp00ky-skeleton/hld-expansion
   "" nil
   "HAL_LOG_DEBUG(\"" _ "\");" >)
@@ -79,7 +98,6 @@
   "{" _ > \n
   "} enumName;" >)
 
-;(clear-abbrev-table c-mode-abbrev-table)
 (define-abbrev-table 'c-mode-abbrev-table
   '(
     ("tenu" "" sp00ky-skeleton/c-tenu)
@@ -90,8 +108,9 @@
     ("cfor" "" sp00ky-skeleton/c-for-statement)
     ("chf" "" sp00ky-skeleton/c-hal-ret-fun)
     ("cst" "" sp00ky-skeleton/skeleton-test)
-    ("hs" "HalStatus")
+    ("hs" "" sp00ky-skeleton/hs-expansion)
     ("hss" "" sp00ky-skeleton/hss)
+    ("rhso" "" sp00ky-skeleton/rhso-expansion)
     ("hso" "" sp00ky-skeleton/hso-expansion)
     ("hse" "HalStatus_Error")
     ("hsi" "HalStatus_InvalidParameter")
@@ -99,9 +118,11 @@
     ("hli" "" sp00ky-skeleton/hli-expansion)
     ("hle" "" sp00ky-skeleton/hle-expansion)
     ("hld" "" sp00ky-skeleton/hld-expansion)
-    ("HER" "" sp00ky-skeleton/HER-expansion)
-    ("HERU" "" sp00ky-skeleton/HERU-expansion)
-    ("DER" "" sp00ky-skeleton/DER-expansion)
+    ("hec" "" sp00ky-skeleton/hec-expansion)
+    ("cher" "" sp00ky-skeleton/HER-expansion)
+    ("cheru" "" sp00ky-skeleton/HERU-expansion)
+    ("der" "" sp00ky-skeleton/DER-expansion)
+    ("sdfn" "" sp00ky-skeleton/c-sdfn)
     ;; END
     ))
 
@@ -127,6 +148,21 @@
     ("dfk" "" sp00ky-skeleton/elisp-dfk-expansion)
     ("dfv" "" sp00ky-skeleton/elisp-dfv-expansion)
     ;; END
+    ))
+
+(define-skeleton sp00ky-skeleton/sh-dfn-expansion
+  "Insert a defun statement" nil
+  "function f" _ " () {" \n \n
+  "}" >)
+
+(define-abbrev-table 'sh-mode-abbrev-table
+  '(
+    ("dfn" "" sp00ky-skeleton/sh-dfn-expansion)
+    ))
+
+(define-abbrev-table 'shell-mode-abbrev-table
+  '(
+    ("dfn" "" sp00ky-skeleton/sh-dfn-expansion)
     ))
 
 ;; Global abbrevs. The abbrevs in this table mainly handle typos

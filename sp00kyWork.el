@@ -89,3 +89,11 @@ oam_index: \"\"
             (delete-forward-char 1)
             (insert (capitalize current-char)))))
     (forward-char)))
+
+(defun sp00ky/conf-mode-hook ()
+  "Config to run when entering conf mode"
+  ;; This was a little confusing to figure out. Anyways, it makes the
+  ;; char / work as both the first and second char in a comment
+  ;; sequence, else it will just be punctuation.
+  (modify-syntax-entry ?/ ". 12"))
+(add-hook 'conf-unix-mode-hook 'sp00ky/conf-mode-hook)

@@ -1,4 +1,6 @@
 ;; TODO
+;; - Fix comment-start-skip for conf files to include //
+;; - Look into fixing paragraph-start for programming modes (lines with whitespace should not count)
 ;; - Clean up modeline, for example, only need to show eyebrowse workspace thats currently active
 ;; - Enable visual-line-mode or auto-fill-mode for org-mode. For autofill mode, verify
 ;; if it can auto format lines when editing late
@@ -67,8 +69,6 @@
 (setq my-packages
       '(company
         company-jedi
-        ;; evil            ; Long term goal of completing Evics to replace this
-        ;; evil-collection ; Long term goal of completing Evics to replace this
         eyebrowse       ; Can explore using built in tab-bar mode, or
                         ; window/frame registers
         geiser
@@ -86,22 +86,38 @@
         undo-tree))     ; Can get rid of undo-tree in emacs 28, we can use undo-redo
 (mapc 'sp00ky/install-package my-packages)
 
-(if (not file-exists-p "/multimedia/builds/evics")
-    (setq sp00ky/use-evics nil))
+(when sp00ky/use-evics
+  (let ((loaded nil))
+    (when (file-exists-p "/multimedia/builds/evics")
+      (add-to-list 'load-path "/multimedia/builds/evics")
+      (setq loaded t))
+    (when (file-exists-p "/localdata/hmuresan/my_builds/evics")
+      (add-to-list 'load-path "/localdata/hmuresan/my_builds/evics")
+      (setq loaded t))
+    (setq sp00ky/use-evics loaded)))
+
 (if sp00ky/use-evics
     (progn
-      (add-to-list 'load-path "/multimedia/builds/evics")
       (require 'evics)
-      (evics-global-mode t))
+      (evics-global-mode t)
+      (global-undo-tree-mode))
   (mapc
    'sp00ky/install-package
    (list
-    evil
-    evil-collection)))
+    'evil
+    'evil-collection)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;SECTION:            PACKAGE INIT                ;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;SUBSECTION: Evil ;;;;;;;;;;;;;;;;
+(when sp00ky/use-evics
+  (define-key evics-visual-transient-mode-map (kbd "C-f") 'mark-defun)
+  (define-key evics-visual-transient-mode-map (kbd "C-b") 'mark-whole-buffer)
+  (define-key evics-visual-transient-mode-map (kbd "C-v") '(lambda ()
+                                                           (interactive)
+                                                           (deactivate-mark)
+                                                           (mark-paragraph))))
 
 ;;;;;;;;;;;;;;;;SUBSECTION: Evil ;;;;;;;;;;;;;;;;
 (if (not sp00ky/use-evics)
@@ -257,7 +273,9 @@
   (define-key helm-gtags-mode-map (kbd "C-c z g") 'helm-gtags-parse-file)
   (define-key helm-gtags-mode-map (kbd "M-<") 'helm-gtags-previous-history))
 
+(add-hook 'c++-mode-hook 'helm-gtags-mode)
 (add-hook 'c-mode-hook 'helm-gtags-mode)
+(add-hook 'sh-mode-hook 'helm-gtags-mode)
 
 ;;;;;;;;;;;;;;;;SUBSECTION: Eyebrowse ;;;;;;;;;;;;;;;;
 (require 'eyebrowse)
@@ -333,7 +351,7 @@
 ;;;;;;;;;;;;;;SECTION:            MISC KEYBINDINGS            ;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (global-set-key (kbd "<tab>") 'complete-symbol)
-(global-set-key (kbd "TAB") 'complete-symbol)
+(global-set-key (kbd "TAB") 'indent-for-tab-command)
 (global-set-key (kbd "M-w") 'hippie-expand)
 (global-set-key (kbd "C-x C-b") 'switch-to-buffer)
 (global-set-key (kbd "C-x C-b") 'switch-to-buffer)
@@ -350,6 +368,9 @@
 (global-set-key (kbd "C-;")     'comment-line)
 (global-set-key (kbd "M-;")     'comment-region)
 
+;; In the future, lets move out these requires and add them to a hook.
+(require 'vc-annotate)
+(define-key vc-annotate-mode-map (kbd "L") 'vc-annotate-show-log-revision-at-line)
 (define-key help-mode-map (kbd "M-<") 'help-go-back)
 (define-key help-mode-map (kbd "M->") 'help-go-forward)
 (define-key Info-mode-map (kbd "H") 'Info-last)
@@ -447,7 +468,7 @@
 ;;;;;;;;;;;;;;;;SUBSECTION: Shell-script mode Hooks ;;;;;;;;;;;;;;;;
 (defun sp00ky/sh-mode-hook ()
   "Various settings to apply to shell script"
-  (interactive)
+  (abbrev-mode)
   (setq tab-stop-list     '(0 3)
         tab-width           3
         ;; evil-shift-width    3
@@ -457,18 +478,17 @@
 (setq c-default-style "k&r")
 (defun sp00ky/c-mode-hook ()
   "Various configs I want to apply for c-mode"
-  (interactive)
   (setq tab-stop-list     '(0 3)
         tab-width           3
         c-basic-offset      3
         c-tab-always-indent nil
         ;; evil-shift-width    3
-        fill-column         100))
+        fill-column         80))
 (add-hook 'c-mode-hook 'sp00ky/c-mode-hook)
+;;;;;;;;;;;;;;;;SUBSECTION: Conf mode Hooks ;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;SUBSECTION: Elisp mode Hooks ;;;;;;;;;;;;;;;;
 (defun sp00ky/tex-mode-hook ()
-  (interactive)
   (flyspell-mode-on))
 (add-hook 'tex-mode-hook 'sp00ky/tex-mode-hook)
 
@@ -482,7 +502,6 @@
 
 (defun sp00ky/emacs-lisp-mode-hook ()
   "Various configs I want to apply for c-mode"
-  (interactive)
   (setq tab-always-indent nil)
   (abbrev-mode)
   (if (string-equal (buffer-name) "init.el")
@@ -569,7 +588,9 @@
     (setq auto-mode-alist (cons '("\\.inc$" . bb-mode) auto-mode-alist))
     (setq auto-mode-alist (cons '("\\.bbappend$" . bb-mode) auto-mode-alist))
     (setq auto-mode-alist (cons '("\\.bbclass$" . bb-mode) auto-mode-alist))
-    (setq auto-mode-alist (cons '("\\.conf$" . bb-mode) auto-mode-alist))))
+    ;; (setq auto-mode-alist (cons '("\\.conf$" . bb-mode) auto-mode-alist))
+    ))
+;; (setq auto-mode-alist (remove '("\\.conf$" . bb-mode) auto-mode-alist))
 
 (let ((file "~/.emacs.d/help-fns+.el"))
   (when (file-exists-p file)
