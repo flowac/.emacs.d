@@ -112,9 +112,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;SUBSECTION: Evil ;;;;;;;;;;;;;;;;
 (when sp00ky/use-evics
-  (define-key evics-visual-transient-mode-map (kbd "C-f") 'mark-defun)
-  (define-key evics-visual-transient-mode-map (kbd "C-b") 'mark-whole-buffer)
-  (define-key evics-visual-transient-mode-map (kbd "C-v") '(lambda ()
+  (define-key evics-mark-active-mode-map (kbd "f") 'mark-defun)
+  (define-key evics-mark-active-mode-map (kbd "b") 'mark-whole-buffer)
+  (define-key evics-mark-active-mode-map (kbd "v") '(lambda ()
                                                            (interactive)
                                                            (deactivate-mark)
                                                            (mark-paragraph))))
