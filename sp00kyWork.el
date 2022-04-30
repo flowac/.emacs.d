@@ -21,23 +21,8 @@ expecting this port to be port forwarded with something like
       (let ((tmp-file "/tmp/emacs-clipboard"))
         (write-region start end tmp-file)
         (async-shell-command (concat "cat " (shell-quote-argument tmp-file) " | nc localhost 5556"))
-        (if sp00ky/use-evics
-            (evics-kill-ring-save)
-          (call-interactively 'evil-yank)))))
-;; Old method
-;(defun sp00kyWork/copy-to-clipboard ()
-;  "Send text from selected region to port 5556. Note, we are
-;expecting this port to be port forwarded with something like
-;\"ssh -R 5556:localhost:5556\""
-;  (interactive)
-;  (if (use-region-p)
-;      (let ((regionp (buffer-substring-no-properties (mark) (point))))
-;        (async-shell-command (concat "echo -n " (shell-quote-argument regionp) "| nc localhost 5556"))
-;        (call-interactively 'evil-yank))))
-
-(if sp00ky/use-evics
-    (define-key evics-normal-mode-map (kbd "y") 'sp00kyWork/copy-to-clipboard)
-  (define-key evil-visual-state-map (kbd "y") 'sp00kyWork/copy-to-clipboard))
+        (evics-kill-ring-save))))
+(define-key evics-normal-mode-map (kbd "y") 'sp00kyWork/copy-to-clipboard)
 
 (defun sp00ky/cnfp-dbg-parse-pkt ()
   "Take output from pp vis ppi and make it fit parsepkt. To use,
