@@ -10,6 +10,27 @@
     (if (not quiet)
         (message "Expecting number at point"))))
 
+(defun sp00ky/kill-dangling-buffers ()
+  "Kill any buffers that are pointing to a nonexistent file"
+  (interactive)
+  (let (buffers-to-kill
+        (buffers-to-kill-prompt "Do you want to kill the following files:\n")
+        (buffers (buffer-list)))
+    (mapc
+     (lambda (buffer)
+       (let ((f-name (buffer-file-name buffer)))
+         (when (and f-name
+                    (not (file-exists-p f-name)))
+           (push buffer buffers-to-kill)
+           (setq buffers-to-kill-prompt (concat buffers-to-kill-prompt (buffer-name buffer) "\n")))))
+     buffers)
+    (if (y-or-n-p buffers-to-kill-prompt)
+        (mapc
+         (lambda (buffer)
+           (print (concat "Killing buffer " (buffer-name buffer)))
+           (kill-buffer buffer))
+         buffers-to-kill))))
+
 (require 'desktop)
 (defun sp00ky/remove-unused-desktop-lock ()
   "If emacs crashes or exits abruptly then it does not remove the 

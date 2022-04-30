@@ -9,7 +9,8 @@
 
 
 ;;(setq user-emacs-directory "~/.emacs.d/")
-(load "~/.emacs.d/evics/evics.el")
+(add-to-list 'load-path "/localdata/hmuresan/my_builds/evics")
+;; (load "/localdata/hmuresan/my_builds/evics/evics.el")
 (load "~/scratch/visual-regexp.el")
 (xterm-mouse-mode     1)
 
@@ -17,6 +18,7 @@
 (load-theme 'sp00ky t)
 
 (toggle-debug-on-error)
+(require 'evics)
 (evics-global-mode t)
 (define-key global-map (kbd "<escape>") 'keyboard-escape-quit)
 (evics-init-esc)

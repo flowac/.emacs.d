@@ -19,10 +19,36 @@
   "{" > \n \n
   "return;" > \n
   "}" >)
+
+(define-skeleton sp00ky-skeleton/c-hdfn
+  "Insert a function" nil
+  "//======================================================================" \n
+  "// Description:" \n
+  "//" \n
+  "//   DOCSTRING" \n
+  "//======================================================================" \n
+  "HalStatus f" _ "(void)" \n
+  "{" > \n \n
+  "return HalStatus_Ok;" > \n
+  "}" >)
+
+(define-skeleton sp00ky-skeleton/c-static-hal-dfn
+  "Insert a function" nil
+  "//======================================================================" \n
+  "// Description:" \n
+  "//" \n
+  "//   DOCSTRING" \n
+  "//======================================================================" \n
+  "static HalStatus f" _ "(void)" \n
+  "{" > \n \n
+  "return HalStatus_Ok;" > \n
+  "}" >)
+
 (define-skeleton sp00ky-skeleton/c-sdfn
   "Insert a function" nil
   "//======================================================================" \n
   "// Description:" \n
+  "//" \n
   "//   DOCSTRING" \n
   "//======================================================================" \n
   "static void f" _ "(void)" \n
@@ -30,17 +56,19 @@
   "return;" > \n
   "}" >)
 (define-skeleton sp00ky-skeleton/c-whi
-  "Insert a function" nil
+  "" nil
   "while (" _ ")" \n
   "{" > \n \n
   "}" >)
+
 (define-skeleton sp00ky-skeleton/c-for-statement
-  "Insert an if statement" nil
-  "for (" _ ")" > \n
+  "" nil
+  "for (int i = 0; " _ "; i++)" > \n
   "{" > \n
   "}" >)
+
 (define-skeleton sp00ky-skeleton/c-hal-ret-fun
-  "Insert a function skeleton that returns HalStatus" nil
+  "" nil
   "HalStatus " _ "()" > \n
   "{" > \n
   "}" >)
@@ -51,6 +79,15 @@
 (define-skeleton sp00ky-skeleton/HER-expansion
   "Insert a function skeleton that returns HalStatus" nil
   "HAL_ERR_RET(status, " _ ");")
+(define-skeleton sp00ky-skeleton/hal-cnc-err-ret-expansion
+  "" nil
+  "HAL_CNCORE_ERR_RET(status, " _ ");")
+(define-skeleton sp00ky-skeleton/hal-cnc-err-retu-expansion
+  "" nil
+  "HAL_CNCORE_ERR_RETU(status, " _ ");")
+(define-skeleton sp00ky-skeleton/hal-cnc-err-cont-expansion
+  "" nil
+  "HAL_CNCORE_ERR_CONT(status, " _ ");")
 (define-skeleton sp00ky-skeleton/hec-expansion
   "" nil
   "HAL_ERR_CONT(status, " _ ");")
@@ -61,6 +98,18 @@
 (define-skeleton sp00ky-skeleton/DER-expansion
   "Insert a function skeleton that returns HalStatus" nil
   "DRV_ERR_RET(drvStatus, " _ ");")
+
+(define-skeleton sp00ky-skeleton/cso-expansion
+  "" nil
+  "CnCoreStatus_Ok");")
+
+(define-skeleton sp00ky-skeleton/rcso-expansion
+  "" nil
+  "return CnCoreStatus_Ok;");")
+
+(define-skeleton sp00ky-skeleton/cs-expansion
+  "" nil
+  "CnCoreStatus");")
 
 (define-skeleton sp00ky-skeleton/hso-expansion
   "Insert HalStatus_Ok" nil
@@ -103,15 +152,21 @@
     ("tenu" "" sp00ky-skeleton/c-tenu)
     ("swi" "" sp00ky-skeleton/c-swi)
     ("whi" "" sp00ky-skeleton/c-whi)
-    ("dfn" "" sp00ky-skeleton/c-dfn)
     ("cif" "" sp00ky-skeleton/c-if-statement)
     ("cfor" "" sp00ky-skeleton/c-for-statement)
     ("chf" "" sp00ky-skeleton/c-hal-ret-fun)
     ("cst" "" sp00ky-skeleton/skeleton-test)
+    ("dfn" "" sp00ky-skeleton/c-dfn)
+    ("shdfn" "" sp00ky-skeleton/c-static-hal-dfn)
+    ("hdfn" "" sp00ky-skeleton/c-hdfn)
     ("hs" "" sp00ky-skeleton/hs-expansion)
     ("hss" "" sp00ky-skeleton/hss)
     ("rhso" "" sp00ky-skeleton/rhso-expansion)
     ("hso" "" sp00ky-skeleton/hso-expansion)
+    ("cs" "" sp00ky-skeleton/cs-expansion)
+    ("cso" "" sp00ky-skeleton/cso-expansion)
+    ("rcso" "" sp00ky-skeleton/rcso-expansion)
+    ("hsf" "HalStatus_Failure")
     ("hse" "HalStatus_Error")
     ("hsi" "HalStatus_InvalidParameter")
     ("hsd" "HalStatus_DriverError")
@@ -119,8 +174,11 @@
     ("hle" "" sp00ky-skeleton/hle-expansion)
     ("hld" "" sp00ky-skeleton/hld-expansion)
     ("hec" "" sp00ky-skeleton/hec-expansion)
-    ("cher" "" sp00ky-skeleton/HER-expansion)
-    ("cheru" "" sp00ky-skeleton/HERU-expansion)
+    ("her" "" sp00ky-skeleton/HER-expansion)
+    ("hcer" "" sp00ky-skeleton/hal-cnc-err-ret-expansion)
+    ("hceru" "" sp00ky-skeleton/hal-cnc-err-retu-expansion)
+    ("hcec" "" sp00ky-skeleton/hal-cnc-err-cont-expansion)
+    ("heru" "" sp00ky-skeleton/HERU-expansion)
     ("der" "" sp00ky-skeleton/DER-expansion)
     ("sdfn" "" sp00ky-skeleton/c-sdfn)
     ;; END
@@ -171,5 +229,8 @@
   '(
     ("teh" "the")
     ("thsi" "this")
+    ("cant" "can't")
+    ("dont" "don't")
+    ("isnt" "isn't")
     ;; END
     ))

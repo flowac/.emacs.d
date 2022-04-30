@@ -1,4 +1,5 @@
 ;; TODO
+;; - Look at using view-buffer-other-window to clone the current window in the other window
 ;; - Fix comment-start-skip for conf files to include //
 ;; - Look into fixing paragraph-start for programming modes (lines with whitespace should not count)
 ;; - Clean up modeline, for example, only need to show eyebrowse workspace thats currently active
@@ -112,12 +113,21 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;SUBSECTION: Evil ;;;;;;;;;;;;;;;;
 (when sp00ky/use-evics
+  (define-key evics-normal-mode-map (kbd "C-j") 'evics-join-line)
+  (define-key evics-normal-mode-map "J" 'forward-paragraph)
+  (define-key evics-normal-mode-map "K" 'backward-paragraph)
+  (define-key evics-mark-active-mode-map (kbd "+") '(lambda ()
+                                                      (interactive)
+                                                      (deactivate-mark)
+                                                      (save-excursion
+                                                        (mark-defun)
+                                                        (call-interactively 'indent-region))))
   (define-key evics-mark-active-mode-map (kbd "f") 'mark-defun)
-  (define-key evics-mark-active-mode-map (kbd "b") 'mark-whole-buffer)
+  (define-key evics-mark-active-mode-map (kbd "C-b") 'mark-whole-buffer)
   (define-key evics-mark-active-mode-map (kbd "v") '(lambda ()
-                                                           (interactive)
-                                                           (deactivate-mark)
-                                                           (mark-paragraph))))
+                                                      (interactive)
+                                                      (deactivate-mark)
+                                                      (mark-paragraph))))
 
 ;;;;;;;;;;;;;;;;SUBSECTION: Evil ;;;;;;;;;;;;;;;;
 (if (not sp00ky/use-evics)
@@ -482,6 +492,8 @@
         tab-width           3
         c-basic-offset      3
         c-tab-always-indent nil
+        comment-start       "// "
+        comment-end         ""
         ;; evil-shift-width    3
         fill-column         80))
 (add-hook 'c-mode-hook 'sp00ky/c-mode-hook)
