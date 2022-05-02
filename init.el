@@ -257,7 +257,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;SECTION:            MISC KEYBINDINGS            ;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(global-set-key (kbd "<tab>") 'complete-symbol)
+;; (global-set-key (kbd "<tab>") 'complete-symbol)
 (global-set-key (kbd "TAB")   'indent-for-tab-command)
 (global-set-key (kbd "M-w")   'hippie-expand)
 (global-set-key (kbd "C-x C-b") 'switch-to-buffer)
@@ -283,6 +283,7 @@
 (define-key Info-mode-map (kbd "H") 'Info-last)
 (define-key Info-mode-map (kbd "J") 'Info-forward-node)
 (define-key Info-mode-map (kbd "K") 'Info-backward-node)
+(define-key Info-mode-map (kbd "C-k") 'Info-up)
 (define-key Info-mode-map (kbd "L") 'Info-history-forward)
 (define-key Info-mode-map (kbd ",") 'Info-index-next)
 
@@ -417,12 +418,29 @@
 (add-hook 'emacs-lisp-mode-hook 'sp00ky/emacs-lisp-mode-hook)
 
 ;;;;;;;;;;;;;;;;SUBSECTION: Scheme (Guile) mode Hooks ;;;;;;;;;;;;;;;;
-(defun sp00ky/scheme-mode-hook ()
-  "Various configs I want to apply for c-mode"
-  (interactive))
-(add-hook 'scheme-mode-hook 'sp00ky/scheme-mode-hook)
 (require 'geiser-guile)
-;; Empty for now
+(require 'geiser-mode)
+(define-key geiser-mode-map (kbd "M-t") 'geiser-edit-symbol-at-point)
+(define-key geiser-mode-map (kbd "M-<") 'geiser-pop-symbol-stack)
+(define-key geiser-mode-map (kbd "z") 'geiser-eval-buffer)
+
+(require 'geiser-repl)
+(defvar geiser-repl-mode nil)
+(setq geiser-repl-current-project-function 'projectile-project-root)
+(defun sp00ky/geiser-repl-mode-hook ()
+  ""
+  (setq-local geiser-repl-mode t))
+(add-hook 'geiser-repl-mode-hook 'sp00ky/geiser-repl-mode-hook)
+(define-key geiser-repl-mode-map (kbd "k") '(lambda ()
+                                              (interactive)
+                                              (if evics-normal-mode
+                                                  (comint-previous-matching-input-from-input)
+                                                (call-interactively 'self-insert-command))))
+(define-key geiser-repl-mode-map (kbd "j") '(lambda ()
+                                              (interactive)
+                                              (if evics-normal-mode
+                                                  (comint-next-matching-input-from-input)
+                                                (call-interactively 'self-insert-command))))
 
 ;;;;;;;;;;;;;;;;SUBSECTION: Python mode Hooks ;;;;;;;;;;;;;;;;
 (defun sp00ky/python-mode-hook ()
