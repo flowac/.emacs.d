@@ -82,3 +82,27 @@ oam_index: \"\"
   ;; sequence, else it will just be punctuation.
   (modify-syntax-entry ?/ ". 12"))
 (add-hook 'conf-unix-mode-hook 'sp00ky/conf-mode-hook)
+
+(defun sp00ky/log-macro-update (start end)
+  "In our code we see lines such as:
+     CNCORE_LOG( PACKAGE_NAME, LOG_ERR, NULL, \"Invalid virtual mac pointer\" );
+We want to update these lines to look more like:
+     HAL_LOG_ERR(\"Invalid virtual mac pointer\");
+We will have to account for LOG_INFO and LOG_DEBUG accordingly."
+  (interactive "r")
+  (goto-char start)
+  (defvar replacement-string "")
+  (while (re-search-forward "CNCORE_LOG[ ]*(" end t)
+    (beginning-of-line)
+    (cond ((re-search-forward "LOG_INFO" (line-end-position) t)
+           (setq replacement-string "HAL_LOG_INFO(\""))
+          ((re-search-forward "LOG_ERR" (line-end-position) t)
+           (setq replacement-string "HAL_LOG_ERR(\""))
+          ((re-search-forward "LOG_DEBUG" (line-end-position) t)
+           (setq replacement-string "HAL_LOG_DEBUG(\"")))
+    (beginning-of-line)
+    (replace-regexp
+     "cncore_log.*?\"\\(error:\\|\\)"
+     replacement-string
+     nil (line-beginning-position) (line-end-position))
+    (sp00ky/indent-paragraph)))

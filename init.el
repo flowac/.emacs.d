@@ -1,13 +1,20 @@
 ;; TODO
+;; - Using emacs compile to build:
+;;     Will need to investigate dir variables
+;;     Seems like we will need to set default directory then invoke compile, something like
+;;     (defun compile-in-dir (dir command)
+;;      (interactive "DCompile in directory: \nsCommand: ")
+;       (let ((default-directory dir))
+;;       (compile command)))
+;;     Also look into compilation-search-path
+;; - Look at so-long mode to handle long lines
 ;; - Look at using view-buffer-other-window to clone the current window in the other window
-;; - Fix comment-start-skip for conf files to include //
 ;; - Look into fixing paragraph-start for programming modes (lines with whitespace should not count)
 ;; - Clean up modeline, for example, only need to show eyebrowse workspace thats currently active
 ;; - Enable visual-line-mode or auto-fill-mode for org-mode. For autofill mode, verify
 ;; if it can auto format lines when editing late
 ;; - Make helm respect screen split when using helm-buffer-max-length
 ;; - Maybe switch C-h i to 'info-display-manual
-;; - Fix calc-mode keybindings
 ;; - Look at xref--marker-ring to make history function that does not pop the entry from the stack
 ;; - Figure out whats wrong with TAB in cc-mode
 ;;    - I think c-tab-always-indent fixes this
@@ -43,6 +50,7 @@
 ;; ./configure --without-all --with-xml2 --with-xft --with-libotf --with-x-toolkit=lucid --with-modules --with-png --with-jpeg --with-mailutils
 
 (setq gc-cons-threshold (* 32 1024 1024))
+;; Look into package-quickstate to speed package-initialize up
 (package-initialize)
 
 (require 'package)
@@ -67,6 +75,7 @@
 (setq my-packages
       '(company
         company-jedi
+        docker-compose-mode
         eyebrowse       ; Can explore using built in tab-bar mode, or
                         ; window/frame registers
         geiser
@@ -84,6 +93,10 @@
         undo-tree))     ; Can get rid of undo-tree in emacs 28, we can use undo-redo
 (mapc 'sp00ky/install-package my-packages)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;SECTION:            PACKAGE INIT                ;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;SUBSECTION: Evics ;;;;;;;;;;;;;;;;
 (when (file-exists-p "/multimedia/builds/evics")
   (add-to-list 'load-path "/multimedia/builds/evics"))
 (when (file-exists-p "/localdata/hmuresan/my_builds/evics")
@@ -91,11 +104,6 @@
 (require 'evics)
 (evics-global-mode t)
 (global-undo-tree-mode)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;SECTION:            PACKAGE INIT                ;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;SUBSECTION: Evics ;;;;;;;;;;;;;;;;
 (define-key evics-normal-mode-map (kbd "C-j") 'evics-join-line)
 (define-key evics-normal-mode-map "J" 'forward-paragraph)
 (define-key evics-normal-mode-map "K" 'backward-paragraph)
@@ -111,6 +119,10 @@
                                                     (interactive)
                                                     (deactivate-mark)
                                                     (mark-paragraph)))
+
+;;;;;;;;;;;;;;;;SUBSECTION: docker-compose-mode ;;;;;;;;;;;;;;;;
+(require 'docker-compose-mode)
+(add-to-list 'auto-mode-alist '("\\.yml.append\\'" . docker-compose-mode))
 
 ;;;;;;;;;;;;;;;;SUBSECTION: Company ;;;;;;;;;;;;;;;;
 (setq company-dabbrev-downcase      nil
@@ -167,6 +179,13 @@
 (define-key flyspell-mode-map (kbd "C-;") 'helm-flyspell-correct)
 
 ;;;;;;;;;;;;;;;;SUBSECTION: helm-gtags ;;;;;;;;;;;;;;;;
+(defun sp00ky/gtags-find-current-function ()
+  "Find the references for the current function that point is
+in."
+  (interactive)
+  (let ((f (which-function)))
+    (helm-gtags-find-rtag f)))
+
 (setq helm-gtags-fuzzy-match            t
       helm-gtags-display-style          nil
       helm-gtags-use-input-at-cursor    t
@@ -181,7 +200,7 @@
 
 (with-eval-after-load 'helm-gtags
   (define-key helm-gtags-mode-map (kbd "M-t") 'helm-gtags-dwim)
-  (define-key helm-gtags-mode-map (kbd "M-T") 'helm-gtags-find-tag)
+  (define-key helm-gtags-mode-map (kbd "M-T") 'sp00ky/gtags-find-current-function)
   (define-key helm-gtags-mode-map (kbd "M-r") 'helm-gtags-find-rtag)
   (define-key helm-gtags-mode-map (kbd "M-s") 'helm-gtags-find-symbol)
   (define-key helm-gtags-mode-map (kbd "M-f") 'helm-gtags-tags-in-this-function)
@@ -239,6 +258,16 @@
       highlight-indent-guides-responsive 'stack)
 (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
 
+;;;;;;;;;;;;;;;;SUBSECTION: re-builder ;;;;;;;;;;;;;;;;
+(defvar sp00ky/evics/reb-mode nil
+  "Indicates if re-builder is active. This is used to control
+  evics keymap prios")
+(add-hook 'reb-mode-hook (lambda ()
+                           (setq-local sp00ky/evics/reb-mode t)))
+(add-to-ordered-list 'evics--emulation-maps (cons 'sp00ky/evics/reb-mode reb-mode-map) 1)
+(define-key reb-mode-map (kbd "q") 'reb-quit)
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;SECTION:       MISC ELISP LOADING               ;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -257,13 +286,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;SECTION:            MISC KEYBINDINGS            ;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; (global-set-key (kbd "<tab>") 'complete-symbol)
-(global-set-key (kbd "TAB")   'indent-for-tab-command)
+(with-eval-after-load 'winner
+  (define-key winner-mode-map (kbd "C-a z") 'toggle-maximize-buffer))
 (global-set-key (kbd "M-w")   'hippie-expand)
 (global-set-key (kbd "C-x C-b") 'switch-to-buffer)
 (global-set-key (kbd "C-x C-b") 'switch-to-buffer)
-;; Error about starting with non prefix key...
-;; (global-set-key (kbd "C-a z")   'toggle-maximize-buffer)
 (global-set-key (kbd "C-x C-e") 'eval-last-sexp)
 (global-set-key (kbd "C-c s") 'split-window-horizontally)
 (global-set-key (kbd "C-c m") 'bookmark-set)
@@ -276,8 +303,8 @@
 (global-set-key (kbd "M-;")   'comment-region)
 
 ;; In the future, lets move out these requires and add them to a hook.
-(require 'vc-annotate)
-(define-key vc-annotate-mode-map (kbd "L") 'vc-annotate-show-log-revision-at-line)
+(with-eval-after-load 'vc-annotate
+  (define-key vc-annotate-mode-map (kbd "L") 'vc-annotate-show-log-revision-at-line))
 (define-key help-mode-map (kbd "M-<") 'help-go-back)
 (define-key help-mode-map (kbd "M->") 'help-go-forward)
 (define-key Info-mode-map (kbd "H") 'Info-last)
@@ -295,10 +322,10 @@
 (global-set-key (kbd "ESC ESC")  'keyboard-escape-quit)
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
-(require 'python)
-(define-key python-mode-map (kbd "M-t") 'jedi:goto-definition)
-(define-key python-mode-map (kbd "M-<") 'jedi:goto-definition-pop-marker)
-(define-key python-mode-map (kbd "M-h") 'jedi:show-doc)
+(with-eval-after-load 'python
+  (define-key python-mode-map (kbd "M-t") 'jedi:goto-definition)
+  (define-key python-mode-map (kbd "M-<") 'jedi:goto-definition-pop-marker)
+  (define-key python-mode-map (kbd "M-h") 'jedi:show-doc))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;SECTION:              MISC INIT                 ;;;;;;;;;;;;;;;;;
@@ -315,6 +342,7 @@
       help-window-select    t
       scroll-conservatively 101    ; Scroll just one line when hitting bottom of window
       text-scale-mode-step  1.05
+      Man-notify-method     'aggressive
       org-edit-src-content-indentation 0   ; Org mode autoindents src code
       xref-prompt-for-identifier       nil ; So we don't need to input the symbol each
                                            ; time we call xref
@@ -373,6 +401,26 @@
 (add-to-list 'auto-mode-alist '("\\.cint\\'" . c-mode))
 (add-to-list 'auto-mode-alist '("\\.gpi\\'"  . gnuplot-mode))
 ;;;;;;;;;;;;;;;;SUBSECTION: Programming Mode Hooks ;;;;;;;;;;;;;;;;
+(defun sp00ky/align-region-or-paragraph ()
+  "align paragraph"
+  (interactive)
+  (save-excursion
+    (if (not mark-active)
+        (mark-paragraph))
+    (call-interactively 'align)
+    (deactivate-mark)))
+
+(defun sp00ky/indent-region-or-paragraph ()
+  "Indent paragraph or region if active"
+  (interactive)
+  (save-excursion
+    (if (not mark-active)
+        (mark-paragraph))
+    (call-interactively 'indent-region)))
+
+(define-key prog-mode-map (kbd "TAB") 'sp00ky/indent-region-or-paragraph)
+(define-key prog-mode-map (kbd "<backtab>") 'sp00ky/align-region-or-paragraph)
+
 ;;;;;;;;;;;;;;;;SUBSECTION: Shell-script mode Hooks ;;;;;;;;;;;;;;;;
 (defun sp00ky/sh-mode-hook ()
   "Various settings to apply to shell script"
@@ -385,6 +433,7 @@
 (setq c-default-style "k&r")
 (defun sp00ky/c-mode-hook ()
   "Various configs I want to apply for c-mode"
+  (c-set-offset 'case-label '+)
   (setq tab-stop-list     '(0 3)
         tab-width           3
         c-basic-offset      3
@@ -450,15 +499,16 @@
 (add-hook 'python-mode-hook 'sp00ky/python-mode-hook)
 
 ;;;;;;;;;;;;;;;;SUBSECTION: Org mode Hooks ;;;;;;;;;;;;;;;;
-(setq org-adapt-indentation 'nil)
 (defun sp00ky/org-mode-hook ()
   "Various config for org-mode"
   (visual-line-mode t)
   (setq-local word-wrap nil)
   (setq fill-column 100))
-(add-hook 'org-mode-hook 'sp00ky/org-mode-hook)
-(require 'org)
-(plist-put org-format-latex-options :scale 2.5)
+
+(with-eval-after-load 'org
+  (setq org-adapt-indentation 'nil)
+  (add-hook 'org-mode-hook 'sp00ky/org-mode-hook)
+  (plist-put org-format-latex-options :scale 2.5))
 
 ;;;;;;;;;;;;;;;;SUBSECTION: Javascript mode ;;;;;;;;;;;;;;;;
 (defun sp00ky/js-mode-hook ()
@@ -473,7 +523,7 @@
 ;; This is grabbed from:
 ;; https://github.com/protocolbuffers/protobuf/blob/master/editors/protobuf-mode.el
 (if (file-exists-p "/localdata/hmuresan/my_builds/protobuf/editors/protobuf-mode.el")
-    (progn (load "/localdata/hmuresan/my_builds/protobuf/editors/protobuf-mode.el")
+    (progn (load "/localdata/hmuresan/my_builds/protobuf/editors/protobuf-mode")
            (require 'protobuf-mode)
            (add-to-list 'auto-mode-alist '("\\.proto\\'" . protobuf-mode)))
   (message "Cannot locate protobuf-mode.el, not loading"))
