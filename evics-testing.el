@@ -1,20 +1,12 @@
 ;; TODO
-;; - Using emacs compile to build:
-;;     Will need to investigate dir variables
-;;     Seems like we will need to set default directory then invoke compile, something like
-;;     (defun compile-in-dir (dir command)
-;;      (interactive "DCompile in directory: \nsCommand: ")
-;       (let ((default-directory dir))
-;;       (compile command)))
-;;     Also look into compilation-search-path
-;; - Look at so-long mode to handle long lines
-;; - Look at using view-buffer-other-window to clone the current window in the other window
+;; - Fix comment-start-skip for conf files to include //
 ;; - Look into fixing paragraph-start for programming modes (lines with whitespace should not count)
 ;; - Clean up modeline, for example, only need to show eyebrowse workspace thats currently active
 ;; - Enable visual-line-mode or auto-fill-mode for org-mode. For autofill mode, verify
 ;; if it can auto format lines when editing late
 ;; - Make helm respect screen split when using helm-buffer-max-length
 ;; - Maybe switch C-h i to 'info-display-manual
+;; - Fix calc-mode keybindings
 ;; - Look at xref--marker-ring to make history function that does not pop the entry from the stack
 ;; - Figure out whats wrong with TAB in cc-mode
 ;;    - I think c-tab-always-indent fixes this
@@ -50,7 +42,6 @@
 ;; ./configure --without-all --with-xml2 --with-xft --with-libotf --with-x-toolkit=lucid --with-modules --with-png --with-jpeg --with-mailutils
 
 (setq gc-cons-threshold (* 32 1024 1024))
-;; Look into package-quickstate to speed package-initialize up
 (package-initialize)
 
 (require 'package)
@@ -72,10 +63,12 @@
     (package-refresh-contents)
     (package-install package)))
 
+(defvar sp00ky/use-evics t
+  "Load evics or evil")
+
 (setq my-packages
       '(company
         company-jedi
-        docker-compose-mode
         eyebrowse       ; Can explore using built in tab-bar mode, or
                         ; window/frame registers
         geiser
@@ -93,37 +86,114 @@
         undo-tree))     ; Can get rid of undo-tree in emacs 28, we can use undo-redo
 (mapc 'sp00ky/install-package my-packages)
 
+(when sp00ky/use-evics
+  (let ((loaded nil))
+    (when (file-exists-p "/multimedia/builds/evics-devel")
+      (add-to-list 'load-path "/multimedia/builds/evics-devel")
+      (setq loaded t))
+    (when (file-exists-p "/localdata/hmuresan/my_builds/evics")
+      (add-to-list 'load-path "/localdata/hmuresan/my_builds/evics")
+      (setq loaded t))
+    (setq sp00ky/use-evics loaded)))
+
+(if sp00ky/use-evics
+    (progn
+      (require 'evics)
+      (evics-global-mode t)
+      (global-undo-tree-mode))
+  (mapc
+   'sp00ky/install-package
+   (list
+    'evil
+    'evil-collection)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;SECTION:            PACKAGE INIT                ;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;SUBSECTION: Evics ;;;;;;;;;;;;;;;;
-(when (file-exists-p "/multimedia/builds/evics")
-  (add-to-list 'load-path "/multimedia/builds/evics"))
-(when (file-exists-p "/localdata/hmuresan/my_builds/evics")
-  (add-to-list 'load-path "/localdata/hmuresan/my_builds/evics"))
-(require 'evics)
-(evics-global-mode t)
-(global-undo-tree-mode)
-(define-key evics-normal-mode-map (kbd "C-j") 'evics-join-line)
-(define-key evics-normal-mode-map "J" 'forward-paragraph)
-(define-key evics-normal-mode-map "K" 'backward-paragraph)
-(define-key evics-mark-active-mode-map (kbd "+") '(lambda ()
-                                                    (interactive)
-                                                    (deactivate-mark)
-                                                    (save-excursion
-                                                      (mark-defun)
-                                                      (call-interactively 'indent-region))))
-(define-key evics-mark-active-mode-map (kbd "f") 'mark-defun)
-(define-key evics-mark-active-mode-map (kbd "C-b") 'mark-whole-buffer)
-(define-key evics-mark-active-mode-map (kbd "v") '(lambda ()
-                                                    (interactive)
-                                                    (deactivate-mark)
-                                                    (mark-paragraph)))
+;;;;;;;;;;;;;;;;SUBSECTION: Evil ;;;;;;;;;;;;;;;;
+;(when sp00ky/use-evics
+;  (define-key evics-visual-transient-mode-map (kbd "C-f") 'mark-defun)
+;  (define-key evics-visual-transient-mode-map (kbd "C-b") 'mark-whole-buffer)
+;  (define-key evics-visual-transient-mode-map (kbd "C-v") '(lambda ()
+;                                                           (interactive)
+;                                                           (deactivate-mark)
+;                                                           (mark-paragraph))))
 
-;;;;;;;;;;;;;;;;SUBSECTION: docker-compose-mode ;;;;;;;;;;;;;;;;
-(require 'docker-compose-mode)
-(add-to-list 'auto-mode-alist '("\\.yml.append\\'" . docker-compose-mode))
+;;;;;;;;;;;;;;;;SUBSECTION: Evil ;;;;;;;;;;;;;;;;
+(if (not sp00ky/use-evics)
+    (progn
+      (require 'undo-tree)
+      (setq evil-want-integration t
+            evil-want-keybinding  nil
+            evil-undo-system 'undo-tree)
+      (require 'evil)
+      (add-hook 'evil-local-mode-hook 'turn-on-undo-tree-mode)
+      ;; I wish this would work... No idea why this is not working...
+      (add-to-list 'evil-overriding-maps '(Info-mode-map . nil))
+      (add-to-list 'evil-intercept-maps '(Info-mode-map . nil))
+      (evil-mode 1)
+      (require 'evil-collection)
+      (delete 'calc evil-collection-mode-list)
+      (delete 'info evil-collection-mode-list)
+      (evil-collection-init)
 
+      (evil-define-key 'motion Info-mode-map (kbd "<escape>") 'sp00ky/ignore)
+      (evil-define-key 'motion Info-mode-map (kbd "f") 'sp00ky/highlight-word-at-point)
+      (evil-define-key 'motion Info-mode-map (kbd "F") 'sp00ky/unhighlight-all-in-buffer)
+      (evil-define-key 'motion Info-mode-map (kbd "RET") 'Info-follow-nearest-node)
+      (evil-define-key 'motion Info-mode-map (kbd "H") 'Info-last)
+      (evil-define-key 'motion Info-mode-map (kbd "u") 'Info-up)
+      (evil-define-key 'motion Info-mode-map (kbd "J") 'Info-forward-node)
+      (evil-define-key 'motion Info-mode-map (kbd "K") 'Info-backward-node)
+      (evil-define-key 'motion Info-mode-map (kbd "L") 'Info-history-forward)
+      (evil-define-key 'motion Info-mode-map (kbd ",") 'Info-index-next)
+      (evil-define-key 'normal help-mode-map (kbd "M-<") 'help-go-back)
+      (evil-define-key 'normal help-mode-map (kbd "M->") 'help-go-forward)
+
+      ;; Some aliases to cover my common typos.
+      (evil-ex-define-cmd "Q"    'kill-this-buffer)
+      (evil-ex-define-cmd "E"    'evil-edit)
+      (evil-ex-define-cmd "Wq"   'evil-save-and-close)
+      (evil-ex-define-cmd "W"    'evil-write)
+      (evil-ex-define-cmd "Qa"   "quitall")
+      (evil-ex-define-cmd "Wqa"  'evil-save-and-quit)
+      (evil-ex-define-cmd "q"    'kill-this-buffer)
+      (evil-ex-define-cmd "quit" 'evil-quit) ;; Need to type out :quit to close emacs
+
+      ;; Go over lines that span multiple lines nicely
+      ;; (define-key evil-insert-state-map (kbd "C-k") 'hippie-expand)
+
+      (define-key evil-normal-state-map (kbd "j") 'evil-next-visual-line)
+      (define-key evil-normal-state-map (kbd "k") 'evil-previous-visual-line)
+      (define-key evil-normal-state-map "+"       'text-scale-increase)
+      (define-key evil-normal-state-map "-"       'text-scale-decrease)
+      (define-key evil-motion-state-map (kbd "TAB") 'nil)
+      (define-key evil-motion-state-map (kbd "z z") 'eval-defun)
+      ;; Not sure why I need the \C infront here... perhaps it's something prefix related. Doesnt
+      ;; seem to work when using just C-h or C-o
+      (define-key evil-window-map "\C-h" 'evil-window-left)
+      (define-key evil-window-map "\C-o" 'nil)
+      (define-key evil-window-map "o" 'nil)
+
+      ;; Change evil window commands to C-a to be like my tmux config. Helps not confuse my fingers
+      ;; if everything is the same.
+      ;;
+      ;; Previously this was done using dolist, it was cleaner. But now
+      ;; I am specifying ` as an extra window switching cmd and I still want to be able to insert
+      ;; ` normally in insert mode.
+      (eval-after-load "evil-maps"
+        (progn
+          ;; Clearing old window movement keybindings
+          (define-key evil-motion-state-map (kbd "C-w") nil)
+          (define-key evil-insert-state-map (kbd "C-w") nil)
+          (define-key evil-emacs-state-map  (kbd "C-w") nil)
+          ;; Defining new window movement keybindings
+          (define-key evil-motion-state-map (kbd "C-a") 'evil-window-map)
+          (define-key evil-insert-state-map (kbd "C-a") 'evil-window-map)
+          (define-key evil-emacs-state-map  (kbd "C-a") 'evil-window-map)
+          (define-key evil-motion-state-map (kbd "`")   'evil-window-map)
+          (define-key evil-emacs-state-map  (kbd "`")   'evil-window-map)))
+      (define-key evil-normal-state-map (kbd "`") 'nil)))
 ;;;;;;;;;;;;;;;;SUBSECTION: Company ;;;;;;;;;;;;;;;;
 (setq company-dabbrev-downcase      nil
       company-idle-delay            0.2
@@ -131,6 +201,7 @@
       company-minimum-prefix-length 5)
 
 (company-mode 1)
+(global-company-mode 1)
 (add-hook 'after-init-hook 'global-company-mode ) ;; use in all buffers
 
 (define-key company-active-map (kbd "<tab>") 'company-complete-common-or-cycle)
@@ -179,13 +250,6 @@
 (define-key flyspell-mode-map (kbd "C-;") 'helm-flyspell-correct)
 
 ;;;;;;;;;;;;;;;;SUBSECTION: helm-gtags ;;;;;;;;;;;;;;;;
-(defun sp00ky/gtags-find-current-function ()
-  "Find the references for the current function that point is
-in."
-  (interactive)
-  (let ((f (which-function)))
-    (helm-gtags-find-rtag f)))
-
 (setq helm-gtags-fuzzy-match            t
       helm-gtags-display-style          nil
       helm-gtags-use-input-at-cursor    t
@@ -200,7 +264,7 @@ in."
 
 (with-eval-after-load 'helm-gtags
   (define-key helm-gtags-mode-map (kbd "M-t") 'helm-gtags-dwim)
-  (define-key helm-gtags-mode-map (kbd "M-T") 'sp00ky/gtags-find-current-function)
+  (define-key helm-gtags-mode-map (kbd "M-T") 'helm-gtags-find-tag)
   (define-key helm-gtags-mode-map (kbd "M-r") 'helm-gtags-find-rtag)
   (define-key helm-gtags-mode-map (kbd "M-s") 'helm-gtags-find-symbol)
   (define-key helm-gtags-mode-map (kbd "M-f") 'helm-gtags-tags-in-this-function)
@@ -251,67 +315,68 @@ in."
 
 ;;;;;;;;;;;;;;;;SUBSECTION: Highlight-Parentheses ;;;;;;;;;;;;;;;;
 (require 'highlight-parentheses)
+;;(setq highlight-parentheses-background-colors '("steelblue3"))
 (add-hook 'prog-mode-hook 'highlight-parentheses-mode)
+;; (add-hook 'c-mode-hook 'highlight-parentheses-mode)
+;; (add-hook 'emacs-lisp-mode-hook 'highlight-parentheses-mode)
+;; (add-hook 'scheme-mode-hook 'highlight-parentheses-mode)
 
 ;;;;;;;;;;;;;;;;SUBSECTION: Highlight-Indent-Guides ;;;;;;;;;;;;;;;;
 (setq highlight-indent-guides-method     'character
       highlight-indent-guides-responsive 'stack)
 (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
 
-;;;;;;;;;;;;;;;;SUBSECTION: re-builder ;;;;;;;;;;;;;;;;
-(require 're-builder)
-(defvar sp00ky/evics/reb-mode nil
-  "Indicates if re-builder is active. This is used to control
-  evics keymap prios")
-(add-hook 'reb-mode-hook (lambda ()
-                           (setq-local sp00ky/evics/reb-mode t)))
-(add-to-ordered-list 'evics--emulation-maps (cons 'sp00ky/evics/reb-mode reb-mode-map) 1)
-(define-key reb-mode-map (kbd "q") 'reb-quit)
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;SECTION:       MISC ELISP LOADING               ;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(load (sp00ky/set-init-file-path "sp00ky-functions.el"))
-(load (sp00ky/set-init-file-path "sp00ky-abbrevs.el"))
-(if (file-exists-p (sp00ky/set-init-file-path ".sp00ky-work"))
-    (load (sp00ky/set-init-file-path "sp00ky-work.el"))
-  (load (sp00ky/set-init-file-path "sp00ky-home.el")))
+(load (sp00ky/set-init-file-path "sp00kyFunctions.el"))
+(load (sp00ky/set-init-file-path "sp00kyAbbrevs.el"))
+(if (file-exists-p (sp00ky/set-init-file-path ".sp00kyWork"))
+    (load (sp00ky/set-init-file-path "sp00kyWork.el"))
+  (load (sp00ky/set-init-file-path "sp00kyHome.el")))
 
 ;;;;;;;;; Keybindings for loaded functions
-(define-key evics-normal-mode-map (kbd "f") 'sp00ky/highlight-word-at-point)
-(define-key evics-normal-mode-map (kbd "F") 'sp00ky/unhighlight-all-in-buffer)
+(if sp00ky/use-evics
+    (progn
+      (define-key evics-normal-mode-map (kbd "f") 'sp00ky/highlight-word-at-point)
+      (define-key evics-normal-mode-map (kbd "F") 'sp00ky/unhighlight-all-in-buffer))
+  (progn
+    (define-key evil-normal-state-map (kbd "f") 'sp00ky/highlight-word-at-point)
+    (define-key evil-normal-state-map (kbd "F") 'sp00ky/unhighlight-all-in-buffer)))
+;; (define-key evil-normal-state-map (kbd "t") 'sp00ky/highlight-word-at-point)
+;; (define-key evil-normal-state-map (kbd "T") 'sp00ky/unhighlight-all-in-buffer)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;SECTION:            MISC KEYBINDINGS            ;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(with-eval-after-load 'winner
-  (define-key winner-mode-map (kbd "C-a z") 'toggle-maximize-buffer))
-(global-set-key (kbd "M-w")   'hippie-expand)
+(global-set-key (kbd "<tab>") 'complete-symbol)
+(global-set-key (kbd "TAB") 'indent-for-tab-command)
+(global-set-key (kbd "M-w") 'hippie-expand)
 (global-set-key (kbd "C-x C-b") 'switch-to-buffer)
 (global-set-key (kbd "C-x C-b") 'switch-to-buffer)
+;; Error about starting with non prefix key...
+;; (global-set-key (kbd "C-a z")   'toggle-maximize-buffer)
+(global-set-key (kbd "C-c s")   'split-window-horizontally)
 (global-set-key (kbd "C-x C-e") 'eval-last-sexp)
-(global-set-key (kbd "C-c s") 'split-window-horizontally)
-(global-set-key (kbd "C-c m") 'bookmark-set)
-(global-set-key (kbd "C-c M") 'bookmark-set-no-overwrite)
-(global-set-key (kbd "C-c d") 'bookmark-delete)
-(global-set-key (kbd "C-=")   'align)
-(global-set-key (kbd "C-c l") 'recenter)
-(global-set-key (kbd "C-h M") 'man)
-(global-set-key (kbd "C-;")   'comment-line)
-(global-set-key (kbd "M-;")   'comment-region)
+(global-set-key (kbd "C-c m")   'bookmark-set)
+(global-set-key (kbd "C-c M")   'bookmark-set-no-overwrite)
+(global-set-key (kbd "C-c d")   'bookmark-delete)
+(global-set-key (kbd "C-=")     'align)
+(global-set-key (kbd "C-c l")   'recenter)
+(global-set-key (kbd "C-h M")   'man)
+(global-set-key (kbd "C-;")     'comment-line)
+(global-set-key (kbd "M-;")     'comment-region)
 
 ;; In the future, lets move out these requires and add them to a hook.
-(with-eval-after-load 'vc-annotate
-  (define-key vc-annotate-mode-map (kbd "L") 'vc-annotate-show-log-revision-at-line))
+(require 'vc-annotate)
+(define-key vc-annotate-mode-map (kbd "L") 'vc-annotate-show-log-revision-at-line)
 (define-key help-mode-map (kbd "M-<") 'help-go-back)
 (define-key help-mode-map (kbd "M->") 'help-go-forward)
 (define-key Info-mode-map (kbd "H") 'Info-last)
 (define-key Info-mode-map (kbd "J") 'Info-forward-node)
 (define-key Info-mode-map (kbd "K") 'Info-backward-node)
-(define-key Info-mode-map (kbd "C-k") 'Info-up)
 (define-key Info-mode-map (kbd "L") 'Info-history-forward)
 (define-key Info-mode-map (kbd ",") 'Info-index-next)
 
@@ -323,10 +388,10 @@ in."
 (global-set-key (kbd "ESC ESC")  'keyboard-escape-quit)
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
-(with-eval-after-load 'python
-  (define-key python-mode-map (kbd "M-t") 'jedi:goto-definition)
-  (define-key python-mode-map (kbd "M-<") 'jedi:goto-definition-pop-marker)
-  (define-key python-mode-map (kbd "M-h") 'jedi:show-doc))
+(require 'python)
+(define-key python-mode-map (kbd "M-t") 'jedi:goto-definition)
+(define-key python-mode-map (kbd "M-<") 'jedi:goto-definition-pop-marker)
+(define-key python-mode-map (kbd "M-h") 'jedi:show-doc)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;SECTION:              MISC INIT                 ;;;;;;;;;;;;;;;;;
@@ -342,17 +407,16 @@ in."
       backup-inhibited      t
       help-window-select    t
       scroll-conservatively 101    ; Scroll just one line when hitting bottom of window
-      text-scale-mode-step  1.05
-      Man-notify-method     'aggressive
-      org-edit-src-content-indentation 0   ; Org mode autoindents src code
-      xref-prompt-for-identifier       nil ; So we don't need to input the symbol each
-                                           ; time we call xref
-      eldoc-echo-area-use-multiline-p  t   ; Let eldoc use more than 1 line in the echo area
+      text-scale-mode-step 1.05
+      org-edit-src-content-indentation 0; Org mode autoindents src code
+      xref-prompt-for-identifier nil    ; So we don't need to input the symbol each time we call xref
+      eldoc-echo-area-use-multiline-p t ; Let eldoc use more than 1 line in the echo area
       auto-save-default     nil
       xterm-max-cut-length  200000)
 
 ; Setting tab width
 (setq tab-stop-list     '(0 3)
+      ;; evil-shift-width    3
       tab-width           3)
 
 ;; Highlighting matching parens
@@ -387,60 +451,34 @@ in."
 (setq clean-buffer-list-delay-general 14)
 (midnight-mode t)
 
-(sp00ky/remove-unused-desktop-lock)
-(setq desktop-restore-eager 10
-      desktop-load-locked-desktop 'nil)
-(desktop-save-mode 1)
-
 (setq sp00ky/number-to-hex-timer
       (run-with-idle-timer 0.5 t 'sp00ky/at-point-to-hex t))
 
 (autoload 'cflow-mode "cflow-mode")
 (add-to-list 'auto-mode-alist '("\\.flow\\'" . cflow-mode))
-(add-to-list 'auto-mode-alist '("\\.inc\\'"  . conf-mode))
-(add-to-list 'auto-mode-alist '("\\.bb\\'"   . conf-mode))
+(add-to-list 'auto-mode-alist '("\\.inc\\'" . conf-mode))
+(add-to-list 'auto-mode-alist '("\\.bb\\'" . conf-mode))
 (add-to-list 'auto-mode-alist '("\\.cint\\'" . c-mode))
-(add-to-list 'auto-mode-alist '("\\.gpi\\'"  . gnuplot-mode))
+(add-to-list 'auto-mode-alist '("\\.gpi\\'" . gnuplot-mode))
 ;;;;;;;;;;;;;;;;SUBSECTION: Programming Mode Hooks ;;;;;;;;;;;;;;;;
-(defun sp00ky/align-region-or-paragraph ()
-  "align paragraph"
-  (interactive)
-  (save-excursion
-    (if (not mark-active)
-        (mark-paragraph))
-    (call-interactively 'align)
-    (deactivate-mark)))
-
-(defun sp00ky/indent-region-or-paragraph ()
-  "Indent paragraph or region if active"
-  (interactive)
-  (save-excursion
-    (if (not mark-active)
-        (mark-paragraph))
-    (call-interactively 'indent-region)))
-
-(define-key prog-mode-map (kbd "TAB") 'sp00ky/indent-region-or-paragraph)
-(define-key prog-mode-map (kbd "<backtab>") 'sp00ky/align-region-or-paragraph)
-
 ;;;;;;;;;;;;;;;;SUBSECTION: Shell-script mode Hooks ;;;;;;;;;;;;;;;;
 (defun sp00ky/sh-mode-hook ()
   "Various settings to apply to shell script"
   (abbrev-mode)
   (setq tab-stop-list     '(0 3)
         tab-width           3
-        sh-basic-offset     3))
+        ;; evil-shift-width    3
+        sh-basic-offset      3))
 (add-hook 'sh-mode-hook 'sp00ky/sh-mode-hook)
 ;;;;;;;;;;;;;;;;SUBSECTION: C mode Hooks ;;;;;;;;;;;;;;;;
 (setq c-default-style "k&r")
 (defun sp00ky/c-mode-hook ()
   "Various configs I want to apply for c-mode"
-  (c-set-offset 'case-label '+)
   (setq tab-stop-list     '(0 3)
         tab-width           3
         c-basic-offset      3
         c-tab-always-indent nil
-        comment-start       "// "
-        comment-end         ""
+        ;; evil-shift-width    3
         fill-column         80))
 (add-hook 'c-mode-hook 'sp00ky/c-mode-hook)
 ;;;;;;;;;;;;;;;;SUBSECTION: Conf mode Hooks ;;;;;;;;;;;;;;;;
@@ -467,52 +505,13 @@ in."
             imenu-generic-expression init-el-lisp-imenu-generic-expression)))
 (add-hook 'emacs-lisp-mode-hook 'sp00ky/emacs-lisp-mode-hook)
 
-;;;;;;;;;;;;;;;;SUBSECTION: geiser, Scheme (Guile) mode Hooks ;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;SUBSECTION: Scheme (Guile) mode Hooks ;;;;;;;;;;;;;;;;
+(defun sp00ky/scheme-mode-hook ()
+  "Various configs I want to apply for c-mode"
+  (interactive))
+(add-hook 'scheme-mode-hook 'sp00ky/scheme-mode-hook)
 (require 'geiser-guile)
-(require 'geiser-mode)
-(define-key geiser-mode-map (kbd "M-t") 'geiser-edit-symbol-at-point)
-(define-key geiser-mode-map (kbd "M-<") 'geiser-pop-symbol-stack)
-(define-key geiser-mode-map (kbd "z") 'geiser-eval-buffer)
-
-(require 'geiser-repl)
-(setq geiser-repl-current-project-function 'projectile-project-root)
-(defvar sp00ky/evics/geiser-repl-mode nil)
-(defun sp00ky/geiser-repl-mode-hook ()
-  ""
-  (setq-local sp00ky/evics/geiser-repl-mode t))
-(add-hook 'geiser-repl-mode-hook 'sp00ky/geiser-repl-mode-hook)
-
-(defun sp00ky/evics/geiser-history-up-override ()
-  "When in geiser repl mode, make j/k go to the next or previous
-item in the command history respectively."
-  (interactive)
-  (if evics-normal-mode
-      (progn
-        ;; Move point to the end of the repl prompt so comint does
-        ;; not complain
-        (goto-char (process-mark (get-buffer-process (current-buffer))))
-        (call-interactively 'comint-previous-input))
-    (call-interactively 'self-insert-command)))
-
-(defun sp00ky/evics/geiser-history-down-override ()
-  "When in geiser repl mode, make j/k go to the next or previous
-item in the command history respectively."
-  (interactive)
-  (if evics-normal-mode
-      (progn
-        ;; Move point to the end of the repl prompt so comint does
-        (goto-char (process-mark (get-buffer-process (current-buffer))))
-        (call-interactively 'comint-next-input))
-    (call-interactively 'self-insert-command)))
-
-(define-key geiser-repl-mode-map (kbd "C-a") 'nil)
-(define-key geiser-repl-mode-map (kbd "k") 'sp00ky/evics/geiser-history-up-override)
-(define-key geiser-repl-mode-map (kbd "j") 'sp00ky/evics/geiser-history-down-override)
-
-(add-to-ordered-list
- 'evics--emulation-maps
- (cons 'sp00ky/evics/geiser-repl-mode geiser-repl-mode-map)
- 1)
+;; Empty for now
 
 ;;;;;;;;;;;;;;;;SUBSECTION: Python mode Hooks ;;;;;;;;;;;;;;;;
 (defun sp00ky/python-mode-hook ()
@@ -522,16 +521,15 @@ item in the command history respectively."
 (add-hook 'python-mode-hook 'sp00ky/python-mode-hook)
 
 ;;;;;;;;;;;;;;;;SUBSECTION: Org mode Hooks ;;;;;;;;;;;;;;;;
+(setq org-adapt-indentation 'nil)
 (defun sp00ky/org-mode-hook ()
   "Various config for org-mode"
   (visual-line-mode t)
   (setq-local word-wrap nil)
   (setq fill-column 100))
-
-(with-eval-after-load 'org
-  (setq org-adapt-indentation 'nil)
-  (add-hook 'org-mode-hook 'sp00ky/org-mode-hook)
-  (plist-put org-format-latex-options :scale 2.5))
+(add-hook 'org-mode-hook 'sp00ky/org-mode-hook)
+(require 'org)
+(plist-put org-format-latex-options :scale 2.5)
 
 ;;;;;;;;;;;;;;;;SUBSECTION: Javascript mode ;;;;;;;;;;;;;;;;
 (defun sp00ky/js-mode-hook ()
@@ -539,6 +537,7 @@ item in the command history respectively."
   (setq tab-stop-list     '(0 3)
         tab-width           3
         js-indent-level     3
+        ;; evil-shift-width    3
         fill-column         100))
 (add-hook 'js-mode-hook 'sp00ky/js-mode-hook)
 
@@ -546,7 +545,7 @@ item in the command history respectively."
 ;; This is grabbed from:
 ;; https://github.com/protocolbuffers/protobuf/blob/master/editors/protobuf-mode.el
 (if (file-exists-p "/localdata/hmuresan/my_builds/protobuf/editors/protobuf-mode.el")
-    (progn (load "/localdata/hmuresan/my_builds/protobuf/editors/protobuf-mode")
+    (progn (load "/localdata/hmuresan/my_builds/protobuf/editors/protobuf-mode.el")
            (require 'protobuf-mode)
            (add-to-list 'auto-mode-alist '("\\.proto\\'" . protobuf-mode)))
   (message "Cannot locate protobuf-mode.el, not loading"))
@@ -559,7 +558,7 @@ item in the command history respectively."
 
 ;; It's annoying when a new emacs instance prompts about a pre-existing server
 (require 'server)
-(if (not (server-running-p))
+(if (not server-process)
     (server-start)
   (message "Not starting emacs server, one already exists"))
 
@@ -576,16 +575,18 @@ item in the command history respectively."
   (when value
     (setq package-selected-packages value)))
 
+
 (let ((file "~/.emacs.d/bb-mode.el"))
   (when (file-exists-p file)
     (load file)
     (require 'bb-mode)
-    (setq auto-mode-alist (cons '("\\.bb$"  . bb-mode) auto-mode-alist))
+    (setq auto-mode-alist (cons '("\\.bb$" . bb-mode) auto-mode-alist))
     (setq auto-mode-alist (cons '("\\.inc$" . bb-mode) auto-mode-alist))
     (setq auto-mode-alist (cons '("\\.bbappend$" . bb-mode) auto-mode-alist))
-    (setq auto-mode-alist (cons '("\\.bbclass$"  . bb-mode) auto-mode-alist))
+    (setq auto-mode-alist (cons '("\\.bbclass$" . bb-mode) auto-mode-alist))
     ;; (setq auto-mode-alist (cons '("\\.conf$" . bb-mode) auto-mode-alist))
     ))
+;; (setq auto-mode-alist (remove '("\\.conf$" . bb-mode) auto-mode-alist))
 
 (let ((file "~/.emacs.d/help-fns+.el"))
   (when (file-exists-p file)
@@ -599,6 +600,12 @@ item in the command history respectively."
 ;; (require 'display-line-numbers)
 ;; (setq display-line-numbers-type 'relative)
 ;; (add-hook 'c-mode-hook 'display-line-numbers-mode)
+
+;; Making evil not overwrite copied text when pasting
+;; (define-key evil-visual-state-map "p" 'sp00ky/evil-paste-after-from-0)
+;; (define-key evil-normal-state-map "p" 'evil-paste-after)
+;; (define-key evil-visual-state-map "x" 'sp00ky/evil-cut-to-0)
+;; (define-key evil-normal-state-map "x" 'sp00ky/evil-delete-char)
 
 ;; Some interesting helm config to take from https://tuhdo.github.io/helm-intro.html
 ;; helm-split-window-default-side
