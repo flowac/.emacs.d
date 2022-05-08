@@ -308,6 +308,8 @@ in."
   (define-key vc-annotate-mode-map (kbd "L") 'vc-annotate-show-log-revision-at-line))
 (define-key help-mode-map (kbd "M-<") 'help-go-back)
 (define-key help-mode-map (kbd "M->") 'help-go-forward)
+(define-key Info-mode-map (kbd "M-<") 'Info-history-back)
+(define-key Info-mode-map (kbd "M->") 'Info-history-forward)
 (define-key Info-mode-map (kbd "H") 'Info-last)
 (define-key Info-mode-map (kbd "J") 'Info-forward-node)
 (define-key Info-mode-map (kbd "K") 'Info-backward-node)
@@ -526,7 +528,7 @@ item in the command history respectively."
   "Various config for org-mode"
   (visual-line-mode t)
   (setq-local word-wrap nil)
-  (setq fill-column 100))
+  (setq fill-column 90))
 
 (with-eval-after-load 'org
   (setq org-adapt-indentation 'nil)
