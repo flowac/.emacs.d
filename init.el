@@ -199,6 +199,8 @@ in."
       helm-gtags-path-style             'root)
 
 (with-eval-after-load 'helm-gtags
+  ;; (define-key c-mode-map (kbd "t") 'helm-gtags-dwim)
+  ;; (define-key c-mode-map (kbd "T") 'sp00ky/gtags-find-current-function)
   (define-key helm-gtags-mode-map (kbd "M-t") 'helm-gtags-dwim)
   (define-key helm-gtags-mode-map (kbd "M-T") 'sp00ky/gtags-find-current-function)
   (define-key helm-gtags-mode-map (kbd "M-r") 'helm-gtags-find-rtag)
@@ -209,6 +211,12 @@ in."
   ;; Look into swapping this with a prefix based keybinding C-c z is my helm prefix
   (define-key helm-gtags-mode-map (kbd "C-c z g") 'helm-gtags-parse-file)
   (define-key helm-gtags-mode-map (kbd "M-<") 'helm-gtags-previous-history))
+
+;; (add-to-ordered-list
+;;  'evics--emulation-maps
+;;  (cons 'evics-normal-mode c-mode-map)
+;;  2)
+
 
 (add-hook 'c++-mode-hook 'helm-gtags-mode)
 (add-hook 'c-mode-hook 'helm-gtags-mode)
@@ -423,6 +431,8 @@ in."
 
 (define-key prog-mode-map (kbd "TAB") 'sp00ky/indent-region-or-paragraph)
 (define-key prog-mode-map (kbd "<backtab>") 'sp00ky/align-region-or-paragraph)
+(define-key c-mode-map (kbd "TAB") 'sp00ky/indent-region-or-paragraph)
+(define-key c-mode-map (kbd "<backtab>") 'sp00ky/align-region-or-paragraph)
 
 ;;;;;;;;;;;;;;;;SUBSECTION: Shell-script mode Hooks ;;;;;;;;;;;;;;;;
 (defun sp00ky/sh-mode-hook ()
@@ -468,6 +478,8 @@ in."
       (setq imenu-generic-skip-comments-and-strings nil
             imenu-generic-expression init-el-lisp-imenu-generic-expression)))
 (add-hook 'emacs-lisp-mode-hook 'sp00ky/emacs-lisp-mode-hook)
+(define-key emacs-lisp-mode-map (kbd "M-t") 'xref-find-definitions)
+(define-key emacs-lisp-mode-map (kbd "M-<") 'xref-pop-marker-stack)
 
 ;;;;;;;;;;;;;;;;SUBSECTION: geiser, Scheme (Guile) mode Hooks ;;;;;;;;;;;;;;;;
 (require 'geiser-guile)

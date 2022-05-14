@@ -9,8 +9,11 @@
 
 
 ;;(setq user-emacs-directory "~/.emacs.d/")
-(add-to-list 'load-path "/localdata/hmuresan/my_builds/evics")
+;; (add-to-list 'load-path "/localdata/hmuresan/my_builds/evics")
 ;; (load "/localdata/hmuresan/my_builds/evics/evics.el")
+(add-to-list 'load-path "/localdata/hmuresan/my_builds/evics")
+;; (require 'evics)
+;; (evics-global-mode t)
 (load "~/scratch/visual-regexp.el")
 (xterm-mouse-mode     1)
 
@@ -18,10 +21,13 @@
 (load-theme 'sp00ky t)
 
 (toggle-debug-on-error)
-(require 'evics)
-(evics-global-mode t)
-(define-key global-map (kbd "<escape>") 'keyboard-escape-quit)
-(evics-init-esc)
+;; (require 'evics)
+;; (evics-global-mode t)
+;; (define-key global-map (kbd "<escape>") 'keyboard-escape-quit)
+;; (evics-init-esc)
+;; (define-key global-map (kbd "ESC") 'keyboard-escape-quit)
+;; (define-key global-map (kbd "M-x") 'M-x)
+;; (define-key key-translation-map (kbd "ESC") (kbd "C-g"))
 
 (setq visual-order-cursor-movement t
       help-window-select    t)

@@ -1,0 +1,3 @@
+[submodule "submodules/call-graph"]
+	path = submodules/call-graph
+	url = https://github.com/beacoder/call-graph.git
