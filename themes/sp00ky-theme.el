@@ -7,10 +7,13 @@
       (sp00ky-green          "#155b05")
       (sp00ky-light-green    "#00ff00")
       (sp00ky-background     "#111111")
-      (sp00ky-alt-background "#1f1f1f")
+      ;; (sp00ky-alt-background "#1f1f1f")
+      (sp00ky-alt-background "#333333")
+      ;; (sp00ky-white          "#cccccc")
       (sp00ky-white          "#cccccc")
       (sp00ky-grey           "#656765")
       (sp00ky-yellow         "#e9ff00")
+      (sp00ky-yellow2        "#eeee00")
       (sp00ky-red            "#770202")
       (sp00ky-orange         "#ff8c00")
       (sp00ky-majenta        "#99008C")
@@ -24,6 +27,12 @@
       (sp00ky-light-brown    "#C8B4A0")
       (sp00ky-pink           "#cc0099")
       )
+
+  (defface sp00ky-hi
+    `((t (:foreground ,sp00ky-red :background ,sp00ky-yellow2)))
+    "Sp00ky face for hi-lock mode.")
+  ;; To unset the face (to redefine it) use unintern
+  ;; (unintern 'sp00ky-hi)
 
   (custom-theme-set-faces
    'sp00ky
@@ -86,7 +95,8 @@
    `(neo-file-link-face ((,class (:foreground ,sp00ky-white))))
 
 
-;; org-mode
+   ;; org-mode
+   `(org-block ((,class (:inherit default))))
    `(org-level-2 ((,class (:foreground ,sp00ky-yellow))))
    `(org-level-4 ((,class (:foreground ,sp00ky-orange))))
 

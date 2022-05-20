@@ -119,7 +119,7 @@ hilighting")
 	  (sp00ky/unhighlight-word-at-point target)
 	  (setq sp00ky/last-highlighted-word nil))
       (progn
-	(highlight-regexp (regexp-opt target))
+	(highlight-regexp (regexp-opt target) 'hi-yellow)
 	(setq sp00ky/last-highlighted-word target)))))
 
 ;;=========================================================================

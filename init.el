@@ -76,6 +76,7 @@
       '(company
         company-jedi
         docker-compose-mode
+        htmlize
         eyebrowse       ; Can explore using built in tab-bar mode, or
                         ; window/frame registers
         geiser
@@ -107,18 +108,19 @@
 (define-key evics-normal-mode-map (kbd "C-j") 'evics-join-line)
 (define-key evics-normal-mode-map "J" 'forward-paragraph)
 (define-key evics-normal-mode-map "K" 'backward-paragraph)
-(define-key evics-mark-active-mode-map (kbd "+") '(lambda ()
-                                                    (interactive)
-                                                    (deactivate-mark)
-                                                    (save-excursion
-                                                      (mark-defun)
-                                                      (call-interactively 'indent-region))))
+(define-key evics-mark-active-mode-map (kbd "+") #'(lambda ()
+                                                     (interactive)
+                                                     (deactivate-mark)
+                                                     (save-excursion
+                                                       (mark-defun)
+                                                       (call-interactively 'indent-region))))
 (define-key evics-mark-active-mode-map (kbd "f") 'mark-defun)
-(define-key evics-mark-active-mode-map (kbd "C-b") 'mark-whole-buffer)
-(define-key evics-mark-active-mode-map (kbd "v") '(lambda ()
-                                                    (interactive)
-                                                    (deactivate-mark)
-                                                    (mark-paragraph)))
+;; (define-key evics-mark-active-mode-map (kbd "C-b") 'mark-whole-buffer)
+(define-key evics-mark-active-mode-map (kbd "v") #'(lambda ()
+                                                     (interactive)
+                                                     (deactivate-mark)
+                                                     (mark-paragraph)))
+
 
 ;;;;;;;;;;;;;;;;SUBSECTION: docker-compose-mode ;;;;;;;;;;;;;;;;
 (require 'docker-compose-mode)
@@ -297,6 +299,9 @@ in."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (with-eval-after-load 'winner
   (define-key winner-mode-map (kbd "C-a z") 'toggle-maximize-buffer))
+; This sometimes invoked eval-expression instead of going to command
+; mode in evics. This is related to how TTYs send ESC and META.
+(global-set-key (kbd "M-:")   'evics-command)
 (global-set-key (kbd "M-w")   'hippie-expand)
 (global-set-key (kbd "C-x C-b") 'switch-to-buffer)
 (global-set-key (kbd "C-x C-b") 'switch-to-buffer)
@@ -342,7 +347,13 @@ in."
 ;;;;;;;;;;;;;;SECTION:              MISC INIT                 ;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(with-eval-after-load 'gdb-mi
+  (setq gdb-default-window-configuration-file "sp00ky-gdb-layout"
+        gdb-display-io-nopopup t))
+
 ;; Various configurations that I like:
+(setq-default abbrev-mode t)
+
 (require 'ispell)
 (setq-default ispell-program-name "aspell")
 (setq-default indent-tabs-mode nil); Replace Tabs with spaces
@@ -360,6 +371,13 @@ in."
       eldoc-echo-area-use-multiline-p  t   ; Let eldoc use more than 1 line in the echo area
       auto-save-default     nil
       xterm-max-cut-length  200000)
+
+;; Mouse settings
+(setq mouse-wheel-scroll-amount '(5
+                                  ((shift). hscroll)
+                                  ((meta))
+                                  ((control) . text-scale)))
+
 
 ; Setting tab width
 (setq tab-stop-list     '(0 3)
@@ -394,7 +412,7 @@ in."
 
 ;; Delete unused buffers after a certain amount of time. This could potentially go into sp00kyWork.
 (require 'midnight)
-(setq clean-buffer-list-delay-general 14)
+(setq clean-buffer-list-delay-general 5)
 (midnight-mode t)
 
 (sp00ky/remove-unused-desktop-lock)
@@ -411,6 +429,7 @@ in."
 (add-to-list 'auto-mode-alist '("\\.bb\\'"   . conf-mode))
 (add-to-list 'auto-mode-alist '("\\.cint\\'" . c-mode))
 (add-to-list 'auto-mode-alist '("\\.gpi\\'"  . gnuplot-mode))
+(add-to-list 'auto-mode-alist '("\\.completion\\'"  . shell-script-mode))
 ;;;;;;;;;;;;;;;;SUBSECTION: Programming Mode Hooks ;;;;;;;;;;;;;;;;
 (defun sp00ky/align-region-or-paragraph ()
   "align paragraph"
@@ -431,13 +450,14 @@ in."
 
 (define-key prog-mode-map (kbd "TAB") 'sp00ky/indent-region-or-paragraph)
 (define-key prog-mode-map (kbd "<backtab>") 'sp00ky/align-region-or-paragraph)
+(require 'cc-mode)
 (define-key c-mode-map (kbd "TAB") 'sp00ky/indent-region-or-paragraph)
 (define-key c-mode-map (kbd "<backtab>") 'sp00ky/align-region-or-paragraph)
 
 ;;;;;;;;;;;;;;;;SUBSECTION: Shell-script mode Hooks ;;;;;;;;;;;;;;;;
 (defun sp00ky/sh-mode-hook ()
   "Various settings to apply to shell script"
-  (abbrev-mode)
+  (abbrev-mode t)
   (setq tab-stop-list     '(0 3)
         tab-width           3
         sh-basic-offset     3))
@@ -457,7 +477,7 @@ in."
 (add-hook 'c-mode-hook 'sp00ky/c-mode-hook)
 ;;;;;;;;;;;;;;;;SUBSECTION: Conf mode Hooks ;;;;;;;;;;;;;;;;
 
-;;;;;;;;;;;;;;;;SUBSECTION: Elisp mode Hooks ;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;SUBSECTION: Tex mode Hooks ;;;;;;;;;;;;;;;;
 (defun sp00ky/tex-mode-hook ()
   (flyspell-mode-on))
 (add-hook 'tex-mode-hook 'sp00ky/tex-mode-hook)
@@ -473,7 +493,7 @@ in."
 (defun sp00ky/emacs-lisp-mode-hook ()
   "Various configs I want to apply for c-mode"
   (setq tab-always-indent nil)
-  (abbrev-mode)
+  (abbrev-mode t)
   (if (string-equal (buffer-name) "init.el")
       (setq imenu-generic-skip-comments-and-strings nil
             imenu-generic-expression init-el-lisp-imenu-generic-expression)))
@@ -538,6 +558,7 @@ item in the command history respectively."
 ;;;;;;;;;;;;;;;;SUBSECTION: Org mode Hooks ;;;;;;;;;;;;;;;;
 (defun sp00ky/org-mode-hook ()
   "Various config for org-mode"
+  (flyspell-mode t)
   (visual-line-mode t)
   (setq-local word-wrap nil)
   (setq fill-column 90))
