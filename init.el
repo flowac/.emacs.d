@@ -568,6 +568,22 @@ item in the command history respectively."
   (add-hook 'org-mode-hook 'sp00ky/org-mode-hook)
   (plist-put org-format-latex-options :scale 2.5))
 
+(setq org-publish-project-alist
+      '(("notes"
+         :base-directory "~/notes/"
+         :publishing-function org-html-publish-to-html
+         :publishing-directory "~/notes/html"
+         :section-numbers nil
+         :with-toc t
+         :makeindex t
+         :html-head-include-default-style nil
+         :html-head "<link rel=\"stylesheet\"
+                         href=\"../style.css\"
+                         type=\"text/css\"/>"
+         :html-postamble t
+         :html-postamble-format (("en" "<p class=\"date\">Last Updated: %T\n</p>"))
+         )))
+
 ;;;;;;;;;;;;;;;;SUBSECTION: Javascript mode ;;;;;;;;;;;;;;;;
 (defun sp00ky/js-mode-hook ()
   "Various config for org-mode"
