@@ -77,6 +77,7 @@
         company-jedi
         docker-compose-mode
         htmlize
+        citeproc
         eyebrowse       ; Can explore using built in tab-bar mode, or
                         ; window/frame registers
         geiser
@@ -254,6 +255,7 @@ in."
 ;;;;;;;;;;;;;;;;SUBSECTION: Projectile ;;;;;;;;;;;;;;;;
 (projectile-mode +1)
 (define-key projectile-mode-map (kbd "C-w") 'projectile-command-map)
+(define-key projectile-mode-map (kbd "C-w ESC") 'nil)
 (setq projectile-enable-caching nil)
 (setq projectile-globally-ignored-files
       (append '("GTAGS" "GPATH" "GRTAGS" "TAGS")))
@@ -417,7 +419,8 @@ in."
 
 (sp00ky/remove-unused-desktop-lock)
 (setq desktop-restore-eager 10
-      desktop-load-locked-desktop 'nil)
+      desktop-load-locked-desktop 'nil
+      desktop-auto-save-timeout 300)
 (desktop-save-mode 1)
 
 (setq sp00ky/number-to-hex-timer
@@ -506,7 +509,7 @@ in."
 (require 'geiser-mode)
 (define-key geiser-mode-map (kbd "M-t") 'geiser-edit-symbol-at-point)
 (define-key geiser-mode-map (kbd "M-<") 'geiser-pop-symbol-stack)
-(define-key geiser-mode-map (kbd "z") 'geiser-eval-buffer)
+;; (define-key geiser-mode-map (kbd "z") 'geiser-eval-buffer)
 
 (require 'geiser-repl)
 (setq geiser-repl-current-project-function 'projectile-project-root)
@@ -556,6 +559,8 @@ item in the command history respectively."
 (add-hook 'python-mode-hook 'sp00ky/python-mode-hook)
 
 ;;;;;;;;;;;;;;;;SUBSECTION: Org mode Hooks ;;;;;;;;;;;;;;;;
+(require 'citeproc)
+(require 'oc-csl)
 (defun sp00ky/org-mode-hook ()
   "Various config for org-mode"
   (flyspell-mode t)

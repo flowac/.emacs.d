@@ -105,4 +105,4 @@ We will have to account for LOG_INFO and LOG_DEBUG accordingly."
      "cncore_log.*?\"\\(error:\\|\\)"
      replacement-string
      nil (line-beginning-position) (line-end-position))
-    (sp00ky/indent-paragraph)))
+    (sp00ky/indent-region-or-paragraph)))
