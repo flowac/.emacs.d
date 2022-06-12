@@ -10,6 +10,13 @@
     (if (not quiet)
         (message "Expecting number at point"))))
 
+(defun sp00ky/xterm-mouse--tracking-sequence (suffix)
+  "Override of `xterm-mouse--tracking-sequence' with the goal of
+disabling mouse tracking while keeping mouse clicking working."
+  (mapcar
+   (lambda (code) (format "\e[?%d%c" code suffix))
+   `(1000 ,@(when xterm-mouse-utf-8 '(1005)) 1006)))
+
 (defun sp00ky/kill-dangling-buffers ()
   "Kill any buffers that are pointing to a nonexistent file"
   (interactive)

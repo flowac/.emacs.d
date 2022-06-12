@@ -76,6 +76,7 @@
       '(company
         company-jedi
         docker-compose-mode
+        graphviz-dot-mode
         htmlize
         citeproc
         eyebrowse       ; Can explore using built in tab-bar mode, or
@@ -107,6 +108,7 @@
 (evics-global-mode t)
 (global-undo-tree-mode)
 (define-key evics-normal-mode-map (kbd "C-j") 'evics-join-line)
+(define-key evics-normal-mode-map "s" 'save-buffer)
 (define-key evics-normal-mode-map "J" 'forward-paragraph)
 (define-key evics-normal-mode-map "K" 'backward-paragraph)
 (define-key evics-mark-active-mode-map (kbd "+") #'(lambda ()
@@ -123,6 +125,9 @@
                                                      (mark-paragraph)))
 
 
+;;;;;;;;;;;;;;;;SUBSECTION: graphviz-dot-mode ;;;;;;;;;;;;;;;;
+(require 'graphviz-dot-mode)
+(setq graphviz-dot-indent-width 3)
 ;;;;;;;;;;;;;;;;SUBSECTION: docker-compose-mode ;;;;;;;;;;;;;;;;
 (require 'docker-compose-mode)
 (add-to-list 'auto-mode-alist '("\\.yml.append\\'" . docker-compose-mode))
@@ -228,6 +233,16 @@ in."
 ;;;;;;;;;;;;;;;;SUBSECTION: Eyebrowse ;;;;;;;;;;;;;;;;
 (require 'eyebrowse)
 (setq eyebrowse-new-workspace t)
+(define-key evics-normal-mode-map (kbd "w 1") 'eyebrowse-switch-to-window-config-1)
+(define-key evics-normal-mode-map (kbd "w 2") 'eyebrowse-switch-to-window-config-2)
+(define-key evics-normal-mode-map (kbd "w 3") 'eyebrowse-switch-to-window-config-3)
+(define-key evics-normal-mode-map (kbd "w 4") 'eyebrowse-switch-to-window-config-4)
+(define-key evics-normal-mode-map (kbd "w 5") 'eyebrowse-switch-to-window-config-5)
+(define-key evics-normal-mode-map (kbd "w 6") 'eyebrowse-switch-to-window-config-6)
+(define-key evics-normal-mode-map (kbd "w 7") 'eyebrowse-switch-to-window-config-7)
+(define-key evics-normal-mode-map (kbd "w 8") 'eyebrowse-switch-to-window-config-8)
+(define-key evics-normal-mode-map (kbd "w 9") 'eyebrowse-switch-to-window-config-9)
+(define-key evics-normal-mode-map (kbd "w 0") 'eyebrowse-switch-to-window-config-0)
 
 (define-key eyebrowse-mode-map (kbd "C-a 1") 'eyebrowse-switch-to-window-config-1)
 (define-key eyebrowse-mode-map (kbd "C-a 2") 'eyebrowse-switch-to-window-config-2)
@@ -300,9 +315,15 @@ in."
 ;;;;;;;;;;;;;;SECTION:            MISC KEYBINDINGS            ;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (with-eval-after-load 'winner
-  (define-key winner-mode-map (kbd "C-a z") 'toggle-maximize-buffer))
-; This sometimes invoked eval-expression instead of going to command
-; mode in evics. This is related to how TTYs send ESC and META.
+  (define-key evics-normal-mode-map (kbd "w z") 'toggle-maximize-buffer)
+  (define-key evics-normal-mode-map (kbd "w h") 'windmove-left)
+  (define-key evics-normal-mode-map (kbd "w l") 'windmove-right)
+  (define-key evics-normal-mode-map (kbd "w j") 'windmove-down)
+  (define-key evics-normal-mode-map (kbd "w k") 'windmove-up)
+  (define-key evics-normal-mode-map (kbd "w c") 'delete-window))
+
+;; This sometimes invoked eval-expression instead of going to command
+;; mode in evics. This is related to how TTYs send ESC and META.
 (global-set-key (kbd "M-:")   'evics-command)
 (global-set-key (kbd "M-w")   'hippie-expand)
 (global-set-key (kbd "C-x C-b") 'switch-to-buffer)
@@ -395,12 +416,21 @@ in."
 (scroll-bar-mode     -1)
 (tool-bar-mode       -1)
 (menu-bar-mode       -1)
-(xterm-mouse-mode     1)
 (electric-pair-mode   t)
 ;; Modifications to mode line
 (size-indication-mode)
 (column-number-mode   t)
 (line-number-mode     t)
+
+;; Removing mouse movement sequences, they don't seem to play well in
+;; TTY mode. Mouse movement + hitting escape seems to trigger emacs to
+;; close windows.
+(when (terminal-live-p (frame-terminal))
+  (advice-add
+   'xterm-mouse--tracking-sequence
+   :override
+   'sp00ky/xterm-mouse--tracking-sequence))
+(xterm-mouse-mode t)
 
 (which-function-mode)
 (setq which-func-unknown "n/a") ; Display n/a instead of ???
@@ -414,7 +444,7 @@ in."
 
 ;; Delete unused buffers after a certain amount of time. This could potentially go into sp00kyWork.
 (require 'midnight)
-(setq clean-buffer-list-delay-general 5)
+(setq clean-buffer-list-delay-general 10)
 (midnight-mode t)
 
 (sp00ky/remove-unused-desktop-lock)

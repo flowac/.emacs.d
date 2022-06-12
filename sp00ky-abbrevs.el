@@ -13,6 +13,7 @@
   "Insert a function" nil
   "//================================================================================" \n
   "// Description:" \n
+  "//" \n
   "//   DOCSTRING" \n
   "//================================================================================" \n
   "void f" _ "(void)" \n
@@ -146,9 +147,19 @@
   "typedef enum" > \n
   "{" _ > \n
   "} enumName;" >)
+(define-skeleton sp00ky-skeleton/typedef-struct
+  "" nil
+  "typedef struct _t" > \n
+  "{" _ > \n
+  "} t;" >)
+(define-skeleton sp00ky-skeleton/c-include
+  "" nil
+  "#include <" _ ">" >)
 
 (define-abbrev-table 'c-mode-abbrev-table
   '(
+    ("inc" "" sp00ky-skeleton/c-include)
+    ("tstr" "" sp00ky-skeleton/typedef-struct)
     ("tenu" "" sp00ky-skeleton/c-tenu)
     ("swi" "" sp00ky-skeleton/c-swi)
     ("whi" "" sp00ky-skeleton/c-whi)
