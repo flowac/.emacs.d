@@ -1,4 +1,5 @@
 ;; TODO
+;; - dabbrev--find-expansion filter out the stdout of this
 ;; - Using emacs compile to build:
 ;;     Will need to investigate dir variables
 ;;     Seems like we will need to set default directory then invoke compile, something like
@@ -73,11 +74,15 @@
     (package-install package)))
 
 (setq my-packages
-      '(company
-        company-jedi
+      '(
+        corfu
+        corfu-terminal
+        ;; company
+        ;; company-jedi
         docker-compose-mode
         graphviz-dot-mode
         htmlize
+        call-graph
         citeproc
         eyebrowse       ; Can explore using built in tab-bar mode, or
                         ; window/frame registers
@@ -125,27 +130,51 @@
                                                      (mark-paragraph)))
 
 
+;;;;;;;;;;;;;;;;SUBSECTION: call-graph ;;;;;;;;;;;;;;;;
+(require 'hierarchy)
+(require 'call-graph)
 ;;;;;;;;;;;;;;;;SUBSECTION: graphviz-dot-mode ;;;;;;;;;;;;;;;;
 (require 'graphviz-dot-mode)
 (setq graphviz-dot-indent-width 3)
 ;;;;;;;;;;;;;;;;SUBSECTION: docker-compose-mode ;;;;;;;;;;;;;;;;
 (require 'docker-compose-mode)
 (add-to-list 'auto-mode-alist '("\\.yml.append\\'" . docker-compose-mode))
+;;;;;;;;;;;;;;;;SUBSECTION: Corfu ;;;;;;;;;;;;;;;;
+(require 'corfu)
+(require 'corfu-terminal)
+;; Some useful corfu config can be found here:
+;; https://kristofferbalintona.me/posts/202202270056/
+(setq corfu-min-width 50
+      corfu-max-width corfu-min-width
+      corfu-preselect-first t
+      corfu-echo-documentation t
+      corfu-auto t
+      corfu-auto-prefix 4
+      corfu-quit-no-match 'separator)
+(define-key corfu-map (kbd "<escape>") 'corfu-quit)
+(unless (display-graphic-p)
+  (corfu-terminal-mode +1))
+(global-corfu-mode)
+;; (define-key prog-mode-map (kbd "TAB") 'completion-at-point)
+;; (define-key prog-mode-map (kbd "<backtab>") 'completion-at-point)
+;; (define-key c-mode-map (kbd "TAB") 'completion-at-point)
+;; (define-key c-mode-map (kbd "<backtab>") 'completion-at-point)
+(setq tab-always-indent 'complete)
 
 ;;;;;;;;;;;;;;;;SUBSECTION: Company ;;;;;;;;;;;;;;;;
-(setq company-dabbrev-downcase      nil
-      company-idle-delay            0.2
-      company-selection-wrap-around t
-      company-minimum-prefix-length 5)
-
-(company-mode 1)
-(add-hook 'after-init-hook 'global-company-mode ) ;; use in all buffers
-
-(define-key company-active-map (kbd "<tab>") 'company-complete-common-or-cycle)
-(define-key company-active-map (kbd "TAB")   'company-complete-common-or-cycle)
-(define-key company-active-map (kbd "S-TAB") 'company-complete-common-or-cycle)
-(define-key company-active-map (kbd "C-n")   'company-complete-common-or-cycle)
-(define-key company-active-map (kbd "C-p")   'company-select-previous)
+;(setq company-dabbrev-downcase      nil
+;      company-idle-delay            0.2
+;      company-selection-wrap-around t
+;      company-minimum-prefix-length 5)
+;
+;(company-mode 1)
+;(add-hook 'after-init-hook 'global-company-mode ) ;; use in all buffers
+;
+;(define-key company-active-map (kbd "<tab>") 'company-complete-common-or-cycle)
+;(define-key company-active-map (kbd "TAB")   'company-complete-common-or-cycle)
+;(define-key company-active-map (kbd "S-TAB") 'company-complete-common-or-cycle)
+;(define-key company-active-map (kbd "C-n")   'company-complete-common-or-cycle)
+;(define-key company-active-map (kbd "C-p")   'company-select-previous)
 
 ;;;;;;;;;;;;;;;;SUBSECTION: Helm ;;;;;;;;;;;;;;;;
 (require 'helm)
@@ -456,6 +485,18 @@ in."
 (setq sp00ky/number-to-hex-timer
       (run-with-idle-timer 0.5 t 'sp00ky/at-point-to-hex t))
 
+;; Adding capfs config
+;; Taken from: https://emacs.stackexchange.com/questions/30690/code-auto-completion-with-ivy/30704#30704
+(require 'dabbrev)
+(defun dabbrev-complation-at-point ()
+  (dabbrev--reset-global-variables)
+  (let* ((abbrev (dabbrev--abbrev-at-point))
+         (candidates (dabbrev--find-all-expansions abbrev t))
+         (bnd (bounds-of-thing-at-point 'symbol)))
+    (list (car bnd) (cdr bnd) candidates)))
+(add-to-list 'completion-at-point-functions 'dabbrev-complation-at-point)
+(add-to-list 'completion-at-point-functions 'sp00ky/gtags-completion-at-point)
+
 (autoload 'cflow-mode "cflow-mode")
 (add-to-list 'auto-mode-alist '("\\.flow\\'" . cflow-mode))
 (add-to-list 'auto-mode-alist '("\\.inc\\'"  . conf-mode))
@@ -500,6 +541,7 @@ in."
 (defun sp00ky/c-mode-hook ()
   "Various configs I want to apply for c-mode"
   (c-set-offset 'case-label '+)
+  ;; (setq-local completion-at-point-functions (list 'sp00ky/gtags-completion-at-point))
   (setq tab-stop-list     '(0 3)
         tab-width           3
         c-basic-offset      3
@@ -582,11 +624,11 @@ item in the command history respectively."
  1)
 
 ;;;;;;;;;;;;;;;;SUBSECTION: Python mode Hooks ;;;;;;;;;;;;;;;;
-(defun sp00ky/python-mode-hook ()
-  "Various configs I want to apply for c-mode"
-  (interactive)
-  (add-to-list 'company-backends 'company-jedi))
-(add-hook 'python-mode-hook 'sp00ky/python-mode-hook)
+;(defun sp00ky/python-mode-hook ()
+;  "Various configs I want to apply for c-mode"
+;  (interactive)
+;  (add-to-list 'company-backends 'company-jedi))
+;(add-hook 'python-mode-hook 'sp00ky/python-mode-hook)
 
 ;;;;;;;;;;;;;;;;SUBSECTION: Org mode Hooks ;;;;;;;;;;;;;;;;
 (require 'citeproc)

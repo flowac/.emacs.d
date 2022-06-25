@@ -1,4 +1,28 @@
 ;; Home to various sp00ky functions
+(defun sp00ky/gtags-completion-at-point ()
+  "Completion function that will utilize gtags to generate
+candidates."
+  (interactive)
+  (let* ((bounds (bounds-of-thing-at-point 'symbol))
+         (beg (car bounds))
+         (end (cdr bounds))) ; For now, end is not used
+    (list beg
+          (point)
+          (sp00ky/global-fetch-candidates
+           (thing-at-point 'symbol t))
+          :exclusive 'no)))
+
+(defun sp00ky/global-fetch-candidates (thing)
+  "Invoke global with -c argument to fetch the candidate list."
+  (interactive)
+  (if (stringp thing)
+      (progn
+        (with-temp-buffer
+          (let ((rv (call-process "global" nil t nil "-c" thing)))
+            (when (= rv 0)
+              (split-string (buffer-string))))))
+    nil))
+
 (defvar sp00ky/number-to-hex-timer nil
   "Timer for `sp00ky/at-point-to-hex' to reschedule itself, or nil.")
 (require 'eldoc)
