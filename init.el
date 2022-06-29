@@ -135,7 +135,8 @@
 (require 'call-graph)
 ;;;;;;;;;;;;;;;;SUBSECTION: graphviz-dot-mode ;;;;;;;;;;;;;;;;
 (require 'graphviz-dot-mode)
-(setq graphviz-dot-indent-width 3)
+(setq graphviz-dot-indent-width 3
+      graphviz-dot-preview-extension "svg")
 ;;;;;;;;;;;;;;;;SUBSECTION: docker-compose-mode ;;;;;;;;;;;;;;;;
 (require 'docker-compose-mode)
 (add-to-list 'auto-mode-alist '("\\.yml.append\\'" . docker-compose-mode))
@@ -395,6 +396,11 @@ in."
   (define-key python-mode-map (kbd "M-<") 'jedi:goto-definition-pop-marker)
   (define-key python-mode-map (kbd "M-h") 'jedi:show-doc))
 
+(define-key evics-normal-mode-map (kbd ";") 'helm-buffers-list)
+(define-key evics-normal-mode-map (kbd "t i") 'helm-imenu)
+(define-key evics-normal-mode-map (kbd "t r") 'helm-resume)
+(define-key evics-normal-mode-map (kbd "t g") 'helm-projectile-grep)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;SECTION:              MISC INIT                 ;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -412,6 +418,7 @@ in."
 (setq ring-bell-function   'ignore ; Who wants to hear this annoying bell anyways...
       make-backup-files     nil    ; By default, emacs makes to many backup files.
       org-imenu-depth       6
+      show-trailing-whitespace t
       backup-inhibited      t
       help-window-select    t
       scroll-conservatively 101    ; Scroll just one line when hitting bottom of window
@@ -486,15 +493,6 @@ in."
       (run-with-idle-timer 0.5 t 'sp00ky/at-point-to-hex t))
 
 ;; Adding capfs config
-;; Taken from: https://emacs.stackexchange.com/questions/30690/code-auto-completion-with-ivy/30704#30704
-(require 'dabbrev)
-(defun dabbrev-complation-at-point ()
-  (dabbrev--reset-global-variables)
-  (let* ((abbrev (dabbrev--abbrev-at-point))
-         (candidates (dabbrev--find-all-expansions abbrev t))
-         (bnd (bounds-of-thing-at-point 'symbol)))
-    (list (car bnd) (cdr bnd) candidates)))
-(add-to-list 'completion-at-point-functions 'dabbrev-complation-at-point)
 (add-to-list 'completion-at-point-functions 'sp00ky/gtags-completion-at-point)
 
 (autoload 'cflow-mode "cflow-mode")
