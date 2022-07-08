@@ -1,5 +1,4 @@
 ;; TODO
-;; - dabbrev--find-expansion filter out the stdout of this
 ;; - Using emacs compile to build:
 ;;     Will need to investigate dir variables
 ;;     Seems like we will need to set default directory then invoke compile, something like
@@ -9,7 +8,6 @@
 ;;       (compile command)))
 ;;     Also look into compilation-search-path
 ;; - Look at so-long mode to handle long lines
-;; - Look at using view-buffer-other-window to clone the current window in the other window
 ;; - Look into fixing paragraph-start for programming modes (lines with whitespace should not count)
 ;; - Clean up modeline, for example, only need to show eyebrowse workspace thats currently active
 ;; - Enable visual-line-mode or auto-fill-mode for org-mode. For autofill mode, verify
@@ -405,6 +403,12 @@ in."
 (define-key evics-normal-mode-map (kbd "t f") 'helm-projectile-find-file)
 (define-key evics-normal-mode-map (kbd "t p") 'helm-projectile-switch-project)
 (define-key evics-normal-mode-map (kbd ",") 'helm-occur)
+
+;; Helm info keybindings
+(define-key evics-normal-mode-map (kbd "t h e") 'helm-info-emacs)
+(define-key evics-normal-mode-map (kbd "t h l") 'helm-info-elisp)
+(define-key evics-normal-mode-map (kbd "t h g") 'helm-info-guile)
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;SECTION:              MISC INIT                 ;;;;;;;;;;;;;;;;;

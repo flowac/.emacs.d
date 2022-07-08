@@ -2,12 +2,59 @@
 
 ;; (setq display-buffer-alist 'nil)
 ;; Might want to make this better: https://emacs.stackexchange.com/questions/12747/how-to-conditionally-reuse-the-current-window-to-display-a-buffer
-;; 
+;;
 ;; Control where the *Messages* buffer opens
 ;; (add-to-list 'display-buffer-alist
 ;;              '("\\*Messages\\*" . ((display-buffer-reuse-window
 ;;                                     display-buffer-pop-up-window)
 ;;                                    . ((inhibit-same-window . t)))))
+
+(defun sp00ky/gdb-core-file ()
+  "Wrapper function to invoke gdb easily on a core file. This
+function will prompt the user each time for information. I don't
+expect to be using it that often, so this is fine."
+  (interactive)
+  (let* ((input (read-from-minibuffer "Compile Cmd:
+1[ax]  - build dir and arch (a=aarch64, x=x86-64)
+c      - debug a core file, will prompt for path
+d      - clean dbg dir (/localdisk/yocto_debugging/*)
+i      - attach to remote, will prompt for ip and pid
+Examples: 1a d1a d1xc
+: "))
+         build-dir extra-cmds cmd)
+    (setq
+     build-dir
+     (cond ((string-search "1a" input)
+            "/localdisk/hmuresan/yocto/builds/valimar1/cn-container-hal-dnx-docker-aarch64")
+           ((string-search "1x" input)
+            "/localdisk/hmuresan/yocto/builds/valimar1/cn-container-hal-dnx-docker-x86-64")
+           ((string-search "2a" input)
+            "/localdisk/hmuresan/yocto/builds/valimar2/cn-container-hal-dnx-docker-aarch64")
+           ((string-search "2x" input)
+            "/localdisk/hmuresan/yocto/builds/valimar2/cn-container-hal-dnx-docker-x86-64")
+           ((string-search "3a" input)
+            "/localdisk/hmuresan/yocto/builds/valimar3/cn-container-hal-dnx-docker-aarch64")
+           ((string-search "3x" input)
+            "/localdisk/hmuresan/yocto/builds/valimar3/cn-container-hal-dnx-docker-x86-64")))
+
+    ;; Perform any extra actions we need
+    (cond ((string-search "c" input)
+           (setq extra-cmds
+                 (concat "-c "
+                         (read-file-name "Location of core file:" "~/from_device/crash/"))))
+          ((string-search "d" input)
+           (shell-command "rm -rf /localdisk/yocto_debugging/*"))
+          ((string-search "i" input)
+           (setq extra-cmds
+                 (concat
+                  "--ip "
+                  (read-from-minibuffer "IP:")
+                  " --pid "
+                  (read-from-minibuffer "PID:"))))
+          )
+    (setq cmd (concat "gdb_wrapper.sh --build-dir=" build-dir " " extra-cmds))
+    (if (y-or-n-p (concat "Does this command look good?\n\n" cmd "\n\n"))
+        (gdb cmd))))
 
 (add-to-list 'display-buffer-alist
              '("\\*Async Shell Command\\*" . (display-buffer-no-window . nil)))
