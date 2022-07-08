@@ -397,9 +397,14 @@ in."
   (define-key python-mode-map (kbd "M-h") 'jedi:show-doc))
 
 (define-key evics-normal-mode-map (kbd ";") 'helm-buffers-list)
+(define-key evics-normal-mode-map (kbd "t a") 'beginning-of-defun)
+(define-key evics-normal-mode-map (kbd "t o") 'sp00ky/view-current-buffer-other-window)
 (define-key evics-normal-mode-map (kbd "t i") 'helm-imenu)
 (define-key evics-normal-mode-map (kbd "t r") 'helm-resume)
 (define-key evics-normal-mode-map (kbd "t g") 'helm-projectile-grep)
+(define-key evics-normal-mode-map (kbd "t f") 'helm-projectile-find-file)
+(define-key evics-normal-mode-map (kbd "t p") 'helm-projectile-switch-project)
+(define-key evics-normal-mode-map (kbd ",") 'helm-occur)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;SECTION:              MISC INIT                 ;;;;;;;;;;;;;;;;;
@@ -414,11 +419,11 @@ in."
 
 (require 'ispell)
 (setq-default ispell-program-name "aspell")
-(setq-default indent-tabs-mode nil); Replace Tabs with spaces
+(setq-default indent-tabs-mode nil ; Replace Tabs with spaces
+              show-trailing-whitespace t)
 (setq ring-bell-function   'ignore ; Who wants to hear this annoying bell anyways...
       make-backup-files     nil    ; By default, emacs makes to many backup files.
       org-imenu-depth       6
-      show-trailing-whitespace t
       backup-inhibited      t
       help-window-select    t
       scroll-conservatively 101    ; Scroll just one line when hitting bottom of window
@@ -426,7 +431,7 @@ in."
       Man-notify-method     'aggressive
       org-edit-src-content-indentation 0   ; Org mode autoindents src code
       xref-prompt-for-identifier       nil ; So we don't need to input the symbol each
-                                           ; time we call xref
+                                        ; time we call xref
       eldoc-echo-area-use-multiline-p  t   ; Let eldoc use more than 1 line in the echo area
       auto-save-default     nil
       xterm-max-cut-length  200000)
@@ -620,6 +625,22 @@ item in the command history respectively."
  'evics--emulation-maps
  (cons 'sp00ky/evics/geiser-repl-mode geiser-repl-mode-map)
  1)
+
+;; GUD Mode
+(require 'gud)
+(define-key gud-mode-map (kbd "k") 'sp00ky/evics/geiser-history-up-override)
+(define-key gud-mode-map (kbd "j") 'sp00ky/evics/geiser-history-down-override)
+
+(defvar sp00ky/evics/gud-mode nil)
+(defun sp00ky/gud-mode-hook ()
+  ""
+  (setq-local sp00ky/evics/gud-mode t))
+(add-hook 'gud-mode-hook 'sp00ky/gud-mode-hook)
+(add-to-ordered-list
+ 'evics--emulation-maps
+ (cons 'sp00ky/evics/gud-mode gud-mode-map)
+ 1)
+
 
 ;;;;;;;;;;;;;;;;SUBSECTION: Python mode Hooks ;;;;;;;;;;;;;;;;
 ;(defun sp00ky/python-mode-hook ()

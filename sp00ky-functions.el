@@ -1,4 +1,9 @@
 ;; Home to various sp00ky functions
+(defun sp00ky/switch-to-current-buffer-other-window ()
+  "Switch to current buffer in other window"
+  (interactive)
+  (switch-to-buffer-other-window (buffer-name)))
+
 (defun sp00ky/gtags-completion-at-point ()
   "Completion function that will utilize gtags to generate
 candidates."
