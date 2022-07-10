@@ -346,7 +346,7 @@ in."
 (define-key evics-normal-mode-map (kbd ";") 'helm-buffers-list)
 (define-key evics-normal-mode-map (kbd "t e") 'sp00ky/gdb-wrapper)
 (define-key evics-normal-mode-map (kbd "t a") 'beginning-of-defun)
-(define-key evics-normal-mode-map (kbd "t o") 'sp00ky/view-current-buffer-other-window)
+(define-key evics-normal-mode-map (kbd "t o") 'sp00ky/switch-to-current-buffer-other-window)
 (define-key evics-normal-mode-map (kbd "t i") 'helm-imenu)
 (define-key evics-normal-mode-map (kbd "t r") 'helm-resume)
 (define-key evics-normal-mode-map (kbd "t g") 'helm-projectile-grep)
