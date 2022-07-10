@@ -9,10 +9,10 @@
 ;;                                     display-buffer-pop-up-window)
 ;;                                    . ((inhibit-same-window . t)))))
 
-(defun sp00ky/gdb-core-file ()
-  "Wrapper function to invoke gdb easily on a core file. This
-function will prompt the user each time for information. I don't
-expect to be using it that often, so this is fine."
+(defun sp00ky/gdb-wrapper ()
+  "Wrapper function to invoke en-dbg easily. This function will
+prompt the user each time for information. I don't expect to be
+using it that often, so this is fine."
   (interactive)
   (let* ((input (read-from-minibuffer "Compile Cmd:
 1[ax]  - build dir and arch (a=aarch64, x=x86-64)
@@ -25,9 +25,9 @@ Examples: 1a d1a d1xc
     (setq
      build-dir
      (cond ((string-search "1a" input)
-            "/localdisk/hmuresan/yocto/builds/valimar1/cn-container-hal-dnx-docker-aarch64")
+            "/localdisk/hmuresan/yocto/builds/valimar/cn-container-hal-dnx-docker-aarch64")
            ((string-search "1x" input)
-            "/localdisk/hmuresan/yocto/builds/valimar1/cn-container-hal-dnx-docker-x86-64")
+            "/localdisk/hmuresan/yocto/builds/valimar/cn-container-hal-dnx-docker-x86-64")
            ((string-search "2a" input)
             "/localdisk/hmuresan/yocto/builds/valimar2/cn-container-hal-dnx-docker-aarch64")
            ((string-search "2x" input)

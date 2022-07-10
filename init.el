@@ -342,6 +342,23 @@ in."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;SECTION:            MISC KEYBINDINGS            ;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Evics extended keybindings
+(define-key evics-normal-mode-map (kbd ";") 'helm-buffers-list)
+(define-key evics-normal-mode-map (kbd "t e") 'sp00ky/gdb-wrapper)
+(define-key evics-normal-mode-map (kbd "t a") 'beginning-of-defun)
+(define-key evics-normal-mode-map (kbd "t o") 'sp00ky/view-current-buffer-other-window)
+(define-key evics-normal-mode-map (kbd "t i") 'helm-imenu)
+(define-key evics-normal-mode-map (kbd "t r") 'helm-resume)
+(define-key evics-normal-mode-map (kbd "t g") 'helm-projectile-grep)
+(define-key evics-normal-mode-map (kbd "t f") 'helm-projectile-find-file)
+(define-key evics-normal-mode-map (kbd "t p") 'helm-projectile-switch-project)
+(define-key evics-normal-mode-map (kbd ",") 'helm-occur)
+
+;; Helm info keybindings
+(define-key evics-normal-mode-map (kbd "t h e") 'helm-info-emacs)
+(define-key evics-normal-mode-map (kbd "t h l") 'helm-info-elisp)
+(define-key evics-normal-mode-map (kbd "t h g") 'helm-info-guile)
+
 (with-eval-after-load 'winner
   (define-key evics-normal-mode-map (kbd "w z") 'toggle-maximize-buffer)
   (define-key evics-normal-mode-map (kbd "w h") 'windmove-left)
@@ -393,21 +410,6 @@ in."
   (define-key python-mode-map (kbd "M-t") 'jedi:goto-definition)
   (define-key python-mode-map (kbd "M-<") 'jedi:goto-definition-pop-marker)
   (define-key python-mode-map (kbd "M-h") 'jedi:show-doc))
-
-(define-key evics-normal-mode-map (kbd ";") 'helm-buffers-list)
-(define-key evics-normal-mode-map (kbd "t a") 'beginning-of-defun)
-(define-key evics-normal-mode-map (kbd "t o") 'sp00ky/view-current-buffer-other-window)
-(define-key evics-normal-mode-map (kbd "t i") 'helm-imenu)
-(define-key evics-normal-mode-map (kbd "t r") 'helm-resume)
-(define-key evics-normal-mode-map (kbd "t g") 'helm-projectile-grep)
-(define-key evics-normal-mode-map (kbd "t f") 'helm-projectile-find-file)
-(define-key evics-normal-mode-map (kbd "t p") 'helm-projectile-switch-project)
-(define-key evics-normal-mode-map (kbd ",") 'helm-occur)
-
-;; Helm info keybindings
-(define-key evics-normal-mode-map (kbd "t h e") 'helm-info-emacs)
-(define-key evics-normal-mode-map (kbd "t h l") 'helm-info-elisp)
-(define-key evics-normal-mode-map (kbd "t h g") 'helm-info-guile)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
