@@ -719,6 +719,7 @@ item in the command history respectively."
 (load-theme 'sp00ky t)
 ;; Changing font to my current favourite font, DejaVu Sans Mono
 (add-to-list 'default-frame-alist '(font . "DejaVu Sans Mono-16"))
+(set-face-attribute 'fixed-pitch nil :font "DejaVu Sans Mono-16")
 
 ;; It's annoying when a new emacs instance prompts about a pre-existing server
 (require 'server)
