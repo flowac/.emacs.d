@@ -1,5 +1,20 @@
 ;; Config specific to home
 
+;; Set up bcf mode
+(load (sp00ky/set-init-file-path "bcf-index.el"))
+(add-to-list 'auto-mode-alist '("keywordIndex\\.txt\\'" . bcf-index-mode))
+(add-to-list 'auto-mode-alist '("topicalIndex\\.txt\\'" . bcf-index-mode))
+(add-to-list 'auto-mode-alist '("questionIndex\\.txt\\'" . bcf-index-mode))
+
+;; Useful so we can easily grab the emacs frame from xdotool
+(set-frame-name "emacs@sp00ky")
+
+;; See info node for elisp `frame parameters'. Essentially will make
+;; the frame take up half the window.
+(add-to-list 'default-frame-alist '(width  . 0.5))
+(add-to-list 'default-frame-alist '(height . 1.0))
+
+;; Not sure why I added this. To be removed.
 (setq org-format-latex-header
 "\\documentclass[fleqno]{article}
 \\usepackage[usenames]{color}

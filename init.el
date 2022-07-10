@@ -407,9 +407,13 @@ in."
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
 (with-eval-after-load 'python
-  (define-key python-mode-map (kbd "M-t") 'jedi:goto-definition)
-  (define-key python-mode-map (kbd "M-<") 'jedi:goto-definition-pop-marker)
-  (define-key python-mode-map (kbd "M-h") 'jedi:show-doc))
+  (define-key python-mode-map (kbd "M-t") 'anaconda-mode-find-definitions)
+  (define-key python-mode-map (kbd "M-r") 'anaconda-mode-find-references)
+  (define-key python-mode-map (kbd "M-<") 'xref-pop-marker-stack)
+  (define-key python-mode-map (kbd "M-h") 'anaconda-mode-show-doc)
+  (define-key python-mode-map (kbd "TAB") 'sp00ky/indent-region-or-paragraph)
+  (define-key python-mode-map (kbd "<backtab>") 'sp00ky/align-region-or-paragraph)
+  )
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -425,6 +429,7 @@ in."
 
 (require 'ispell)
 (setq-default ispell-program-name "aspell")
+
 (setq-default indent-tabs-mode nil ; Replace Tabs with spaces
               show-trailing-whitespace t)
 (setq ring-bell-function   'ignore ; Who wants to hear this annoying bell anyways...
@@ -439,8 +444,12 @@ in."
       xref-prompt-for-identifier       nil ; So we don't need to input the symbol each
                                         ; time we call xref
       eldoc-echo-area-use-multiline-p  t   ; Let eldoc use more than 1 line in the echo area
-      auto-save-default     nil
-      xterm-max-cut-length  200000)
+      auto-save-default      nil
+      xterm-max-cut-length   200000
+      frame-resize-pixelwise t             ; Allow emacs frame to not be bound by char height
+                                           ; This fixes when emacs is fullscreened and there is
+                                           ; still some extra space at the bottom
+      )
 
 ;; Mouse settings
 (setq mouse-wheel-scroll-amount '(5
@@ -649,11 +658,12 @@ item in the command history respectively."
 
 
 ;;;;;;;;;;;;;;;;SUBSECTION: Python mode Hooks ;;;;;;;;;;;;;;;;
-;(defun sp00ky/python-mode-hook ()
-;  "Various configs I want to apply for c-mode"
-;  (interactive)
-;  (add-to-list 'company-backends 'company-jedi))
-;(add-hook 'python-mode-hook 'sp00ky/python-mode-hook)
+(defun sp00ky/python-mode-hook ()
+  "Various configs I want to apply for c-mode"
+  (interactive)
+  (add-to-list 'completion-at-point-functions 'anaconda-mode-complete))
+(remove-hook 'python-mode-hook 'sp00ky/python-mode-hook)
+(add-hook 'python-mode-hook 'anaconda-mode)
 
 ;;;;;;;;;;;;;;;;SUBSECTION: Org mode Hooks ;;;;;;;;;;;;;;;;
 (require 'citeproc)

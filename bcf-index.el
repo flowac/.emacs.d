@@ -7,7 +7,7 @@
     ))
 
 (defvar bcf-imenu-generic-expression
-  (list '("Keyword" "Keyword:\s\\(.*\\)" 1))
+  (list '("" "Keyword:\s\\(.*\\)" 1))
   "Bcf related imenu categories.")
 
 
