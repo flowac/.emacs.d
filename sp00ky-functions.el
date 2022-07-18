@@ -44,6 +44,8 @@ candidates."
 disabling mouse tracking while keeping mouse clicking working."
   (mapcar
    (lambda (code) (format "\e[?%d%c" code suffix))
+   ;; 1003 seems to be the movement code:
+   ;;    `(1000 1003 ,@(when xterm-mouse-utf-8 '(1005)) 1006)))
    `(1000 ,@(when xterm-mouse-utf-8 '(1005)) 1006)))
 
 (defun sp00ky/kill-dangling-buffers ()

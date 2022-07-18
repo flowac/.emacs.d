@@ -246,7 +246,8 @@ in."
   (define-key helm-gtags-mode-map (kbd "M->") 'helm-gtags-next-history)
   ;; Look into swapping this with a prefix based keybinding C-c z is my helm prefix
   (define-key helm-gtags-mode-map (kbd "C-c z g") 'helm-gtags-parse-file)
-  (define-key helm-gtags-mode-map (kbd "M-<") 'helm-gtags-previous-history))
+  (define-key helm-gtags-mode-map (kbd "M-<") 'helm-gtags-previous-history)
+  )
 
 ;; (add-to-ordered-list
 ;;  'evics--emulation-maps
@@ -352,7 +353,16 @@ in."
 (define-key evics-normal-mode-map (kbd "t g") 'helm-projectile-grep)
 (define-key evics-normal-mode-map (kbd "t f") 'helm-projectile-find-file)
 (define-key evics-normal-mode-map (kbd "t p") 'helm-projectile-switch-project)
-(define-key evics-normal-mode-map (kbd ",") 'helm-occur)
+(define-key evics-normal-mode-map (kbd "S") 'helm-occur)
+(define-key evics-normal-mode-map (kbd "]") 'scroll-up-command)
+(define-key evics-normal-mode-map (kbd "[") 'scroll-down-command)
+
+(define-key evics-normal-mode-map (kbd ",") 'helm-gtags-dwim)
+;; Finer navigation is done with right hand (hjkl), so generally I am
+;; using my left hand to trigger this.
+(define-key evics-normal-mode-map (kbd "`") 'helm-gtags-dwim)
+(define-key evics-normal-mode-map (kbd ">") 'helm-gtags-next-history)
+(define-key evics-normal-mode-map (kbd "<") 'helm-gtags-previous-history)
 
 ;; Helm info keybindings
 (define-key evics-normal-mode-map (kbd "t h e") 'helm-info-emacs)
@@ -365,6 +375,7 @@ in."
   (define-key evics-normal-mode-map (kbd "w l") 'windmove-right)
   (define-key evics-normal-mode-map (kbd "w j") 'windmove-down)
   (define-key evics-normal-mode-map (kbd "w k") 'windmove-up)
+  (define-key evics-normal-mode-map (kbd "w o") 'delete-other-windows)
   (define-key evics-normal-mode-map (kbd "w c") 'delete-window))
 
 ;; This sometimes invoked eval-expression instead of going to command

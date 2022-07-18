@@ -9,19 +9,26 @@
 ;;                                     display-buffer-pop-up-window)
 ;;                                    . ((inhibit-same-window . t)))))
 
+(defvar sp00ky//gdb-cmd-history '())
+(defvar sp00ky//gdb-ip-history  '())
+(defvar sp00ky//gdb-pid-history '())
 (defun sp00ky/gdb-wrapper ()
   "Wrapper function to invoke en-dbg easily. This function will
 prompt the user each time for information. I don't expect to be
 using it that often, so this is fine."
   (interactive)
-  (let* ((input (read-from-minibuffer "Compile Cmd:
+  (let* ((input (read-string "Compile Cmd:
 1[ax]  - build dir and arch (a=aarch64, x=x86-64)
 c      - debug a core file, will prompt for path
 d      - clean dbg dir (/localdisk/yocto_debugging/*)
 i      - attach to remote, will prompt for ip and pid
 Examples: 1a d1a d1xc
-: "))
-         build-dir extra-cmds cmd)
+: "
+                             (car sp00ky//gdb-cmd-history)
+                             'sp00ky//gdb-cmd-history
+                             sp00ky//gdb-cmd-history
+                             nil))
+         build-dir build-dir-cmd extra-cmds cmd)
     (setq
      build-dir
      (cond ((string-search "1a" input)
@@ -35,26 +42,54 @@ Examples: 1a d1a d1xc
            ((string-search "3a" input)
             "/localdisk/hmuresan/yocto/builds/valimar3/cn-container-hal-dnx-docker-aarch64")
            ((string-search "3x" input)
-            "/localdisk/hmuresan/yocto/builds/valimar3/cn-container-hal-dnx-docker-x86-64")))
+            "/localdisk/hmuresan/yocto/builds/valimar3/cn-container-hal-dnx-docker-x86-64")
+           (t nil)))
+    (when build-dir
+      (setq build-dir-cmd (concat "--build-dir= " build-dir)))
 
     ;; Perform any extra actions we need
-    (cond ((string-search "c" input)
-           (setq extra-cmds
-                 (concat "-c "
-                         (read-file-name "Location of core file:" "~/from_device/crash/"))))
-          ((string-search "d" input)
-           (shell-command "rm -rf /localdisk/yocto_debugging/*"))
-          ((string-search "i" input)
-           (setq extra-cmds
-                 (concat
-                  "--ip "
-                  (read-from-minibuffer "IP:")
-                  " --pid "
-                  (read-from-minibuffer "PID:"))))
-          )
-    (setq cmd (concat "gdb_wrapper.sh --build-dir=" build-dir " " extra-cmds))
-    (if (y-or-n-p (concat "Does this command look good?\n\n" cmd "\n\n"))
-        (gdb cmd))))
+    (when (string-search "c" input)
+      (setq extra-cmds
+            (concat "-c "
+                    (read-file-name "Location of core file:" "~/from_device/crash/"))))
+
+    (when (string-search "d" input)
+      (shell-command "rm -rf /localdisk/yocto_debugging/*"))
+
+    (when (string-search "i" input)
+      ;; We will automatically create an extra gdb command file to
+      ;; source our local files. This is for the devtooled case. I
+      ;; might have to be smarter about this in the future i.e. only
+      ;; make the extra commands file in certain scenarios, but for
+      ;; now let's leave it with this heuristic
+      (delete-file (concat build-dir "/gdb_extra_commands"))
+      (with-temp-file (concat build-dir "/gdb_extra_commands")
+        (insert (concat "directory "
+                        build-dir
+                        "/tmp/work/aarch64-evernight-linux/hal-api/1.0.0+git999-r0/image/"))
+        (insert (concat "directory "
+                        build-dir
+                        "/tmp/work/aarch64-evernight-linux/hal-test/1.0.0+git999-r0/image/"))
+        (insert (concat "directory "
+                        build-dir
+                        "/tmp/work/aarch64-evernight-linux/hal/1.0.0+git999-r0/image/")))
+      (setq extra-cmds
+            (concat
+             "--ip "
+             (read-string "IP:"
+                          (car sp00ky//gdb-ip-history)
+                          'sp00ky//gdb-ip-history
+                          sp00ky//gdb-ip-history
+                          nil)
+             " --pid "
+             (read-string "PID:" nil
+                          'sp00ky//gdb-pid-history
+                          sp00ky//gdb-pid-history
+                          nil))))
+
+    (setq cmd (concat "gdb_wrapper.sh " build-dir-cmd " " extra-cmds))
+    (when (y-or-n-p (concat "Does this command look good?\n\n" cmd "\n\n"))
+      (gdb cmd))))
 
 (add-to-list 'display-buffer-alist
              '("\\*Async Shell Command\\*" . (display-buffer-no-window . nil)))
@@ -102,7 +137,7 @@ oam_index: \"\"
   (goto-char start)
   (while (re-search-forward
           " [a-zA-Z]+[a-zA-Z0-9_]*:"
-         end 
+         end
           t)
     (re-search-backward " ")
     (forward-char)
