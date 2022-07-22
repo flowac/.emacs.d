@@ -140,21 +140,6 @@
 ;; (define-key c-mode-map (kbd "<backtab>") 'completion-at-point)
 (setq tab-always-indent 'complete)
 
-;;;;;;;;;;;;;;;;SUBSECTION: Company ;;;;;;;;;;;;;;;;
-;(setq company-dabbrev-downcase      nil
-;      company-idle-delay            0.2
-;      company-selection-wrap-around t
-;      company-minimum-prefix-length 5)
-;
-;(company-mode 1)
-;(add-hook 'after-init-hook 'global-company-mode ) ;; use in all buffers
-;
-;(define-key company-active-map (kbd "<tab>") 'company-complete-common-or-cycle)
-;(define-key company-active-map (kbd "TAB")   'company-complete-common-or-cycle)
-;(define-key company-active-map (kbd "S-TAB") 'company-complete-common-or-cycle)
-;(define-key company-active-map (kbd "C-n")   'company-complete-common-or-cycle)
-;(define-key company-active-map (kbd "C-p")   'company-select-previous)
-
 ;;;;;;;;;;;;;;;;SUBSECTION: Helm ;;;;;;;;;;;;;;;;
 (require 'helm)
 (require 'helm-config)
@@ -227,13 +212,7 @@ in."
   (define-key helm-gtags-mode-map (kbd "M-f") 'helm-gtags-tags-in-this-function)
   (define-key helm-gtags-mode-map (kbd "<") 'helm-gtags-previous-history)
   (define-key helm-gtags-mode-map (kbd ">") 'helm-gtags-next-history)
-  (add-to-ordered-list 'evics--emulation-maps (cons 'helm-gtags-mode helm-gtags-mode-map) 1))
-
-
-;; (add-to-ordered-list
-;;  'evics--emulation-maps
-;;  (cons 'evics-normal-mode c-mode-map)
-;;  2)
+  (evics-add-to-emulation-map (cons 'helm-gtags-mode helm-gtags-mode-map) 1))
 
 (add-hook 'c++-mode-hook 'helm-gtags-mode)
 (add-hook 'c-mode-hook 'helm-gtags-mode)
@@ -276,6 +255,59 @@ in."
 (define-key eyebrowse-mode-map (kbd "M-0") 'eyebrowse-switch-to-window-config-0)
 (eyebrowse-mode t)
 
+;;;;;;;;;;;;;;;;SUBSECTION: Comint and REPLs ;;;;;;;;;;;;;;;;
+(defun sp00ky/evics/comint-history-up-override ()
+  "When in a comint derived repl mode, make j/k go to the next or
+previous item in the command history respectively."
+  (interactive)
+  (if evics-normal-mode
+      (progn
+        ;; Move point to the end of the repl prompt so comint does
+        ;; not complain
+        (goto-char (process-mark (get-buffer-process (current-buffer))))
+        (call-interactively 'comint-previous-input))
+    (call-interactively 'self-insert-command)))
+
+(defun sp00ky/evics/comint-history-down-override ()
+  "When in a comint derived repl mode, make j/k go to the next or
+previous item in the command history respectively."
+  (interactive)
+  (if evics-normal-mode
+      (progn
+        ;; Move point to the end of the repl prompt so comint does
+        (goto-char (process-mark (get-buffer-process (current-buffer))))
+        (call-interactively 'comint-next-input))
+    (call-interactively 'self-insert-command)))
+
+(defun sp00ky/evics/commint-insert-hook ()
+  "Move point to input line in comint buffer"
+  (when evics-insert-mode
+    (goto-char (process-mark (get-buffer-process (current-buffer))))))
+
+(defun sp00ky/evics/comint-mode-hook ()
+  "Adding buffer local hook to evics insert mode so we are always
+placed on the input line"
+  (add-hook evics-insert-mode-hook 'sp00ky/evics/commint-insert-hook 0 t))
+
+(define-key comint-mode-map (kbd "k") 'sp00ky/evics/comint-history-up-override)
+(define-key comint-mode-map (kbd "j") 'sp00ky/evics/comint-history-down-override)
+
+;; Geiser above in Geiser section
+
+;; GUD
+(require 'gud)
+(defvar sp00ky/evics/gud-mode nil)
+(defun sp00ky/gud-mode-hook ()
+  ""
+  (setq-local sp00ky/evics/gud-mode t))
+(add-hook 'gud-mode-hook 'sp00ky/gud-mode-hook)
+
+(define-key gud-mode-map (kbd "k") 'sp00ky/evics/comint-history-up-override)
+(define-key gud-mode-map (kbd "j") 'sp00ky/evics/comint-history-down-override)
+
+(evics-add-to-emulation-map (cons 'sp00ky/evics/gud-mode gud-mode-map) 1)
+
+
 ;;;;;;;;;;;;;;;;SUBSECTION: Projectile ;;;;;;;;;;;;;;;;
 (projectile-mode +1)
 (define-key projectile-mode-map (kbd "C-w") 'projectile-command-map)
@@ -301,7 +333,7 @@ in."
   evics keymap prios")
 (add-hook 'reb-mode-hook (lambda ()
                            (setq-local sp00ky/evics/reb-mode t)))
-(add-to-ordered-list 'evics--emulation-maps (cons 'sp00ky/evics/reb-mode reb-mode-map) 1)
+(evics-add-to-emulation-map (cons 'sp00ky/evics/reb-mode reb-mode-map) 1)
 (define-key reb-mode-map (kbd "q") 'reb-quit)
 
 
@@ -350,6 +382,8 @@ in."
 (define-key evics-user-normal-map (kbd "t F") 'sp00ky/gtags-find-current-function)
 (define-key evics-user-normal-map (kbd "t g n") 'helm-gtags-tags-in-this-function)
 (define-key evics-user-normal-map (kbd "t g p") 'helm-gtags-parse-file)
+
+(define-key evics-user-normal-map (kbd "t v g") 'vc-annotate)
 
 ;; Helm info keybindings
 (define-key evics-user-normal-map (kbd "t h e") 'helm-info-emacs)
@@ -535,6 +569,7 @@ in."
 (add-to-list 'completion-at-point-functions 'sp00ky/gtags-completion-at-point)
 
 (autoload 'cflow-mode "cflow-mode")
+(add-to-list 'auto-mode-alist '("\\.md\\'"   . text-mode))
 (add-to-list 'auto-mode-alist '("\\.flow\\'" . cflow-mode))
 (add-to-list 'auto-mode-alist '("\\.inc\\'"  . conf-mode))
 (add-to-list 'auto-mode-alist '("\\.bb\\'"   . conf-mode))
@@ -593,6 +628,9 @@ in."
 (add-hook 'c-mode-hook 'sp00ky/c-mode-hook)
 (add-hook 'protobuf-mode-hook 'sp00ky/c-mode-hook)
 ;;;;;;;;;;;;;;;;SUBSECTION: Conf mode Hooks ;;;;;;;;;;;;;;;;
+(defun sp00ky/text-mode-hook ()
+  (setq fill-column 80))
+(add-hook 'text-mode-hook 'sp00ky/text-mode-hook)
 
 ;;;;;;;;;;;;;;;;SUBSECTION: Tex mode Hooks ;;;;;;;;;;;;;;;;
 (defun sp00ky/tex-mode-hook ()
@@ -633,53 +671,11 @@ in."
   (setq-local sp00ky/evics/geiser-repl-mode t))
 (add-hook 'geiser-repl-mode-hook 'sp00ky/geiser-repl-mode-hook)
 
-(defun sp00ky/evics/geiser-history-up-override ()
-  "When in geiser repl mode, make j/k go to the next or previous
-item in the command history respectively."
-  (interactive)
-  (if evics-normal-mode
-      (progn
-        ;; Move point to the end of the repl prompt so comint does
-        ;; not complain
-        (goto-char (process-mark (get-buffer-process (current-buffer))))
-        (call-interactively 'comint-previous-input))
-    (call-interactively 'self-insert-command)))
-
-(defun sp00ky/evics/geiser-history-down-override ()
-  "When in geiser repl mode, make j/k go to the next or previous
-item in the command history respectively."
-  (interactive)
-  (if evics-normal-mode
-      (progn
-        ;; Move point to the end of the repl prompt so comint does
-        (goto-char (process-mark (get-buffer-process (current-buffer))))
-        (call-interactively 'comint-next-input))
-    (call-interactively 'self-insert-command)))
-
 (define-key geiser-repl-mode-map (kbd "C-a") 'nil)
-(define-key geiser-repl-mode-map (kbd "k") 'sp00ky/evics/geiser-history-up-override)
-(define-key geiser-repl-mode-map (kbd "j") 'sp00ky/evics/geiser-history-down-override)
+(define-key geiser-repl-mode-map (kbd "k") 'sp00ky/evics/comint-history-up-override)
+(define-key geiser-repl-mode-map (kbd "j") 'sp00ky/evics/comint-history-down-override)
 
-(add-to-ordered-list
- 'evics--emulation-maps
- (cons 'sp00ky/evics/geiser-repl-mode geiser-repl-mode-map)
- 1)
-
-;; GUD Mode
-(require 'gud)
-(define-key gud-mode-map (kbd "k") 'sp00ky/evics/geiser-history-up-override)
-(define-key gud-mode-map (kbd "j") 'sp00ky/evics/geiser-history-down-override)
-
-(defvar sp00ky/evics/gud-mode nil)
-(defun sp00ky/gud-mode-hook ()
-  ""
-  (setq-local sp00ky/evics/gud-mode t))
-(add-hook 'gud-mode-hook 'sp00ky/gud-mode-hook)
-(add-to-ordered-list
- 'evics--emulation-maps
- (cons 'sp00ky/evics/gud-mode gud-mode-map)
- 1)
-
+(evics-add-to-emulation-map (cons 'sp00ky/evics/geiser-repl-mode geiser-repl-mode-map) 1)
 
 ;;;;;;;;;;;;;;;;SUBSECTION: Python mode Hooks ;;;;;;;;;;;;;;;;
 (defun sp00ky/python-mode-hook ()
