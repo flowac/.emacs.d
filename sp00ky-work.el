@@ -145,6 +145,7 @@ oam_index: \"\"
 
 (defun sp00ky/spartan-to-camel (start end)
   "Remove underscores and capitalize the first letter afterwards within selected region"
+  (declare (obsolete string-inflection-camelcase "<2022-07-22 Fri>"))
   (interactive "r")
   (goto-char start)
   (setq-local delete-active-region nil)

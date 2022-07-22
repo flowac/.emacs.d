@@ -39,9 +39,6 @@
 ;; - Read about CL, see example in helm-get-pid-from-process-name
 ;; - Look at command loop (Section 21 in elisp manual)
 ;;
-;; To Use:
-;; alt-Q - fill-paragraph
-;;
 ;; Useful links:
 ;; https://karthinks.com/software/batteries-included-with-emacs/
 
@@ -72,8 +69,7 @@
     (package-install package)))
 
 (setq my-packages
-      '(
-        corfu
+      '(corfu
         corfu-terminal
         ;; company
         ;; company-jedi
@@ -96,7 +92,8 @@
         highlight-parentheses
         projectile      ; Can use emacs built in project . el in emacs 28
         sudo-edit
-        undo-tree))     ; Can get rid of undo-tree in emacs 28, we can use undo-redo
+        undo-tree     ; Can get rid of undo-tree in emacs 28, we can use undo-redo
+        ))
 (mapc 'sp00ky/install-package my-packages)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -110,23 +107,6 @@
 (require 'evics)
 (evics-global-mode t)
 (global-undo-tree-mode)
-(define-key evics-normal-mode-map (kbd "C-j") 'evics-join-line)
-(define-key evics-normal-mode-map "s" 'save-buffer)
-(define-key evics-normal-mode-map "J" 'forward-paragraph)
-(define-key evics-normal-mode-map "K" 'backward-paragraph)
-(define-key evics-mark-active-mode-map (kbd "+") #'(lambda ()
-                                                     (interactive)
-                                                     (deactivate-mark)
-                                                     (save-excursion
-                                                       (mark-defun)
-                                                       (call-interactively 'indent-region))))
-(define-key evics-mark-active-mode-map (kbd "f") 'mark-defun)
-;; (define-key evics-mark-active-mode-map (kbd "C-b") 'mark-whole-buffer)
-(define-key evics-mark-active-mode-map (kbd "v") #'(lambda ()
-                                                     (interactive)
-                                                     (deactivate-mark)
-                                                     (mark-paragraph)))
-
 
 ;;;;;;;;;;;;;;;;SUBSECTION: call-graph ;;;;;;;;;;;;;;;;
 (require 'hierarchy)
@@ -189,6 +169,10 @@
       ;; to nil seems to address the problem. See:
       ;; https://groups.google.com/g/emacs-helm/c/jmiTit83VhE
       helm-mode-handle-completion-in-region nil)
+(define-key helm-map (kbd "C-j") 'helm-next-line)
+(define-key helm-map (kbd "C-p") 'helm-previous-line)
+(define-key helm-map (kbd "M-j") 'helm-next-line)
+(define-key helm-map (kbd "M-p") 'helm-previous-line)
 
 ;(add-to-list 'helm-imenu-type-faces '("^\\(Sections\\|Subsections\\)" . font-lock-builtin-face))
 
@@ -234,26 +218,22 @@ in."
       helm-gtags-update-interval-second nil
       helm-gtags-path-style             'root)
 
+;; Extra gtags keybindings are also defined below.
 (with-eval-after-load 'helm-gtags
-  ;; (define-key c-mode-map (kbd "t") 'helm-gtags-dwim)
-  ;; (define-key c-mode-map (kbd "T") 'sp00ky/gtags-find-current-function)
-  (define-key helm-gtags-mode-map (kbd "M-t") 'helm-gtags-dwim)
+  (define-key helm-gtags-mode-map (kbd "f") 'helm-gtags-dwim)
+  (define-key helm-gtags-mode-map (kbd "F") 'helm-gtags-find-tag-other-window)
   (define-key helm-gtags-mode-map (kbd "M-T") 'sp00ky/gtags-find-current-function)
-  (define-key helm-gtags-mode-map (kbd "M-r") 'helm-gtags-find-rtag)
   (define-key helm-gtags-mode-map (kbd "M-s") 'helm-gtags-find-symbol)
   (define-key helm-gtags-mode-map (kbd "M-f") 'helm-gtags-tags-in-this-function)
-  (define-key helm-gtags-mode-map (kbd "C-k") 'helm-gtags-previous-history)
-  (define-key helm-gtags-mode-map (kbd "M->") 'helm-gtags-next-history)
-  ;; Look into swapping this with a prefix based keybinding C-c z is my helm prefix
-  (define-key helm-gtags-mode-map (kbd "C-c z g") 'helm-gtags-parse-file)
-  (define-key helm-gtags-mode-map (kbd "M-<") 'helm-gtags-previous-history)
-  )
+  (define-key helm-gtags-mode-map (kbd "<") 'helm-gtags-previous-history)
+  (define-key helm-gtags-mode-map (kbd ">") 'helm-gtags-next-history)
+  (add-to-ordered-list 'evics--emulation-maps (cons 'helm-gtags-mode helm-gtags-mode-map) 1))
+
 
 ;; (add-to-ordered-list
 ;;  'evics--emulation-maps
 ;;  (cons 'evics-normal-mode c-mode-map)
 ;;  2)
-
 
 (add-hook 'c++-mode-hook 'helm-gtags-mode)
 (add-hook 'c-mode-hook 'helm-gtags-mode)
@@ -335,48 +315,76 @@ in."
     (load (sp00ky/set-init-file-path "sp00ky-work.el"))
   (load (sp00ky/set-init-file-path "sp00ky-home.el")))
 
-;;;;;;;;; Keybindings for loaded functions
-(define-key evics-normal-mode-map (kbd "f") 'sp00ky/highlight-word-at-point)
-(define-key evics-normal-mode-map (kbd "F") 'sp00ky/unhighlight-all-in-buffer)
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;SECTION:            MISC KEYBINDINGS            ;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Evics extended keybindings
-(define-key evics-normal-mode-map (kbd ";") 'helm-buffers-list)
-(define-key evics-normal-mode-map (kbd "t e") 'sp00ky/gdb-wrapper)
-(define-key evics-normal-mode-map (kbd "t a") 'beginning-of-defun)
-(define-key evics-normal-mode-map (kbd "t o") 'sp00ky/switch-to-current-buffer-other-window)
-(define-key evics-normal-mode-map (kbd "t i") 'helm-imenu)
-(define-key evics-normal-mode-map (kbd "t r") 'helm-resume)
-(define-key evics-normal-mode-map (kbd "t g") 'helm-projectile-grep)
-(define-key evics-normal-mode-map (kbd "t f") 'helm-projectile-find-file)
-(define-key evics-normal-mode-map (kbd "t p") 'helm-projectile-switch-project)
-(define-key evics-normal-mode-map (kbd "S") 'helm-occur)
-(define-key evics-normal-mode-map (kbd "]") 'scroll-up-command)
-(define-key evics-normal-mode-map (kbd "[") 'scroll-down-command)
+;; Evics extended keybindings. Not needed in mini-mode.
+(define-key evics-normal-mode-map (kbd "C-j") 'evics-join-line)
+(define-key evics-normal-mode-map "s" 'save-buffer)
+(define-key evics-normal-mode-map "J" 'forward-paragraph)
+(define-key evics-normal-mode-map "K" 'backward-paragraph)
 
-(define-key evics-normal-mode-map (kbd ",") 'helm-gtags-dwim)
-;; Finer navigation is done with right hand (hjkl), so generally I am
-;; using my left hand to trigger this.
-(define-key evics-normal-mode-map (kbd "`") 'helm-gtags-dwim)
-(define-key evics-normal-mode-map (kbd ">") 'helm-gtags-next-history)
-(define-key evics-normal-mode-map (kbd "<") 'helm-gtags-previous-history)
+(define-key evics-user-normal-map (kbd ";") 'helm-buffers-list)
+(define-key evics-user-normal-map (kbd "S") 'helm-occur)
+(define-key evics-user-normal-map (kbd "]") 'scroll-up-command)
+(define-key evics-user-normal-map (kbd "[") 'scroll-down-command)
+(define-key evics-user-normal-map (kbd "`") 'sp00ky/highlight-word-at-point)
+(define-key evics-user-normal-map (kbd ",") 'sp00ky/highlight-word-at-point)
+(define-key evics-user-normal-map (kbd "M-,") 'sp00ky/unhighlight-all-in-buffer)
+
+;; t prefix key
+(define-key evics-user-normal-map (kbd "t e") 'sp00ky/gdb-wrapper)
+(define-key evics-user-normal-map (kbd "t a") 'beginning-of-defun)
+(define-key evics-user-normal-map (kbd "t o") 'sp00ky/switch-to-current-buffer-other-window)
+(define-key evics-user-normal-map (kbd "t i") 'helm-imenu)
+(define-key evics-user-normal-map (kbd "t r") 'helm-resume)
+(define-key evics-user-normal-map (kbd "t x") 'toggle-truncate-lines)
+
+(define-key evics-user-normal-map (kbd "t w g") 'helm-projectile-grep)
+(define-key evics-user-normal-map (kbd "t w f") 'helm-projectile-find-file)
+(define-key evics-user-normal-map (kbd "t f") 'helm-projectile-find-file)
+(define-key evics-user-normal-map (kbd "t w p") 'helm-projectile-switch-project)
+(define-key evics-user-normal-map (kbd "t p") 'helm-projectile-switch-project)
+
+(define-key evics-user-normal-map (kbd "t g f") 'sp00ky/gtags-find-current-function)
+(define-key evics-user-normal-map (kbd "t F") 'sp00ky/gtags-find-current-function)
+(define-key evics-user-normal-map (kbd "t g n") 'helm-gtags-tags-in-this-function)
+(define-key evics-user-normal-map (kbd "t g p") 'helm-gtags-parse-file)
 
 ;; Helm info keybindings
-(define-key evics-normal-mode-map (kbd "t h e") 'helm-info-emacs)
-(define-key evics-normal-mode-map (kbd "t h l") 'helm-info-elisp)
-(define-key evics-normal-mode-map (kbd "t h g") 'helm-info-guile)
+(define-key evics-user-normal-map (kbd "t h e") 'helm-info-emacs)
+(define-key evics-user-normal-map (kbd "t h l") 'helm-info-elisp)
+(define-key evics-user-normal-map (kbd "t h g") 'helm-info-guile)
+(define-key evics-user-normal-map (kbd "t h v") 'describe-variable)
+(define-key evics-user-normal-map (kbd "t h k") 'describe-key)
+(define-key evics-user-normal-map (kbd "t h K") 'describe-keymap)
+(define-key evics-user-normal-map (kbd "t h f") 'describe-function)
 
 (with-eval-after-load 'winner
-  (define-key evics-normal-mode-map (kbd "w z") 'toggle-maximize-buffer)
-  (define-key evics-normal-mode-map (kbd "w h") 'windmove-left)
-  (define-key evics-normal-mode-map (kbd "w l") 'windmove-right)
-  (define-key evics-normal-mode-map (kbd "w j") 'windmove-down)
-  (define-key evics-normal-mode-map (kbd "w k") 'windmove-up)
-  (define-key evics-normal-mode-map (kbd "w o") 'delete-other-windows)
-  (define-key evics-normal-mode-map (kbd "w c") 'delete-window))
+  (define-key evics-user-normal-map (kbd "w z") 'toggle-maximize-buffer)
+  (define-key evics-user-normal-map (kbd "w h") 'windmove-left)
+  (define-key evics-user-normal-map (kbd "w l") 'windmove-right)
+  (define-key evics-user-normal-map (kbd "w j") 'windmove-down)
+  (define-key evics-user-normal-map (kbd "w k") 'windmove-up)
+  (define-key evics-user-normal-map (kbd "w o") 'delete-other-windows)
+  (define-key evics-user-normal-map (kbd "w c") 'delete-window))
+
+;; Evics mark active keybindings
+(define-key evics-mark-active-mode-map (kbd "+") #'(lambda ()
+                                                     (interactive)
+                                                     (deactivate-mark)
+                                                     (save-excursion
+                                                       (mark-defun)
+                                                       (call-interactively 'indent-region))))
+(define-key evics-mark-active-mode-map (kbd "f") 'mark-defun)
+;; (define-key evics-mark-active-mode-map (kbd "C-b") 'mark-whole-buffer)
+(define-key evics-mark-active-mode-map (kbd "v") #'(lambda ()
+                                                     (interactive)
+                                                     (deactivate-mark)
+                                                     (mark-paragraph)))
+
+
+
 
 ;; This sometimes invoked eval-expression instead of going to command
 ;; mode in evics. This is related to how TTYs send ESC and META.
@@ -553,9 +561,13 @@ in."
 
 (define-key prog-mode-map (kbd "TAB") 'sp00ky/indent-region-or-paragraph)
 (define-key prog-mode-map (kbd "<backtab>") 'sp00ky/align-region-or-paragraph)
-(require 'cc-mode)
-(define-key c-mode-map (kbd "TAB") 'sp00ky/indent-region-or-paragraph)
-(define-key c-mode-map (kbd "<backtab>") 'sp00ky/align-region-or-paragraph)
+(with-eval-after-load 'cc-mode
+  (define-key c-mode-map (kbd "TAB") 'sp00ky/indent-region-or-paragraph)
+  (define-key c-mode-map (kbd "<backtab>") 'sp00ky/align-region-or-paragraph))
+(with-eval-after-load 'protobuf-mode
+  (define-key protobuf-mode-map (kbd "TAB") 'sp00ky/indent-region-or-paragraph)
+  (define-key protobuf-mode-map (kbd "<backtab>") 'sp00ky/align-region-or-paragraph))
+
 
 ;;;;;;;;;;;;;;;;SUBSECTION: Shell-script mode Hooks ;;;;;;;;;;;;;;;;
 (defun sp00ky/sh-mode-hook ()
@@ -579,6 +591,7 @@ in."
         comment-end         ""
         fill-column         80))
 (add-hook 'c-mode-hook 'sp00ky/c-mode-hook)
+(add-hook 'protobuf-mode-hook 'sp00ky/c-mode-hook)
 ;;;;;;;;;;;;;;;;SUBSECTION: Conf mode Hooks ;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;SUBSECTION: Tex mode Hooks ;;;;;;;;;;;;;;;;
