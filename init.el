@@ -460,13 +460,16 @@ placed on the input line"
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
 (with-eval-after-load 'python
-  (define-key python-mode-map (kbd "M-t") 'anaconda-mode-find-definitions)
+  (define-key python-mode-map (kbd "TAB") 'sp00ky/indent-region-or-paragraph)
+  (define-key python-mode-map (kbd "<backtab>") 'sp00ky/align-region-or-paragraph))
+(with-eval-after-load 'anaconda-mode
+  (define-key python-mode-map (kbd "f") 'anaconda-mode-find-definitions)
+  (define-key python-mode-map (kbd "F") 'anaconda-mode-find-definitions-other-window)
   (define-key python-mode-map (kbd "M-r") 'anaconda-mode-find-references)
+  (define-key python-mode-map (kbd "<") 'xref-pop-marker-stack)
   (define-key python-mode-map (kbd "M-<") 'xref-pop-marker-stack)
   (define-key python-mode-map (kbd "M-h") 'anaconda-mode-show-doc)
-  (define-key python-mode-map (kbd "TAB") 'sp00ky/indent-region-or-paragraph)
-  (define-key python-mode-map (kbd "<backtab>") 'sp00ky/align-region-or-paragraph)
-  )
+  (evics-add-to-emulation-map (cons 'anaconda-mode anaconda-mode-map) 1))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
