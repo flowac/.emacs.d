@@ -157,7 +157,9 @@
 (define-key helm-map (kbd "C-j") 'helm-next-line)
 (define-key helm-map (kbd "C-p") 'helm-previous-line)
 (define-key helm-map (kbd "M-j") 'helm-next-line)
+(define-key helm-map (kbd "M-k") 'helm-previous-line)
 (define-key helm-map (kbd "M-p") 'helm-previous-line)
+(define-key helm-map (kbd "M-n") 'helm-next-line)
 
 ;(add-to-list 'helm-imenu-type-faces '("^\\(Sections\\|Subsections\\)" . font-lock-builtin-face))
 
@@ -205,14 +207,17 @@ in."
 
 ;; Extra gtags keybindings are also defined below.
 (with-eval-after-load 'helm-gtags
-  (define-key helm-gtags-mode-map (kbd "f") 'helm-gtags-dwim)
-  (define-key helm-gtags-mode-map (kbd "F") 'helm-gtags-find-tag-other-window)
+  (evics-define-key 'helm-gtags-mode (kbd "f") 'helm-gtags-dwim)
+  (evics-define-key 'helm-gtags-mode (kbd "F") 'helm-gtags-find-tag-other-window)
+  (evics-define-key 'helm-gtags-mode (kbd "<") 'helm-gtags-previous-history)
+  (evics-define-key 'helm-gtags-mode (kbd ">") 'helm-gtags-next-history)
   (define-key helm-gtags-mode-map (kbd "M-T") 'sp00ky/gtags-find-current-function)
   (define-key helm-gtags-mode-map (kbd "M-s") 'helm-gtags-find-symbol)
   (define-key helm-gtags-mode-map (kbd "M-f") 'helm-gtags-tags-in-this-function)
-  (define-key helm-gtags-mode-map (kbd "<") 'helm-gtags-previous-history)
-  (define-key helm-gtags-mode-map (kbd ">") 'helm-gtags-next-history)
-  (evics-add-to-emulation-map (cons 'helm-gtags-mode helm-gtags-mode-map) 1))
+  (define-key helm-gtags-mode-map (kbd "M-<") 'helm-gtags-previous-history)
+  (define-key helm-gtags-mode-map (kbd "M->") 'helm-gtags-next-history)
+  (evics-add-to-emulation-map (cons 'helm-gtags-mode helm-gtags-mode-map) 1)
+  )
 
 (add-hook 'c++-mode-hook 'helm-gtags-mode)
 (add-hook 'c-mode-hook 'helm-gtags-mode)
@@ -302,11 +307,9 @@ placed on the input line"
   (setq-local sp00ky/evics/gud-mode t))
 (add-hook 'gud-mode-hook 'sp00ky/gud-mode-hook)
 
-(define-key gud-mode-map (kbd "k") 'sp00ky/evics/comint-history-up-override)
-(define-key gud-mode-map (kbd "j") 'sp00ky/evics/comint-history-down-override)
-
+(evics-define-key 'gud-mode (kbd "k") 'sp00ky/evics/comint-history-up-override)
+(evics-define-key 'gud-mode (kbd "j") 'sp00ky/evics/comint-history-down-override)
 (evics-add-to-emulation-map (cons 'sp00ky/evics/gud-mode gud-mode-map) 1)
-
 
 ;;;;;;;;;;;;;;;;SUBSECTION: Projectile ;;;;;;;;;;;;;;;;
 (projectile-mode +1)
@@ -451,6 +454,7 @@ placed on the input line"
 (define-key Info-mode-map (kbd "L") 'Info-history-forward)
 (define-key Info-mode-map (kbd ",") 'Info-index-next)
 
+;; Need to add mechanism in evics to nicely handle major modes
 (define-key emacs-lisp-mode-map (kbd "M-r") 'xref-find-references)
 (define-key emacs-lisp-mode-map (kbd "M-t") 'xref-find-definitions)
 (define-key emacs-lisp-mode-map (kbd "M-<") 'xref-pop-marker-stack)
@@ -463,8 +467,8 @@ placed on the input line"
   (define-key python-mode-map (kbd "TAB") 'sp00ky/indent-region-or-paragraph)
   (define-key python-mode-map (kbd "<backtab>") 'sp00ky/align-region-or-paragraph))
 (with-eval-after-load 'anaconda-mode
-  (define-key python-mode-map (kbd "f") 'anaconda-mode-find-definitions)
-  (define-key python-mode-map (kbd "F") 'anaconda-mode-find-definitions-other-window)
+  (evics-define-key 'python-mode (kbd "f") 'anaconda-mode-find-definitions)
+  (evics-define-key 'python-mode (kbd "F") 'anaconda-mode-find-definitions-other-window)
   (define-key python-mode-map (kbd "M-r") 'anaconda-mode-find-references)
   (define-key python-mode-map (kbd "<") 'xref-pop-marker-stack)
   (define-key python-mode-map (kbd "M-<") 'xref-pop-marker-stack)

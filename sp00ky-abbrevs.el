@@ -158,44 +158,50 @@
 
 (define-abbrev-table 'c-mode-abbrev-table
   '(
-    ("inc" "" sp00ky-skeleton/c-include)
-    ("tstr" "" sp00ky-skeleton/typedef-struct)
-    ("tenu" "" sp00ky-skeleton/c-tenu)
-    ("swi" "" sp00ky-skeleton/c-swi)
-    ("whi" "" sp00ky-skeleton/c-whi)
-    ("cif" "" sp00ky-skeleton/c-if-statement)
-    ("cfor" "" sp00ky-skeleton/c-for-statement)
-    ("chf" "" sp00ky-skeleton/c-hal-ret-fun)
-    ("cst" "" sp00ky-skeleton/skeleton-test)
-    ("dfn" "" sp00ky-skeleton/c-dfn)
+    ("inc" ""   sp00ky-skeleton/c-include)
+    ("tstr" ""  sp00ky-skeleton/typedef-struct)
+    ("tenu" ""  sp00ky-skeleton/c-tenu)
+    ("swi" ""   sp00ky-skeleton/c-swi)
+    ("whi" ""   sp00ky-skeleton/c-whi)
+    ("cif" ""   sp00ky-skeleton/c-if-statement)
+    ("cfor" ""  sp00ky-skeleton/c-for-statement)
+    ("chf" ""   sp00ky-skeleton/c-hal-ret-fun)
+    ("cst" ""   sp00ky-skeleton/skeleton-test)
+    ("dfn" ""   sp00ky-skeleton/c-dfn)
     ("shdfn" "" sp00ky-skeleton/c-static-hal-dfn)
-    ("hdfn" "" sp00ky-skeleton/c-hdfn)
-    ("hs" "" sp00ky-skeleton/hs-expansion)
-    ("hss" "" sp00ky-skeleton/hss)
-    ("rhso" "" sp00ky-skeleton/rhso-expansion)
-    ("hso" "" sp00ky-skeleton/hso-expansion)
-    ("cs" "" sp00ky-skeleton/cs-expansion)
-    ("cso" "" sp00ky-skeleton/cso-expansion)
-    ("rcso" "" sp00ky-skeleton/rcso-expansion)
-    ("hsf" "HalStatus_Failure")
-    ("hse" "HalStatus_Error")
-    ("hsi" "HalStatus_InvalidParameter")
-    ("hsd" "HalStatus_DriverError")
-    ("hli" "" sp00ky-skeleton/hli-expansion)
-    ("hle" "" sp00ky-skeleton/hle-expansion)
-    ("hld" "" sp00ky-skeleton/hld-expansion)
-    ("hec" "" sp00ky-skeleton/hec-expansion)
-    ("her" "" sp00ky-skeleton/HER-expansion)
-    ("hcer" "" sp00ky-skeleton/hal-cnc-err-ret-expansion)
+    ("hdfn" ""  sp00ky-skeleton/c-hdfn)
+    ("hs" ""    sp00ky-skeleton/hs-expansion)
+    ("hss" ""   sp00ky-skeleton/hss)
+    ("rhso" ""  sp00ky-skeleton/rhso-expansion)
+    ("hso" ""   sp00ky-skeleton/hso-expansion)
+    ("cs" ""    sp00ky-skeleton/cs-expansion)
+    ("cso" ""   sp00ky-skeleton/cso-expansion)
+    ("rcso" ""  sp00ky-skeleton/rcso-expansion)
+    ("hsf"      "HalStatus_Failure")
+    ("hse"      "HalStatus_Error")
+    ("hsi"      "HalStatus_InvalidParameter")
+    ("hsd"      "HalStatus_DriverError")
+    ("hli" ""   sp00ky-skeleton/hli-expansion)
+    ("hle" ""   sp00ky-skeleton/hle-expansion)
+    ("hld" ""   sp00ky-skeleton/hld-expansion)
+    ("hec" ""   sp00ky-skeleton/hec-expansion)
+    ("her" ""   sp00ky-skeleton/HER-expansion)
+    ("hcer" ""  sp00ky-skeleton/hal-cnc-err-ret-expansion)
     ("hceru" "" sp00ky-skeleton/hal-cnc-err-retu-expansion)
-    ("hcec" "" sp00ky-skeleton/hal-cnc-err-cont-expansion)
-    ("heru" "" sp00ky-skeleton/HERU-expansion)
-    ("der" "" sp00ky-skeleton/DER-expansion)
-    ("sdfn" "" sp00ky-skeleton/c-sdfn)
+    ("hcec" ""  sp00ky-skeleton/hal-cnc-err-cont-expansion)
+    ("heru" ""  sp00ky-skeleton/HERU-expansion)
+    ("der" ""   sp00ky-skeleton/DER-expansion)
+    ("sdfn" ""  sp00ky-skeleton/c-sdfn)
     ;; END
     ))
 
 (define-skeleton sp00ky-skeleton/elisp-dfn-expansion
+  "Insert a defun statement" nil
+  "(defun f" _ " ()" \n
+  "\"DOCSTRING\"" \n
+  ")")
+
+(define-skeleton sp00ky-skeleton/elisp-dfni-expansion
   "Insert a defun statement" nil
   "(defun f" _ " ()" \n
   "\"DOCSTRING\"" \n
@@ -213,9 +219,10 @@
 ;; (clear-abbrev-table emacs-lisp-mode-abbrev-table)
 (define-abbrev-table 'emacs-lisp-mode-abbrev-table
   '(
-    ("dfn" "" sp00ky-skeleton/elisp-dfn-expansion)
-    ("dfk" "" sp00ky-skeleton/elisp-dfk-expansion)
-    ("dfv" "" sp00ky-skeleton/elisp-dfv-expansion)
+    ("dfn" ""  sp00ky-skeleton/elisp-dfn-expansion)
+    ("dfni" "" sp00ky-skeleton/elisp-dfni-expansion)
+    ("dfk" ""  sp00ky-skeleton/elisp-dfk-expansion)
+    ("dfv" ""  sp00ky-skeleton/elisp-dfv-expansion)
     ;; END
     ))
 
