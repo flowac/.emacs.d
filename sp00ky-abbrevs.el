@@ -241,6 +241,19 @@
     ("dfn" "" sp00ky-skeleton/sh-dfn-expansion)
     ))
 
+(define-skeleton sp00ky-skeleton/scm-dfn-expansion
+  "Insert a defun statement" nil
+  "(define (" _ ")" \n
+  "\"DOCSTRING\"" \n
+  ")">)
+
+(define-abbrev-table 'scheme-mode-abbrev-table
+  '(
+    ("dfn" ""  sp00ky-skeleton/scm-dfn-expansion)
+    ;; END
+    ))
+
+
 ;; Global abbrevs. The abbrevs in this table mainly handle typos
 (clear-abbrev-table global-abbrev-table)
 (define-abbrev-table 'global-abbrev-table

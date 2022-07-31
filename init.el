@@ -463,9 +463,9 @@ placed on the input line"
 (global-set-key (kbd "ESC ESC")  'keyboard-escape-quit)
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
-(with-eval-after-load 'python
-  (define-key python-mode-map (kbd "TAB") 'sp00ky/indent-region-or-paragraph)
-  (define-key python-mode-map (kbd "<backtab>") 'sp00ky/align-region-or-paragraph))
+;; (with-eval-after-load 'python
+  ;; (define-key python-mode-map (kbd "TAB") 'sp00ky/indent-region-or-paragraph)
+  ;; (define-key python-mode-map (kbd "<backtab>") 'sp00ky/align-region-or-paragraph))
 (with-eval-after-load 'anaconda-mode
   (evics-define-key 'python-mode (kbd "f") 'anaconda-mode-find-definitions)
   (evics-define-key 'python-mode (kbd "F") 'anaconda-mode-find-definitions-other-window)
@@ -479,6 +479,9 @@ placed on the input line"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;SECTION:              MISC INIT                 ;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(with-eval-after-load 'edebug
+  (evics-add-to-emulation-map (cons 'edebug-mode edebug-mode-map) 1))
 
 (with-eval-after-load 'gdb-mi
   (setq gdb-default-window-configuration-file "sp00ky-gdb-layout"
@@ -603,6 +606,14 @@ placed on the input line"
 
 (define-key prog-mode-map (kbd "TAB") 'sp00ky/indent-region-or-paragraph)
 (define-key prog-mode-map (kbd "<backtab>") 'sp00ky/align-region-or-paragraph)
+(define-key python-mode-map (kbd "k") 'indent-for-tab-command)
+;; (with-eval-after-load 'elisp-mode
+  ;; (define-key emacs-lisp-mode-map (kbd "TAB") 'sp00ky/indent-region-or-paragraph)
+  ;; (define-key emacs-lisp-mode-map (kbd "<backtab>") 'sp00ky/align-region-or-paragraph))
+;; (with-eval-after-load 'mhtml-mode
+  ;; (define-key mhtml-mode-map (kbd "TAB") 'sp00ky/indent-region-or-paragraph))
+;; (with-eval-after-load 'css-mode
+  ;; (define-key css-mode-map (kbd "TAB") 'sp00ky/indent-region-or-paragraph))
 (with-eval-after-load 'cc-mode
   (define-key c-mode-map (kbd "TAB") 'sp00ky/indent-region-or-paragraph)
   (define-key c-mode-map (kbd "<backtab>") 'sp00ky/align-region-or-paragraph))
@@ -668,7 +679,9 @@ placed on the input line"
 (require 'geiser-mode)
 (define-key geiser-mode-map (kbd "M-t") 'geiser-edit-symbol-at-point)
 (define-key geiser-mode-map (kbd "M-<") 'geiser-pop-symbol-stack)
-;; (define-key geiser-mode-map (kbd "z") 'geiser-eval-buffer)
+(evics-define-key 'geiser-mode (kbd "z") 'geiser-eval-last-sexp)
+(evics-define-key 'geiser-mode (kbd "t r") 'switch-to-geiser)
+(evics-add-to-emulation-map (cons 'geiser-mode geiser-mode-map) 1)
 
 (require 'geiser-repl)
 (setq geiser-repl-current-project-function 'projectile-project-root)
@@ -681,7 +694,7 @@ placed on the input line"
 (define-key geiser-repl-mode-map (kbd "C-a") 'nil)
 (define-key geiser-repl-mode-map (kbd "k") 'sp00ky/evics/comint-history-up-override)
 (define-key geiser-repl-mode-map (kbd "j") 'sp00ky/evics/comint-history-down-override)
-
+(evics-define-key 'geiser-repl-mode (kbd "t r") 'switch-to-geiser)
 (evics-add-to-emulation-map (cons 'sp00ky/evics/geiser-repl-mode geiser-repl-mode-map) 1)
 
 ;;;;;;;;;;;;;;;;SUBSECTION: Python mode Hooks ;;;;;;;;;;;;;;;;
