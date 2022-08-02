@@ -193,31 +193,33 @@ in."
   (let ((f (which-function)))
     (helm-gtags-find-rtag f)))
 
-(setq helm-gtags-fuzzy-match            t
-      helm-gtags-display-style          nil
-      helm-gtags-use-input-at-cursor    t
-      helm-gtags-maximum-candidates     150
-      helm-gtags-pulse-at-cursor        nil ;; reduces lag over ssh
-      helm-gtags-auto-update            t
-      helm-gtags-ignore-case            t
-      helm-gtags-cache-select-result    t
-      helm-gtags-auto-update            t
-      helm-gtags-update-interval-second nil
-      helm-gtags-path-style             'root)
-
 ;; Extra gtags keybindings are also defined below.
 (with-eval-after-load 'helm-gtags
   (evics-define-key 'helm-gtags-mode (kbd "f") 'helm-gtags-dwim)
   (evics-define-key 'helm-gtags-mode (kbd "F") 'helm-gtags-find-tag-other-window)
   (evics-define-key 'helm-gtags-mode (kbd "<") 'helm-gtags-previous-history)
   (evics-define-key 'helm-gtags-mode (kbd ">") 'helm-gtags-next-history)
+
+  (define-key helm-gtags-mode-map (kbd "M-t") 'helm-gtags-dwim)
   (define-key helm-gtags-mode-map (kbd "M-T") 'sp00ky/gtags-find-current-function)
   (define-key helm-gtags-mode-map (kbd "M-s") 'helm-gtags-find-symbol)
+  (define-key helm-gtags-mode-map (kbd "M-r") 'helm-gtags-find-rtag)
   (define-key helm-gtags-mode-map (kbd "M-f") 'helm-gtags-tags-in-this-function)
   (define-key helm-gtags-mode-map (kbd "M-<") 'helm-gtags-previous-history)
   (define-key helm-gtags-mode-map (kbd "M->") 'helm-gtags-next-history)
   (evics-add-to-emulation-map (cons 'helm-gtags-mode helm-gtags-mode-map) 1)
-  )
+
+  (setq helm-gtags-fuzzy-match            t
+        helm-gtags-display-style          nil
+        helm-gtags-use-input-at-cursor    t
+        helm-gtags-maximum-candidates     150
+        helm-gtags-pulse-at-cursor        nil ;; reduces lag over ssh
+        helm-gtags-auto-update            t
+        helm-gtags-ignore-case            t
+        helm-gtags-cache-select-result    t
+        helm-gtags-auto-update            t
+        helm-gtags-update-interval-second nil
+        helm-gtags-path-style             'root))
 
 (add-hook 'c++-mode-hook 'helm-gtags-mode)
 (add-hook 'c-mode-hook 'helm-gtags-mode)

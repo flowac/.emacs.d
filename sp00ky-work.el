@@ -45,7 +45,7 @@ Examples: 1a d1a d1xc
             "/localdisk/hmuresan/yocto/builds/valimar3/cn-container-hal-dnx-docker-x86-64")
            (t nil)))
     (when build-dir
-      (setq build-dir-cmd (concat "--build-dir= " build-dir)))
+      (setq build-dir-cmd (concat "--build-dir=" build-dir)))
 
     ;; Perform any extra actions we need
     (when (string-search "c" input)
@@ -190,3 +190,22 @@ We will have to account for LOG_INFO and LOG_DEBUG accordingly."
      nil (line-beginning-position) (line-end-position))
     (sp00ky/indent-region-or-paragraph)
     (y-or-n-p "Continue?")))
+
+(defun sp00ky/filter-args/helm-gtags--common (args)
+  "Automatically fetch definitions for dnx and petra functions when
+dealing with bcm apis."
+  (print args)
+  (let ((srcs (car args))
+        (tagname (cadr args)))
+    (when (string-match "^\\(bcm_\\)(.*)" tagname)
+      (setq tagname (concat tagname "|"
+                            (match-string 1) "dnx_" (match-string 2) "|"
+                            (match-string 1) "petra_" (match-string 2) "|")))
+    (list srcs tagname)))
+
+;; Add filter to return value of helm-gtags--symbol-at-point
+
+;; (with-eval-after-load 'helm-gtags
+;; (advice-add 'helm-gtags--common :filter-args 'sp00ky/filter-args/helm-gtags--common))
+(advice-add 'helm-gtags--common :filter-args 'sp00ky/filter-args/helm-gtags--common)
+(advice-remove 'helm-gtags--common 'sp00ky/filter-args/helm-gtags--common)
