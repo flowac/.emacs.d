@@ -466,8 +466,8 @@ placed on the input line"
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
 ;; (with-eval-after-load 'python
-  ;; (define-key python-mode-map (kbd "TAB") 'sp00ky/indent-region-or-paragraph)
-  ;; (define-key python-mode-map (kbd "<backtab>") 'sp00ky/align-region-or-paragraph))
+;; (define-key python-mode-map (kbd "TAB") 'sp00ky/indent-region-or-paragraph)
+;; (define-key python-mode-map (kbd "<backtab>") 'sp00ky/align-region-or-paragraph))
 (with-eval-after-load 'anaconda-mode
   (evics-define-key 'python-mode (kbd "f") 'anaconda-mode-find-definitions)
   (evics-define-key 'python-mode (kbd "F") 'anaconda-mode-find-definitions-other-window)
@@ -475,6 +475,7 @@ placed on the input line"
   (define-key python-mode-map (kbd "<") 'xref-pop-marker-stack)
   (define-key python-mode-map (kbd "M-<") 'xref-pop-marker-stack)
   (define-key python-mode-map (kbd "M-h") 'anaconda-mode-show-doc)
+  (define-key python-mode-map (kbd "TAB") 'indent-for-tab-command)
   (evics-add-to-emulation-map (cons 'anaconda-mode anaconda-mode-map) 1))
 
 
@@ -608,7 +609,6 @@ placed on the input line"
 
 (define-key prog-mode-map (kbd "TAB") 'sp00ky/indent-region-or-paragraph)
 (define-key prog-mode-map (kbd "<backtab>") 'sp00ky/align-region-or-paragraph)
-(define-key python-mode-map (kbd "k") 'indent-for-tab-command)
 ;; (with-eval-after-load 'elisp-mode
   ;; (define-key emacs-lisp-mode-map (kbd "TAB") 'sp00ky/indent-region-or-paragraph)
   ;; (define-key emacs-lisp-mode-map (kbd "<backtab>") 'sp00ky/align-region-or-paragraph))
@@ -681,9 +681,16 @@ placed on the input line"
 (require 'geiser-mode)
 (define-key geiser-mode-map (kbd "M-t") 'geiser-edit-symbol-at-point)
 (define-key geiser-mode-map (kbd "M-<") 'geiser-pop-symbol-stack)
-(evics-define-key 'geiser-mode (kbd "z") 'geiser-eval-last-sexp)
-(evics-define-key 'geiser-mode (kbd "t r") 'switch-to-geiser)
+(define-key geiser-mode-map (kbd "Z") 'geiser-eval-buffer-and-go)
+(define-key geiser-mode-map (kbd "z") 'geiser-eval-last-sexp)
+(define-key geiser-mode-map (kbd "t e") 'switch-to-geiser)
 (evics-add-to-emulation-map (cons 'geiser-mode geiser-mode-map) 1)
+(add-hook 'geiser-debug-mode-hook 'evics-mini-mode)
+
+;; TO FIX
+;; Geiser and go functions don't seem to work: fix:
+;; geiser-eval-region
+;; Seems to pass in t to geiser-debug--send-region, this should pass in 'geiser--go-to-repl
 
 (require 'geiser-repl)
 (setq geiser-repl-current-project-function 'projectile-project-root)
@@ -696,7 +703,7 @@ placed on the input line"
 (define-key geiser-repl-mode-map (kbd "C-a") 'nil)
 (define-key geiser-repl-mode-map (kbd "k") 'sp00ky/evics/comint-history-up-override)
 (define-key geiser-repl-mode-map (kbd "j") 'sp00ky/evics/comint-history-down-override)
-(evics-define-key 'geiser-repl-mode (kbd "t r") 'switch-to-geiser)
+(define-key geiser-repl-mode-map (kbd "t e") 'switch-to-geiser)
 (evics-add-to-emulation-map (cons 'sp00ky/evics/geiser-repl-mode geiser-repl-mode-map) 1)
 
 ;;;;;;;;;;;;;;;;SUBSECTION: Python mode Hooks ;;;;;;;;;;;;;;;;
