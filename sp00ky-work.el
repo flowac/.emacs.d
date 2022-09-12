@@ -191,21 +191,32 @@ We will have to account for LOG_INFO and LOG_DEBUG accordingly."
     (sp00ky/indent-region-or-paragraph)
     (y-or-n-p "Continue?")))
 
-(defun sp00ky/filter-args/helm-gtags--common (args)
+(defun sp00ky/filter-args/helm-gtags--common (tagname)
   "Automatically fetch definitions for dnx and petra functions when
 dealing with bcm apis."
-  (print args)
-  (let ((srcs (car args))
-        (tagname (cadr args)))
-    (when (string-match "^\\(bcm_\\)(.*)" tagname)
-      (setq tagname (concat tagname "|"
-                            (match-string 1) "dnx_" (match-string 2) "|"
-                            (match-string 1) "petra_" (match-string 2) "|")))
-    (list srcs tagname)))
+  (set-text-properties 0 (length tagname) nil tagname)
+  (when (string-match "^\\(bcm_\\)\\(.*\\)" tagname)
+    (setq tagname (concat "\"" tagname "|"
+                          (match-string 1 tagname) "dnx_" (match-string 2 tagname) "|"
+                          (match-string 1 tagname) "petra_" (match-string 2 tagname) "\"")))
+  tagname)
 
 ;; Add filter to return value of helm-gtags--symbol-at-point
+(advice-add 'helm-gtags--token-at-point :filter-return 'sp00ky/filter-args/helm-gtags--common)
+(advice-remove 'helm-gtags--token-at-point 'sp00ky/filter-args/helm-gtags--common)
+(sp00ky/filter-args/helm-gtags--common "bcm_text")
+;  sp00ky/filter-args/helm-gtags--common(#("bcm_port_class_set" 0 18 (fontified t)))
+;  helm-gtags--symbol-at-point()
+;  helm-gtags-dwim()
+;  funcall-interactively(helm-gtags-dwim)
+;  call-interactively(helm-gtags-dwim)
+;  (if evics-normal-mode (call-interactively 'helm-gtags-dwim) (call-interactively 'self-insert-command))
+;  evics--helm-gtags-dwim()
+;  funcall-interactively(evics--helm-gtags-dwim)
+;  call-interactively(evics--helm-gtags-dwim nil nil)
+;  command-execute(evics--helm-gtags-dwim)
 
 ;; (with-eval-after-load 'helm-gtags
 ;; (advice-add 'helm-gtags--common :filter-args 'sp00ky/filter-args/helm-gtags--common))
-(advice-add 'helm-gtags--common :filter-args 'sp00ky/filter-args/helm-gtags--common)
-(advice-remove 'helm-gtags--common 'sp00ky/filter-args/helm-gtags--common)
+;; (advice-add 'helm-gtags--common :filter-args 'sp00ky/filter-args/helm-gtags--common)
+;; (advice-remove 'helm-gtags--common 'sp00ky/filter-args/helm-gtags--common)

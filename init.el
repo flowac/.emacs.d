@@ -92,7 +92,6 @@
         highlight-parentheses
         projectile      ; Can use emacs built in project . el in emacs 28
         sudo-edit
-        undo-tree     ; Can get rid of undo-tree in emacs 28, we can use undo-redo
         ))
 (mapc 'sp00ky/install-package my-packages)
 
@@ -106,7 +105,6 @@
   (add-to-list 'load-path "/localdata/hmuresan/my_builds/evics"))
 (require 'evics)
 (evics-global-mode t)
-(global-undo-tree-mode)
 
 ;;;;;;;;;;;;;;;;SUBSECTION: call-graph ;;;;;;;;;;;;;;;;
 (require 'hierarchy)
@@ -373,6 +371,7 @@ placed on the input line"
 (define-key evics-normal-mode-map "J" 'forward-paragraph)
 (define-key evics-normal-mode-map "K" 'backward-paragraph)
 
+(define-key evics-user-normal-map (kbd "\"") 'helm-bookmarks)
 (define-key evics-user-normal-map (kbd ";") 'helm-buffers-list)
 (define-key evics-user-normal-map (kbd "S") 'helm-occur)
 (define-key evics-user-normal-map (kbd "]") 'scroll-up-command)
@@ -389,6 +388,7 @@ placed on the input line"
 (define-key evics-user-normal-map (kbd "t r") 'helm-resume)
 (define-key evics-user-normal-map (kbd "t x") 'toggle-truncate-lines)
 
+(define-key evics-user-normal-map (kbd "t w k") 'projectile-kill-buffers)
 (define-key evics-user-normal-map (kbd "t w g") 'helm-projectile-grep)
 (define-key evics-user-normal-map (kbd "t w f") 'helm-projectile-find-file)
 (define-key evics-user-normal-map (kbd "t f") 'helm-projectile-find-file)
@@ -734,7 +734,7 @@ placed on the input line"
 (require 'oc-csl)
 (defun sp00ky/org-mode-hook ()
   "Various config for org-mode"
-  (flyspell-mode t)
+  ;; (flyspell-mode t)
   (visual-line-mode t)
   (setq-local word-wrap nil)
   (setq fill-column 90))
