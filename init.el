@@ -239,6 +239,18 @@ in."
 (define-key evics-normal-mode-map (kbd "w 9") 'eyebrowse-switch-to-window-config-9)
 (define-key evics-normal-mode-map (kbd "w 0") 'eyebrowse-switch-to-window-config-0)
 
+(define-key evics-mini-mode-map (kbd "w 1") 'eyebrowse-switch-to-window-config-1)
+(define-key evics-mini-mode-map (kbd "w 2") 'eyebrowse-switch-to-window-config-2)
+(define-key evics-mini-mode-map (kbd "w 3") 'eyebrowse-switch-to-window-config-3)
+(define-key evics-mini-mode-map (kbd "w 4") 'eyebrowse-switch-to-window-config-4)
+(define-key evics-mini-mode-map (kbd "w 5") 'eyebrowse-switch-to-window-config-5)
+(define-key evics-mini-mode-map (kbd "w 6") 'eyebrowse-switch-to-window-config-6)
+(define-key evics-mini-mode-map (kbd "w 7") 'eyebrowse-switch-to-window-config-7)
+(define-key evics-mini-mode-map (kbd "w 8") 'eyebrowse-switch-to-window-config-8)
+(define-key evics-mini-mode-map (kbd "w 9") 'eyebrowse-switch-to-window-config-9)
+(define-key evics-mini-mode-map (kbd "w 0") 'eyebrowse-switch-to-window-config-0)
+
+
 (define-key eyebrowse-mode-map (kbd "C-a 1") 'eyebrowse-switch-to-window-config-1)
 (define-key eyebrowse-mode-map (kbd "C-a 2") 'eyebrowse-switch-to-window-config-2)
 (define-key eyebrowse-mode-map (kbd "C-a 3") 'eyebrowse-switch-to-window-config-3)
@@ -439,6 +451,7 @@ placed on the input line"
 (global-set-key (kbd "C-=")   'align)
 (global-set-key (kbd "C-c l") 'recenter)
 (global-set-key (kbd "C-h M") 'man)
+(global-set-key (kbd "C-h h") 'nil) ;; Remove view-hello-file binding
 (global-set-key (kbd "C-;")   'comment-line)
 (global-set-key (kbd "M-;")   'comment-region)
 
@@ -680,9 +693,11 @@ placed on the input line"
 (require 'geiser-guile)
 (require 'geiser-mode)
 (define-key geiser-mode-map (kbd "M-t") 'geiser-edit-symbol-at-point)
+(evics-define-key 'geiser-mode (kbd "Z") 'geiser-eval-buffer-and-go)
+(evics-define-key 'geiser-mode (kbd "f") 'geiser-edit-symbol-at-point)
+(evics-define-key 'geiser-mode (kbd "z") 'geiser-eval-last-sexp)
+
 (define-key geiser-mode-map (kbd "M-<") 'geiser-pop-symbol-stack)
-(define-key geiser-mode-map (kbd "Z") 'geiser-eval-buffer-and-go)
-(define-key geiser-mode-map (kbd "z") 'geiser-eval-last-sexp)
 (define-key geiser-mode-map (kbd "t e") 'switch-to-geiser)
 (evics-add-to-emulation-map (cons 'geiser-mode geiser-mode-map) 1)
 (add-hook 'geiser-debug-mode-hook 'evics-mini-mode)
