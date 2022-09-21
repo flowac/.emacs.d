@@ -485,12 +485,11 @@ placed on the input line"
   (evics-define-key 'python-mode (kbd "f") 'anaconda-mode-find-definitions)
   (evics-define-key 'python-mode (kbd "F") 'anaconda-mode-find-definitions-other-window)
   (define-key python-mode-map (kbd "M-r") 'anaconda-mode-find-references)
-  (define-key python-mode-map (kbd "<") 'xref-pop-marker-stack)
+  (evics-define-key 'python-mode (kbd "<") 'xref-pop-marker-stack)
   (define-key python-mode-map (kbd "M-<") 'xref-pop-marker-stack)
   (define-key python-mode-map (kbd "M-h") 'anaconda-mode-show-doc)
   (define-key python-mode-map (kbd "TAB") 'indent-for-tab-command)
   (evics-add-to-emulation-map (cons 'anaconda-mode anaconda-mode-map) 1))
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;SECTION:              MISC INIT                 ;;;;;;;;;;;;;;;;;
