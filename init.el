@@ -69,7 +69,8 @@
     (package-install package)))
 
 (setq my-packages
-      '(corfu
+      '(anaconda-mode
+        corfu
         corfu-terminal
         ;; company
         ;; company-jedi
@@ -158,6 +159,9 @@
 (define-key helm-map (kbd "M-k") 'helm-previous-line)
 (define-key helm-map (kbd "M-p") 'helm-previous-line)
 (define-key helm-map (kbd "M-n") 'helm-next-line)
+
+(require 'helm-adaptive)
+(helm-adaptive-mode 1)
 
 ;(add-to-list 'helm-imenu-type-faces '("^\\(Sections\\|Subsections\\)" . font-lock-builtin-face))
 
@@ -601,6 +605,7 @@ placed on the input line"
 (add-to-list 'auto-mode-alist '("\\.cint\\'" . c-mode))
 (add-to-list 'auto-mode-alist '("\\.gpi\\'"  . gnuplot-mode))
 (add-to-list 'auto-mode-alist '("\\.completion\\'"  . shell-script-mode))
+(add-to-list 'auto-mode-alist '("\\.gdb\\'"  . gdb-script-mode))
 ;;;;;;;;;;;;;;;;SUBSECTION: Programming Mode Hooks ;;;;;;;;;;;;;;;;
 (defun sp00ky/align-region-or-paragraph ()
   "align paragraph"
@@ -739,7 +744,8 @@ placed on the input line"
   (setq fill-column 90))
 
 (with-eval-after-load 'org
-  (setq org-adapt-indentation 'nil)
+  (setq org-adapt-indentation 'nil
+        org-log-done 'time)
   (add-hook 'org-mode-hook 'sp00ky/org-mode-hook)
   (plist-put org-format-latex-options :scale 2.5))
 
@@ -775,6 +781,11 @@ placed on the input line"
     (progn (load "/localdata/hmuresan/my_builds/protobuf/editors/protobuf-mode")
            (require 'protobuf-mode)
            (add-to-list 'auto-mode-alist '("\\.proto\\'" . protobuf-mode)))
+  (message "Cannot locate protobuf-mode.el, not loading"))
+
+(if (file-exists-p "/localdata/hmuresan/my_builds/flatbuffers-mode/flatbuffers-mode.el")
+    (progn (load "/localdata/hmuresan/my_builds/flatbuffers-mode/flatbuffers-mode")
+           (require 'flatbuffers-mode))
   (message "Cannot locate protobuf-mode.el, not loading"))
 
 ;;;;;;;;;;;;;;SUBSECTION: Misc init elisp ;;;;;;;;;;;;;;;;;

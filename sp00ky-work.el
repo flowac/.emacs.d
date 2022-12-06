@@ -12,6 +12,7 @@
 (defvar sp00ky//gdb-cmd-history '())
 (defvar sp00ky//gdb-ip-history  '())
 (defvar sp00ky//gdb-pid-history '())
+(defvar sp00ky//gdb-platform-history '())
 (defun sp00ky/gdb-wrapper ()
   "Wrapper function to invoke en-dbg easily. This function will
 prompt the user each time for information. I don't expect to be
@@ -22,13 +23,15 @@ using it that often, so this is fine."
 c      - debug a core file, will prompt for path
 d      - clean dbg dir (/localdisk/yocto_debugging/*)
 i      - attach to remote, will prompt for ip and pid
+m      - debug hal startup
 Examples: 1a d1a d1xc
 : "
                              (car sp00ky//gdb-cmd-history)
                              'sp00ky//gdb-cmd-history
                              sp00ky//gdb-cmd-history
                              nil))
-         build-dir build-dir-cmd extra-cmds cmd)
+         (extra-cmds "")
+         build-dir build-dir-cmd pre-cmds cmd platform)
     (setq
      build-dir
      (cond ((string-search "1a" input)
@@ -55,6 +58,25 @@ Examples: 1a d1a d1xc
 
     (when (string-search "d" input)
       (shell-command "rm -rf /localdisk/yocto_debugging/*"))
+
+    (when (string-search "m" input)
+      ;; gdb_wrapper.sh parses the -m and exports a platform variable
+      ;; for us.
+      (setq platform (read-string "Platform (cn5162..):"
+                                  (car sp00ky//gdb-platform-history)
+                                  'sp00ky//gdb-platform-history
+                                  sp00ky//gdb-platform-history
+                                  nil))
+      (setq extra-cmds (concat "-e \"CN_PLATFORM=" platform "\" "
+                               "\"CN_PLATFORM_LIBS=/usr/lib/libhal_board" platform ".so:/usr/lib/libhal_board_default.so\" "
+                               "--gdb-multi -b /usr/bin/cn-node-hal "
+                               "--container=docker:cn_hal_1 "
+                               "--ip "
+                               (read-string "IP:"
+                                            (car sp00ky//gdb-ip-history)
+                                            'sp00ky//gdb-ip-history
+                                            sp00ky//gdb-ip-history
+                                            nil))))
 
     (when (string-search "i" input)
       ;; We will automatically create an extra gdb command file to
@@ -87,7 +109,7 @@ Examples: 1a d1a d1xc
                           sp00ky//gdb-pid-history
                           nil))))
 
-    (setq cmd (concat "gdb_wrapper.sh " build-dir-cmd " " extra-cmds))
+    (setq cmd (concat "gdb_wrapper.sh " pre-cmds " " build-dir-cmd " " extra-cmds))
     (when (y-or-n-p (concat "Does this command look good?\n\n" cmd "\n\n"))
       (gdb cmd))))
 
@@ -102,7 +124,7 @@ expecting this port to be port forwarded with something like
   (if (use-region-p)
       (let ((tmp-file "/tmp/emacs-clipboard"))
         (write-region start end tmp-file)
-        (async-shell-command (concat "cat " (shell-quote-argument tmp-file) " | nc localhost 5556"))
+        (async-shell-command (concat "cat " (shell-quote-argument tmp-file) " | nc -4 localhost 5556"))
         (evics-kill-ring-save))))
 (define-key evics-normal-mode-map (kbd "y") 'sp00kyWork/copy-to-clipboard)
 

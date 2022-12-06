@@ -160,12 +160,41 @@ hilighting")
 	(highlight-regexp (regexp-opt target) 'hi-yellow)
 	(setq sp00ky/last-highlighted-word target)))))
 
+
+(defun sp00ky/transpose-equations ()
+  "Transpose left side of an equation with the right side."
+  (interactive)
+  (let (startr1 endr1 start2 endr2)
+    (beginning-of-line-text)
+    (setq startr1 (point))
+
+    (re-search-forward "=" (line-end-position))
+    (backward-to-word 1)
+    (setq endr1 (point))
+
+    (re-search-forward "=" (line-end-position))
+    (forward-to-word 1)
+    (setq startr2 (point))
+
+    (end-of-line)
+    (backward-to-word 1)
+    (setq endr2 (point))
+    (transpose-regions startr1 endr1 startr2 endr2)))
+
 ;;=========================================================================
+
+;; Trick taken from https://stackoverflow.com/questions/14825108/abbrev-mode-trying-to-get-rid-of-space-character-from-insertion-key
+(defun sp00ky/do-not-insert-space-after-abbrev ()
+  "I am not quite sure how this works, but my guess is that it
+breaks us prematures out of the event processing loop. Thus, we
+expand the abbrev, and then abort the action for the key
+pressed (in this case space)."
+    (signal 'quit nil))
 
 (defun toggle-maximize-buffer () "Maximize buffer"
   (interactive)
   (if (= 1 (length (window-list)))
-      (jump-to-register '_) 
+      (jump-to-register '_)
     (progn
       (window-configuration-to-register '_)
       (delete-other-windows))))

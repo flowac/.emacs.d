@@ -1,14 +1,18 @@
 ;; C-mode abbrevs
 (setq save-abbrevs nil)
 (setq skeleton-end-newline nil)
-(define-skeleton sp00ky-skeleton/hss
-  "Declare HalStatus variable" nil
-  "HalStatus status;" \n)
+
+(define-skeleton sp00ky-skeleton/skeleton-test
+  "Prompt user for input"
+  t
+  ("Enter test input: " "test: " str \n))
+
 (define-skeleton sp00ky-skeleton/c-if-statement
   "Insert an if statement" nil
   "if (" _ ")" > \n
   "{" > \n
   "}" >)
+
 (define-skeleton sp00ky-skeleton/c-dfn
   "Insert a function" nil
   "//================================================================================" \n
@@ -73,25 +77,27 @@
   "HalStatus " _ "()" > \n
   "{" > \n
   "}" >)
-(define-skeleton sp00ky-skeleton/skeleton-test
-  "Prompt user for input"
-  t
-  ("Enter test input: " "test: " str \n))
+
 (define-skeleton sp00ky-skeleton/HER-expansion
   "Insert a function skeleton that returns HalStatus" nil
   "HAL_ERR_RET(status, " _ ");")
+
 (define-skeleton sp00ky-skeleton/hal-cnc-err-ret-expansion
   "" nil
   "HAL_CNCORE_ERR_RET(status, " _ ");")
+
 (define-skeleton sp00ky-skeleton/hal-cnc-err-retu-expansion
   "" nil
   "HAL_CNCORE_ERR_RETU(status, " _ ");")
+
 (define-skeleton sp00ky-skeleton/hal-cnc-err-cont-expansion
   "" nil
   "HAL_CNCORE_ERR_CONT(status, " _ ");")
+
 (define-skeleton sp00ky-skeleton/hec-expansion
   "" nil
   "HAL_ERR_CONT(status, " _ ");")
+
 (define-skeleton sp00ky-skeleton/HERU-expansion
   "Insert a function skeleton that returns HalStatus" nil
   "HAL_ERR_RETU(status, " _ ");")
@@ -100,26 +106,6 @@
   "Insert a function skeleton that returns HalStatus" nil
   "DRV_ERR_RET(drvStatus, " _ ");")
 
-(define-skeleton sp00ky-skeleton/cso-expansion
-  "" nil
-  "CnCoreStatus_Ok");")
-
-(define-skeleton sp00ky-skeleton/rcso-expansion
-  "" nil
-  "return CnCoreStatus_Ok;");")
-
-(define-skeleton sp00ky-skeleton/cs-expansion
-  "" nil
-  "CnCoreStatus");")
-
-(define-skeleton sp00ky-skeleton/hso-expansion
-  "Insert HalStatus_Ok" nil
-  "HalStatus_Ok");")
-
-(define-skeleton sp00ky-skeleton/rhso-expansion
-  "DOCSTRING" nil
-  "return HalStatus_Ok;");")
-
 (define-skeleton sp00ky-skeleton/hli-expansion
   "" nil
   "HAL_LOG_INFO(\"" _ "\");" >)
@@ -127,12 +113,11 @@
 (define-skeleton sp00ky-skeleton/hle-expansion
   "" nil
   "HAL_LOG_ERR(\"" _ "\");" >)
-(define-skeleton sp00ky-skeleton/hs-expansion
-  "" nil
-  "HalStatus" >)
+
 (define-skeleton sp00ky-skeleton/hld-expansion
   "" nil
   "HAL_LOG_DEBUG(\"" _ "\");" >)
+
 (define-skeleton sp00ky-skeleton/c-swi
   "" nil
   "switch (" _ ")" > \n
@@ -142,56 +127,64 @@
   "default:" > \n
   "break;" > \n
   "}" > )
+
 (define-skeleton sp00ky-skeleton/c-tenu
   "" nil
   "typedef enum" > \n
   "{" _ > \n
   "} enumName;" >)
+
 (define-skeleton sp00ky-skeleton/typedef-struct
   "" nil
   "typedef struct _t" > \n
   "{" _ > \n
   "} t;" >)
+
 (define-skeleton sp00ky-skeleton/c-include
   "" nil
   "#include <" _ ">" >)
 
 (define-abbrev-table 'c-mode-abbrev-table
   '(
-    ("inc" ""   sp00ky-skeleton/c-include)
-    ("tstr" ""  sp00ky-skeleton/typedef-struct)
-    ("tenu" ""  sp00ky-skeleton/c-tenu)
-    ("swi" ""   sp00ky-skeleton/c-swi)
-    ("whi" ""   sp00ky-skeleton/c-whi)
-    ("cif" ""   sp00ky-skeleton/c-if-statement)
-    ("cfor" ""  sp00ky-skeleton/c-for-statement)
-    ("chf" ""   sp00ky-skeleton/c-hal-ret-fun)
-    ("cst" ""   sp00ky-skeleton/skeleton-test)
-    ("dfn" ""   sp00ky-skeleton/c-dfn)
-    ("shdfn" "" sp00ky-skeleton/c-static-hal-dfn)
-    ("hdfn" ""  sp00ky-skeleton/c-hdfn)
-    ("hs" ""    sp00ky-skeleton/hs-expansion)
-    ("hss" ""   sp00ky-skeleton/hss)
-    ("rhso" ""  sp00ky-skeleton/rhso-expansion)
-    ("hso" ""   sp00ky-skeleton/hso-expansion)
-    ("cs" ""    sp00ky-skeleton/cs-expansion)
-    ("cso" ""   sp00ky-skeleton/cso-expansion)
-    ("rcso" ""  sp00ky-skeleton/rcso-expansion)
-    ("hsf"      "HalStatus_Failure")
-    ("hse"      "HalStatus_Error")
-    ("hsi"      "HalStatus_InvalidParameter")
-    ("hsd"      "HalStatus_DriverError")
-    ("hli" ""   sp00ky-skeleton/hli-expansion)
-    ("hle" ""   sp00ky-skeleton/hle-expansion)
-    ("hld" ""   sp00ky-skeleton/hld-expansion)
-    ("hec" ""   sp00ky-skeleton/hec-expansion)
-    ("her" ""   sp00ky-skeleton/HER-expansion)
-    ("hcer" ""  sp00ky-skeleton/hal-cnc-err-ret-expansion)
+    ("cif"   "" sp00ky-skeleton/c-if-statement)
+    ("cfor"  "" sp00ky-skeleton/c-for-statement)
+    ("chf"   "" sp00ky-skeleton/c-hal-ret-fun)
+    ("cst"   "" sp00ky-skeleton/skeleton-test)
+    ("der"   "" sp00ky-skeleton/DER-expansion)
+    ("dfn"   "" sp00ky-skeleton/c-dfn)
+    ("hcer"  "" sp00ky-skeleton/hal-cnc-err-ret-expansion)
     ("hceru" "" sp00ky-skeleton/hal-cnc-err-retu-expansion)
-    ("hcec" ""  sp00ky-skeleton/hal-cnc-err-cont-expansion)
-    ("heru" ""  sp00ky-skeleton/HERU-expansion)
-    ("der" ""   sp00ky-skeleton/DER-expansion)
-    ("sdfn" ""  sp00ky-skeleton/c-sdfn)
+    ("hcec"  "" sp00ky-skeleton/hal-cnc-err-cont-expansion)
+    ("hdfn"  "" sp00ky-skeleton/c-hdfn)
+    ("hec"   "" sp00ky-skeleton/hec-expansion)
+    ("her"   "" sp00ky-skeleton/HER-expansion)
+    ("heru"  "" sp00ky-skeleton/HERU-expansion)
+    ("hld"   "" sp00ky-skeleton/hld-expansion)
+    ("hli"   "" sp00ky-skeleton/hli-expansion)
+    ("hle"   "" sp00ky-skeleton/hle-expansion)
+    ("inc"   "" sp00ky-skeleton/c-include)
+    ("sdfn"  "" sp00ky-skeleton/c-sdfn)
+    ("shdfn" "" sp00ky-skeleton/c-static-hal-dfn)
+    ("swi"   "" sp00ky-skeleton/c-swi)
+    ("tenu"  "" sp00ky-skeleton/c-tenu)
+    ("tstr"  "" sp00ky-skeleton/typedef-struct)
+    ("whi"   "" sp00ky-skeleton/c-whi)
+
+    ("cs"    "CnCoreStatus"               sp00ky/do-not-insert-space-after-abbrev)
+    ("css"   "CnCoreStatus status"        sp00ky/do-not-insert-space-after-abbrev)
+    ("csg"   "CnCoreStatus_GenericError"  sp00ky/do-not-insert-space-after-abbrev)
+    ("cso"   "CnCoreStatus_Ok"            sp00ky/do-not-insert-space-after-abbrev)
+    ("hs"    "HalStatus"                  sp00ky/do-not-insert-space-after-abbrev)
+    ("hsd"   "HalStatus_DriverError"      sp00ky/do-not-insert-space-after-abbrev)
+    ("hse"   "HalStatus_Error"            sp00ky/do-not-insert-space-after-abbrev)
+    ("hsf"   "HalStatus_Failure"          sp00ky/do-not-insert-space-after-abbrev)
+    ("hsi"   "HalStatus_InvalidParameter" sp00ky/do-not-insert-space-after-abbrev)
+    ("hss"   "HalStatus status"           sp00ky/do-not-insert-space-after-abbrev)
+    ("hso"   "HalStatus_Ok"               sp00ky/do-not-insert-space-after-abbrev)
+    ("rcs"   "return CnCoreStatus_"       sp00ky/do-not-insert-space-after-abbrev)
+    ("rcso"  "return CnCoreStatus_Ok;"    sp00ky/do-not-insert-space-after-abbrev)
+    ("rhs"   "return HalStatus_"          sp00ky/do-not-insert-space-after-abbrev)
+    ("rhso"  "return HalStatus_Ok;"       sp00ky/do-not-insert-space-after-abbrev)
     ;; END
     ))
 
@@ -219,10 +212,10 @@
 ;; (clear-abbrev-table emacs-lisp-mode-abbrev-table)
 (define-abbrev-table 'emacs-lisp-mode-abbrev-table
   '(
-    ("dfn" ""  sp00ky-skeleton/elisp-dfn-expansion)
-    ("dfni" "" sp00ky-skeleton/elisp-dfni-expansion)
-    ("dfk" ""  sp00ky-skeleton/elisp-dfk-expansion)
-    ("dfv" ""  sp00ky-skeleton/elisp-dfv-expansion)
+    ("dfn"  ""  sp00ky-skeleton/elisp-dfn-expansion)
+    ("dfni" ""  sp00ky-skeleton/elisp-dfni-expansion)
+    ("dfk"  ""  sp00ky-skeleton/elisp-dfk-expansion)
+    ("dfv"  ""  sp00ky-skeleton/elisp-dfv-expansion)
     ;; END
     ))
 
