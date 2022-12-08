@@ -146,7 +146,8 @@
 (global-unset-key (kbd "C-x c"))
 (setq helm-move-to-line-cycle-in-source t   ; circular helm suggestions
       helm-move-to-line-cycle-in-source nil ; scroll through sections
-      helm-buffer-max-length            40
+      helm-split-window-inside-p        nil ; only show helm buffer on act window helm-buffer-max-length            40
+      helm-echo-input-in-header-line    t
       helm-imenu-fuzzy-match            t
       helm-use-mouse                    t
       ;; No idea why helm has this weird tab completion for evil commands... setting this
@@ -692,6 +693,10 @@ placed on the input line"
 (add-hook 'emacs-lisp-mode-hook 'sp00ky/emacs-lisp-mode-hook)
 (define-key emacs-lisp-mode-map (kbd "M-t") 'xref-find-definitions)
 (define-key emacs-lisp-mode-map (kbd "M-<") 'xref-pop-marker-stack)
+(evics-define-key 'emacs-lisp-mode (kbd "f") 'xref-find-definitions)
+(evics-define-key 'emacs-lisp-mode (kbd "F") 'xref-find-definitions-other-window)
+(evics-define-key 'emacs-lisp-mode (kbd "<") 'xref-pop-marker-stack)
+
 
 ;;;;;;;;;;;;;;;;SUBSECTION: geiser, Scheme (Guile) mode Hooks ;;;;;;;;;;;;;;;;
 (require 'geiser-guile)

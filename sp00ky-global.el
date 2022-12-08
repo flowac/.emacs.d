@@ -1,7 +1,7 @@
 ;;; sp00ky-global.el --- My experimental elisp GNU Global interface
 
 ;;; Commentary:
-;; 
+;;
 
 ;;; TODO: Sp00ky-cache-current not working (not modifying global vars)
 
@@ -11,18 +11,16 @@
 (defvar sp00ky-tag-caches (list (list (list) (list)))
   "Holds the list of caches. Each cache contains ((future) (past)). Both lists store the entries
 from newest to oldest.")
-(defvar global-command "global --path-style absolute --result grep "
+(defvar global-base-command "global --path-style absolute --result grep "
   "Shell command to invoke global.")
 
-(defun sp00ky-global-definition (symbol)
+(defun sp00ky-invoke-global (symbol)
   "Sp00ky global wrapper."
-  (interactive)
   (split-string
-   (shell-command-to-string (concat global-command symbol))
+   (shell-command-to-string (concat global-base-command symbol))
    "[\n]+" t))
 
 (defun sp00ky-cache-current ()
-  (interactive)
   "Cache current location in buffer"
   (let* ((cache (nth 0 sp00ky-tag-caches))
          (future (nth sp00ky-cache-future cache))
@@ -33,19 +31,20 @@ from newest to oldest.")
 
 (defun sp00ky-goto-tag (tag)
   "Parse the tag in filename:linenumber:fnname format and then goto it"
-  (interactive)
   (let* ((tag-info (split-string tag "[:]+"))
          (path (nth 0 tag-info))
          (line (nth 1 tag-info))
-         (fun-name (nth 2 tag-info)))
+         ; Currently unused, I am thinking put the point at the start
+         ; of sym-name in the future
+         (sym-name (nth 2 tag-info)))
     (find-file path)
     (goto-line (string-to-number line))))
 
 (defun sp00ky-get-tag-list ()
   "Get tag list."
   (interactive)
-  (let ((tags (sp00ky-global-definition (thing-at-point 'word t))))
-    (if (eq (list-length tags) 1)
+  (let ((tags (sp00ky-invoke-global (thing-at-point 'symbol t))))
+    (if (eq (length tags) 1)
         (sp00ky-goto-tag (car tags))
       (while tags
       ;;; car is first item in list, cdr is the rest of the list

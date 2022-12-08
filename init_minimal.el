@@ -12,11 +12,12 @@
 ;; (add-to-list 'load-path "/localdata/hmuresan/my_builds/evics")
 ;; (load "/localdata/hmuresan/my_builds/evics/evics.el")
 (add-to-list 'load-path "/localdata/hmuresan/my_builds/evics")
-;; (require 'evics)
-;; (evics-global-mode t)
+(require 'evics)
+(evics-global-mode t)
+
 (load "~/scratch/visual-regexp.el")
 (xterm-mouse-mode     1)
-
+(toggle-debug-on-error)
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
 (load-theme 'sp00ky t)
 
