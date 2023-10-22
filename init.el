@@ -32,6 +32,7 @@
 ;; - Look at mouse-buffer-menu to see howto do x-popup-menu
 ;; - Look into org-comment-regexp, making it work when there is no space
 ;; - look into using package-quickstart
+;; - Look at cursor-intagible: https://github.com/weirdNox/dotfiles/blob/master/config/.config/emacs/config.org
 ;;
 ;; MANUAL
 ;; - Read about assoc list (alists)
@@ -77,7 +78,6 @@
         docker-compose-mode
         graphviz-dot-mode
         htmlize
-        call-graph
         citeproc
         eyebrowse       ; Can explore using built in tab-bar mode, or
                         ; window/frame registers
@@ -102,14 +102,11 @@
 ;;;;;;;;;;;;;;;;SUBSECTION: Evics ;;;;;;;;;;;;;;;;
 (when (file-exists-p "/multimedia/builds/evics")
   (add-to-list 'load-path "/multimedia/builds/evics"))
-(when (file-exists-p "/localdata/hmuresan/my_builds/evics")
-  (add-to-list 'load-path "/localdata/hmuresan/my_builds/evics"))
+(when (file-exists-p "/localdisk/hmuresan/localBuilds/evics")
+  (add-to-list 'load-path "/localdisk/hmuresan/localBuilds/evics"))
 (require 'evics)
 (evics-global-mode t)
 
-;;;;;;;;;;;;;;;;SUBSECTION: call-graph ;;;;;;;;;;;;;;;;
-(require 'hierarchy)
-(require 'call-graph)
 ;;;;;;;;;;;;;;;;SUBSECTION: graphviz-dot-mode ;;;;;;;;;;;;;;;;
 (require 'graphviz-dot-mode)
 (setq graphviz-dot-indent-width 3
@@ -141,15 +138,16 @@
 
 ;;;;;;;;;;;;;;;;SUBSECTION: Helm ;;;;;;;;;;;;;;;;
 (require 'helm)
-(require 'helm-config)
+;(require 'helm-config)
 (global-set-key (kbd "C-c z") 'helm-command-prefix)
 (global-unset-key (kbd "C-x c"))
 (setq helm-move-to-line-cycle-in-source t   ; circular helm suggestions
       helm-move-to-line-cycle-in-source nil ; scroll through sections
       helm-split-window-inside-p        nil ; only show helm buffer on act window helm-buffer-max-length            40
-      helm-echo-input-in-header-line    t
+      helm-echo-input-in-header-line    nil
       helm-imenu-fuzzy-match            t
       helm-use-mouse                    t
+      helm-buffer-max-length            40
       ;; No idea why helm has this weird tab completion for evil commands... setting this
       ;; to nil seems to address the problem. See:
       ;; https://groups.google.com/g/emacs-helm/c/jmiTit83VhE
@@ -463,8 +461,8 @@ placed on the input line"
 ;; In the future, lets move out these requires and add them to a hook.
 (with-eval-after-load 'vc-annotate
   (define-key vc-annotate-mode-map (kbd "L") 'vc-annotate-show-log-revision-at-line))
-(define-key help-mode-map (kbd "M-<") 'help-go-back)
-(define-key help-mode-map (kbd "M->") 'help-go-forward)
+;(define-key help-mode-map (kbd "M-<") 'help-go-back)
+;(define-key help-mode-map (kbd "M->") 'help-go-forward)
 (define-key Info-mode-map (kbd "M-<") 'Info-history-back)
 (define-key Info-mode-map (kbd "M->") 'Info-history-forward)
 (define-key Info-mode-map (kbd "H") 'Info-last)
@@ -648,7 +646,8 @@ placed on the input line"
   (abbrev-mode t)
   (setq tab-stop-list     '(0 3)
         tab-width           3
-        sh-basic-offset     3))
+        sh-basic-offset     3
+        fill-column         90))
 (add-hook 'sh-mode-hook 'sp00ky/sh-mode-hook)
 ;;;;;;;;;;;;;;;;SUBSECTION: C mode Hooks ;;;;;;;;;;;;;;;;
 (setq c-default-style "k&r")
@@ -734,9 +733,11 @@ placed on the input line"
 (defun sp00ky/python-mode-hook ()
   "Various configs I want to apply for c-mode"
   (interactive)
-  (add-to-list 'completion-at-point-functions 'anaconda-mode-complete))
+  ;; (add-to-list 'completion-at-point-functions 'anaconda-mode-complete)
+  (setq fill-column 100))
 (remove-hook 'python-mode-hook 'sp00ky/python-mode-hook)
 (add-hook 'python-mode-hook 'anaconda-mode)
+(add-hook 'python-mode-hook 'sp00ky/python-mode-hook)
 
 ;;;;;;;;;;;;;;;;SUBSECTION: Org mode Hooks ;;;;;;;;;;;;;;;;
 (require 'citeproc)

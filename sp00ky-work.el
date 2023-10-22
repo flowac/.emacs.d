@@ -31,7 +31,7 @@ Examples: 1a d1a d1xc
                              sp00ky//gdb-cmd-history
                              nil))
          (extra-cmds "")
-         build-dir build-dir-cmd pre-cmds cmd platform)
+         build-dir build-dir-cmd cmd platform)
     (setq
      build-dir
      (cond ((string-search "1a" input)
@@ -109,7 +109,7 @@ Examples: 1a d1a d1xc
                           sp00ky//gdb-pid-history
                           nil))))
 
-    (setq cmd (concat "gdb_wrapper.sh " pre-cmds " " build-dir-cmd " " extra-cmds))
+    (setq cmd (concat "gdb_wrapper.sh " build-dir-cmd " " extra-cmds))
     (when (y-or-n-p (concat "Does this command look good?\n\n" cmd "\n\n"))
       (gdb cmd))))
 
@@ -212,6 +212,28 @@ We will have to account for LOG_INFO and LOG_DEBUG accordingly."
      nil (line-beginning-position) (line-end-position))
     (sp00ky/indent-region-or-paragraph)
     (y-or-n-p "Continue?")))
+
+(defun sp00ky/split-hex-to-wireshark()
+  "Expects long string of hex to split into rows of 16 bytes"
+  (interactive)
+  (beginning-of-line)
+  (let ((count 0)
+        (row-count 0))
+    (insert (format "%02x: " row-count))
+    (while (< (point) (save-excursion
+                        (end-of-line)
+                        (point)))
+      (forward-char)
+      (forward-char)
+      (insert-char ?\s)
+      (setq count (+ count 1))
+      (if (= count 16)
+          (progn
+            (setq count 0)
+            (setq row-count (+ row-count 16))
+            (newline)
+            (insert (format "%02x: " row-count)))))
+    (whitespace-cleanup)))
 
 (defun sp00ky/filter-args/helm-gtags--common (tagname)
   "Automatically fetch definitions for dnx and petra functions when

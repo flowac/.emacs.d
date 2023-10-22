@@ -71,7 +71,7 @@ disabling mouse tracking while keeping mouse clicking working."
 
 (require 'desktop)
 (defun sp00ky/remove-unused-desktop-lock ()
-  "If emacs crashes or exits abruptly then it does not remove the 
+  "If emacs crashes or exits abruptly then it does not remove the
 desktop lock. This causes subsequent emacs sessions to not load the
 desktop file. Using desktop-load-locked-desktop doesn't address the
 issue since this will cause us to load the desktop file if we have two
@@ -88,7 +88,7 @@ emacs instances running."
                        (comm-file (concat "/proc/" (buffer-string) "/comm")))
                    (message "Found lock file: %s" lock-file)
                    (if (file-exists-p comm-file)
-                       (with-temp-buffer 
+                       (with-temp-buffer
                          (insert-file-contents comm-file)
                          (if (string-match "emacs" (buffer-string))
                              (message "Active emacs session has lock file")
@@ -102,7 +102,7 @@ emacs instances running."
       (message "Cannot handle os: %s" system-type))))
 
 (defun sp00ky-update-env (fn)
-  (let ((str 
+  (let ((str
          (with-temp-buffer
            (insert-file-contents fn)
            (buffer-string))) lst)
@@ -143,22 +143,37 @@ hilighting")
   (interactive)
   (if (not target)
       (setq target (list (symbol-name (symbol-at-point)))))
-  (unhighlight-regexp (regexp-opt target)))
+  (unhighlight-regexp (find-tag-default-as-symbol-regexp)))
+
+;(defun sp00ky/highlight-word-at-point ()
+;  "Highlight the word under the point."
+;  (interactive)
+;  (let* ((target-symbol (symbol-at-point))
+;	 (target (list (symbol-name target-symbol))))
+;    (unless (not target))
+;    (sp00ky/unhighlight-all-in-buffer)
+;    (if (equal target sp00ky/last-highlighted-word)
+;	(progn
+;	  (sp00ky/unhighlight-word-at-point target)
+;	  (setq sp00ky/last-highlighted-word nil))
+;      (progn
+;	(highlight-regexp (regexp-opt target) 'hi-yellow)
+;	(setq sp00ky/last-highlighted-word target)))))
 
 (defun sp00ky/highlight-word-at-point ()
   "Highlight the word under the point."
   (interactive)
   (let* ((target-symbol (symbol-at-point))
-	 (target (list (symbol-name target-symbol))))
+         (target (list (symbol-name target-symbol))))
     (unless (not target))
     (sp00ky/unhighlight-all-in-buffer)
     (if (equal target sp00ky/last-highlighted-word)
-	(progn
-	  (sp00ky/unhighlight-word-at-point target)
-	  (setq sp00ky/last-highlighted-word nil))
+        (progn
+          (sp00ky/unhighlight-word-at-point target)
+          (setq sp00ky/last-highlighted-word nil))
       (progn
-	(highlight-regexp (regexp-opt target) 'hi-yellow)
-	(setq sp00ky/last-highlighted-word target)))))
+        (highlight-regexp (find-tag-default-as-symbol-regexp) 'hi-yellow)
+        (setq sp00ky/last-highlighted-word target)))))
 
 
 (defun sp00ky/transpose-equations ()
