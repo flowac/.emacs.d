@@ -663,6 +663,7 @@ placed on the input line"
         comment-end         ""
         fill-column         80))
 (add-hook 'c-mode-hook 'sp00ky/c-mode-hook)
+(add-hook 'c++-mode-hook 'sp00ky/c-mode-hook)
 (add-hook 'protobuf-mode-hook 'sp00ky/c-mode-hook)
 ;;;;;;;;;;;;;;;;SUBSECTION: Conf mode Hooks ;;;;;;;;;;;;;;;;
 (defun sp00ky/text-mode-hook ()
