@@ -264,3 +264,6 @@ dealing with bcm apis."
 ;; (advice-add 'helm-gtags--common :filter-args 'sp00ky/filter-args/helm-gtags--common))
 ;; (advice-add 'helm-gtags--common :filter-args 'sp00ky/filter-args/helm-gtags--common)
 ;; (advice-remove 'helm-gtags--common 'sp00ky/filter-args/helm-gtags--common)
+
+(load (sp00ky/set-init-file-path "ciena-def-mode.el"))
+(add-to-list 'auto-mode-alist '("\\.def\\'"   . ciena-def-mode))

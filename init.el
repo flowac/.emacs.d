@@ -358,7 +358,6 @@ placed on the input line"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;SECTION:       MISC ELISP LOADING               ;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 (load (sp00ky/set-init-file-path "sp00ky-functions.el"))
 (load (sp00ky/set-init-file-path "sp00ky-abbrevs.el"))
 (if (file-exists-p (sp00ky/set-init-file-path ".sp00ky-work"))
@@ -386,6 +385,7 @@ placed on the input line"
 ;; t prefix key
 (define-key evics-user-normal-map (kbd "t e") 'sp00ky/gdb-wrapper)
 (define-key evics-user-normal-map (kbd "t a") 'beginning-of-defun)
+(define-key evics-user-normal-map (kbd "t A") 'end-of-defun)
 (define-key evics-user-normal-map (kbd "t o") 'sp00ky/switch-to-current-buffer-other-window)
 (define-key evics-user-normal-map (kbd "t i") 'helm-imenu)
 (define-key evics-user-normal-map (kbd "t r") 'helm-resume)
