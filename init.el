@@ -180,6 +180,7 @@
 (define-key helm-map (kbd "<tab>") #'helm-execute-persistent-action) ; Fix tab behaviour in helm
 (helm-mode 1)
 (setq helm-autoresize-min-height 50)
+(setq helm-candidate-number-limit 300)
 (helm-autoresize-mode 1)
 
 ;;;;;;;;;;;;;;;;SUBSECTION: helm-flyspell ;;;;;;;;;;;;;;;;
@@ -390,6 +391,7 @@ placed on the input line"
 (define-key evics-user-normal-map (kbd "t i") 'helm-imenu)
 (define-key evics-user-normal-map (kbd "t r") 'helm-resume)
 (define-key evics-user-normal-map (kbd "t x") 'toggle-truncate-lines)
+(define-key evics-user-normal-map (kbd "t t") 'sp00ky-test-function)
 
 (define-key evics-user-normal-map (kbd "t w k") 'projectile-kill-buffers)
 (define-key evics-user-normal-map (kbd "t w g") 'helm-projectile-grep)
@@ -461,8 +463,14 @@ placed on the input line"
 ;; In the future, lets move out these requires and add them to a hook.
 (with-eval-after-load 'vc-annotate
   (define-key vc-annotate-mode-map (kbd "L") 'vc-annotate-show-log-revision-at-line))
-;(define-key help-mode-map (kbd "M-<") 'help-go-back)
-;(define-key help-mode-map (kbd "M->") 'help-go-forward)
+
+(with-eval-after-load 'help-mode
+  (define-key help-mode-map (kbd "M->") 'help-go-forward)
+  (define-key help-mode-map (kbd "M-<") 'help-go-back)
+  (define-key help-mode-map (kbd ">") 'help-go-forward)
+  (define-key help-mode-map (kbd "<") 'help-go-back)
+  )
+
 (define-key Info-mode-map (kbd "M-<") 'Info-history-back)
 (define-key Info-mode-map (kbd "M->") 'Info-history-forward)
 (define-key Info-mode-map (kbd "H") 'Info-last)
@@ -500,6 +508,15 @@ placed on the input line"
 
 (with-eval-after-load 'edebug
   (evics-add-to-emulation-map (cons 'edebug-mode edebug-mode-map) 1))
+
+(setq imenu-max-items 100)
+
+(defun sp00ky/gdb-mode-hook ()
+  "Gdb-mode-hook for sp00ky mods."
+  (corfu-mode nil) ;; This doesn't work well with a large list of
+                   ;; candidates over remote connections.
+  )
+(add-hook 'gdb-mode-hook 'sp00ky/gdb-mode-hook)
 
 (with-eval-after-load 'gdb-mi
   (setq gdb-default-window-configuration-file "sp00ky-gdb-layout"
@@ -651,10 +668,11 @@ placed on the input line"
 (add-hook 'sh-mode-hook 'sp00ky/sh-mode-hook)
 ;;;;;;;;;;;;;;;;SUBSECTION: C mode Hooks ;;;;;;;;;;;;;;;;
 (setq c-default-style "k&r")
+(load (sp00ky/set-init-file-path "sp00ky-global.el"))
 (defun sp00ky/c-mode-hook ()
   "Various configs I want to apply for c-mode"
   (c-set-offset 'case-label '+)
-  ;; (setq-local completion-at-point-functions (list 'sp00ky/gtags-completion-at-point))
+  (setq-local eldoc-documentation-functions '(sp00ky/gtags/eldoc-function))
   (setq tab-stop-list     '(0 3)
         tab-width           3
         c-basic-offset      3

@@ -11,7 +11,7 @@
 ;;(setq user-emacs-directory "~/.emacs.d/")
 ;; (add-to-list 'load-path "/localdata/hmuresan/my_builds/evics")
 ;; (load "/localdata/hmuresan/my_builds/evics/evics.el")
-(add-to-list 'load-path "/localdata/hmuresan/my_builds/evics")
+(add-to-list 'load-path "/localdisk/hmuresan/localBuilds/evics")
 (require 'evics)
 (evics-global-mode t)
 
@@ -32,9 +32,10 @@
 
 (setq visual-order-cursor-movement t
       help-window-select    t)
+(setq imenu-max-items 100)
 
 ;;; Nice to have init
-(add-to-list 'load-path "~/.emacs.d/elpa/highlight-parentheses-20210821.1957")
+(add-to-list 'load-path "~/.emacs.d/elpa/highlight-parentheses-20220408.845")
 (require 'highlight-parentheses)
 ;; (setq highlight-parentheses-highlight-adjacent t) ; Replace show-paren mode
 ;; (setq highlight-parentheses-background-colors '("steelblue3"))
