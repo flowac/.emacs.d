@@ -246,6 +246,7 @@
   (define-key helm-gtags-mode-map (kbd "M-<") 'helm-gtags-previous-history))
 
 (add-hook 'c-mode-hook 'helm-gtags-mode)
+(add-hook 'c++-mode-hook 'helm-gtags-mode)
 
 ;;;;;;;;;;;;;;;;SUBSECTION: Eyebrowse ;;;;;;;;;;;;;;;;
 (require 'eyebrowse)
@@ -355,8 +356,8 @@
 ;;;;;;;;;;;;;;SECTION:              MISC INIT                 ;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Various configurations that I like:
-(setq-default indent-tabs-mode nil); Replace Tabs with spaces
+(setq smartparens-mode 0)
+(setq-default indent-tabs-mode t); Don't replace Tabs with spaces
 (setq ring-bell-function   'ignore ; Who wants to hear this annoying bell anyways...
       make-backup-files     nil    ; By default, emacs makes to many backup files.
       org-imenu-depth       6
@@ -371,9 +372,9 @@
       xterm-max-cut-length  200000)
 
 ; Setting tab width
-(setq tab-stop-list     '(0 3)
-      tab-width           3
-      evil-shift-width    3)
+(setq tab-stop-list     '(0 4)
+      tab-width           4
+      evil-shift-width    4)
 
 ;; Enabling various minor modes built in with emacs
 (global-auto-revert-mode t)
@@ -382,7 +383,7 @@
 (tool-bar-mode       -1)
 (menu-bar-mode       -1)
 (xterm-mouse-mode     1)
-(electric-pair-mode   t)
+(electric-pair-mode   0) ; parans match
 ;; Modifications to mode line
 (size-indication-mode)
 (column-number-mode   t)
@@ -422,23 +423,27 @@
 (defun sp00ky/sh-mode-hook ()
   "Various settings to apply to shell script"
   (interactive)
-  (setq tab-stop-list     '(0 3)
-        tab-width           3
-        sh-basic-offset      3
-        evil-shift-width    3))
+  (setq sh-basic-offset     4
+        tab-stop-list     '(0 4)
+        tab-width           4
+        evil-shift-width    4))
 (add-hook 'sh-mode-hook 'sp00ky/sh-mode-hook)
 ;;;;;;;;;;;;;;;;SUBSECTION: C mode Hooks ;;;;;;;;;;;;;;;;
 (setq c-default-style "k&r")
+(setq c++-default-style "k&r")
+
 (defun sp00ky/c-mode-hook ()
-  "Various configs I want to apply for c-mode"
   (interactive)
-  (setq tab-stop-list     '(0 3)
-        tab-width           3
-        c-basic-offset      3
-        c-tab-always-indent nil
-        evil-shift-width    3
+  (setq c-basic-offset      4
+        indent-tabs-mode    t
+        c-tab-always-indent t
+        tab-stop-list     '(0 4)
+        tab-width           4
+        evil-shift-width    4
+        smartparens-mode    0
         fill-column         100))
 (add-hook 'c-mode-hook 'sp00ky/c-mode-hook)
+(add-hook 'c++-mode-hook 'sp00ky/c-mode-hook)
 
 ;;;;;;;;;;;;;;;;SUBSECTION: Elisp mode Hooks ;;;;;;;;;;;;;;;;
 (defvar init-el-lisp-imenu-generic-expression
@@ -449,9 +454,8 @@
   "imenu expressions to parse specific tags in init.el")
 
 (defun sp00ky/emacs-lisp-mode-hook ()
-  "Various configs I want to apply for c-mode"
   (interactive)
-  (setq tab-always-indent nil)
+  (setq tab-always-indent t)
   (abbrev-mode)
   (if (string-equal (buffer-name) "init.el")
       (setq imenu-generic-skip-comments-and-strings nil
@@ -460,7 +464,6 @@
 
 ;;;;;;;;;;;;;;;;SUBSECTION: Scheme (Guile) mode Hooks ;;;;;;;;;;;;;;;;
 (defun sp00ky/scheme-mode-hook ()
-  "Various configs I want to apply for c-mode"
   (interactive))
 (add-hook 'scheme-mode-hook 'sp00ky/scheme-mode-hook)
 (require 'geiser-guile)
@@ -468,7 +471,6 @@
 
 ;;;;;;;;;;;;;;;;SUBSECTION: Python mode Hooks ;;;;;;;;;;;;;;;;
 (defun sp00ky/python-mode-hook ()
-  "Various configs I want to apply for c-mode"
   (interactive)
   (add-to-list 'company-backends 'company-jedi))
 (add-hook 'python-mode-hook 'sp00ky/python-mode-hook)
@@ -476,7 +478,6 @@
 ;;;;;;;;;;;;;;;;SUBSECTION: Org mode Hooks ;;;;;;;;;;;;;;;;
 (setq org-adapt-indentation 'nil)
 (defun sp00ky/org-mode-hook ()
-  "Various config for org-mode"
   (visual-line-mode t)
   (setq-local word-wrap nil)
   (setq fill-column 100))
@@ -486,11 +487,10 @@
 
 ;;;;;;;;;;;;;;;;SUBSECTION: Javascript mode ;;;;;;;;;;;;;;;;
 (defun sp00ky/js-mode-hook ()
-  "Various config for org-mode"
-  (setq tab-stop-list     '(0 3)
-        tab-width           3
-        js-indent-level     3
-        evil-shift-width    3
+  (setq tab-stop-list     '(0 4)
+        tab-width           4
+        js-indent-level     4
+        evil-shift-width    4
         fill-column         100))
 (add-hook 'js-mode-hook 'sp00ky/js-mode-hook)
 
@@ -534,9 +534,10 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; If we want relative line number then we can do something like:
-;; (require 'display-line-numbers)
+(require 'display-line-numbers)
 ;; (setq display-line-numbers-type 'relative)
-;; (add-hook 'c-mode-hook 'display-line-numbers-mode)
+(add-hook 'c-mode-hook 'display-line-numbers-mode)
+(add-hook 'c++-mode-hook 'display-line-numbers-mode)
 
 ;; Making evil not overwrite copied text when pasting
 ;; (define-key evil-visual-state-map "p" 'sp00ky/evil-paste-after-from-0)
