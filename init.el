@@ -187,7 +187,6 @@
 
 ;;;;;;;;;;;;;;;;SUBSECTION: Helm ;;;;;;;;;;;;;;;;
 (require 'helm)
-(require 'helm-config)
 (global-set-key (kbd "C-c z") 'helm-command-prefix)
 (global-unset-key (kbd "C-x c"))
 (setq helm-move-to-line-cycle-in-source t   ; circular helm suggestions
