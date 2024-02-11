@@ -493,15 +493,6 @@
         fill-column         100))
 (add-hook 'js-mode-hook 'sp00ky/js-mode-hook)
 
-;;;;;;;;;;;;;;;;SUBSECTION: Protobuf mode ;;;;;;;;;;;;;;;;
-;; This is grabbed from:
-;; https://github.com/protocolbuffers/protobuf/blob/master/editors/protobuf-mode.el
-(if (file-exists-p "/localdata/hmuresan/my_builds/protobuf/editors/protobuf-mode.el")
-    (progn (load "/localdata/hmuresan/my_builds/protobuf/editors/protobuf-mode.el")
-           (require 'protobuf-mode)
-           (add-to-list 'auto-mode-alist '("\\.proto\\'" . protobuf-mode)))
-  (message "Cannot locate protobuf-mode.el, not loading"))
-
 ;;;;;;;;;;;;;;SUBSECTION: Misc init elisp ;;;;;;;;;;;;;;;;;
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
 (load-theme 'sp00ky t)
